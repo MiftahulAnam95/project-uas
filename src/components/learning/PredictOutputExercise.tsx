@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
-import { HelpCircle, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
+import { HelpCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { PredictExercise } from '../../types';
+import { ExerciseCard } from './ExerciseCard';
+import { FeedbackPanel } from './FeedbackPanel';
+import { MiniCode } from '../code-block/MiniCode';
+import { celebrateSmall } from '../../utils/celebrate';
+import { cn } from '../../utils/cn';
 
 interface PredictOutputExerciseProps {
   exercise: PredictExercise;
   onCompleted?: () => void;
 }
+
+const LETTERS = ['A', 'B', 'C', 'D', 'E'];
 
 export const PredictOutputExercise: React.FC<PredictOutputExerciseProps> = ({
   exercise,
@@ -19,8 +26,9 @@ export const PredictOutputExercise: React.FC<PredictOutputExerciseProps> = ({
   const handleSubmit = (option: string) => {
     setSelectedOption(option);
     setIsSubmitted(true);
-    if (option === exercise.correctAnswer && onCompleted) {
-      onCompleted();
+    if (option === exercise.correctAnswer) {
+      celebrateSmall();
+      onCompleted?.();
     }
   };
 
@@ -30,93 +38,98 @@ export const PredictOutputExercise: React.FC<PredictOutputExerciseProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 my-6 transition hover:shadow-md">
-      <div className="flex items-center gap-2.5 mb-3 text-indigo-700">
-        <HelpCircle className="w-5 h-5" />
-        <span className="text-xs font-bold uppercase tracking-wider">
-          Latihan Interaktif: Prediksi Hasil Kode
-        </span>
-      </div>
+    <ExerciseCard
+      kind="Prediksi hasil kode"
+      icon={HelpCircle}
+      title={exercise.title}
+      prompt={exercise.prompt}
+      accent="violet"
+      aside={
+        isSubmitted ? (
+          <span
+            className={cn(
+              'rounded-full border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider',
+              isCorrect
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                : 'border-rose-200 bg-rose-50 text-rose-700'
+            )}
+          >
+            {isCorrect ? 'Benar' : 'Coba lagi'}
+          </span>
+        ) : (
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+            {exercise.options.length} pilihan
+          </span>
+        )
+      }
+    >
+      <MiniCode code={exercise.code} label="kode yang dijalankan" />
 
-      <h4 className="text-base sm:text-lg font-bold text-slate-900 mb-2">
-        {exercise.title}
-      </h4>
-      <p className="text-sm text-slate-600 mb-4">{exercise.prompt}</p>
+      <p className="mb-2 mt-4 text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
+        Menurutmu, apa yang tercetak di terminal?
+      </p>
 
-      {/* Code Snippet Box */}
-      <div className="bg-slate-900 text-slate-100 font-mono text-xs sm:text-sm p-4 rounded-xl mb-4 overflow-x-auto border border-slate-800">
-        <pre className="whitespace-pre">{exercise.code}</pre>
-      </div>
-
-      {/* Options */}
-      <div className="space-y-2 mb-4">
+      <div className="space-y-2">
         {exercise.options.map((option, idx) => {
-          let btnStyle = 'border-slate-200 bg-slate-50 hover:bg-indigo-50/50 hover:border-indigo-300 text-slate-800';
-
-          if (isSubmitted) {
-            if (option === exercise.correctAnswer) {
-              btnStyle = 'border-emerald-500 bg-emerald-50 text-emerald-900 font-medium';
-            } else if (option === selectedOption) {
-              btnStyle = 'border-rose-400 bg-rose-50 text-rose-900';
-            } else {
-              btnStyle = 'border-slate-200 bg-slate-50 text-slate-400 opacity-60';
-            }
-          }
+          const isSelected = option === selectedOption;
+          const isAnswer = option === exercise.correctAnswer;
 
           return (
             <button
               key={idx}
+              type="button"
               onClick={() => !isSubmitted && handleSubmit(option)}
               disabled={isSubmitted}
-              className={`w-full text-left p-3 sm:p-3.5 rounded-xl border text-sm font-mono flex items-center justify-between transition cursor-pointer disabled:cursor-default ${btnStyle}`}
-            >
-              <span>{option}</span>
-              {isSubmitted && option === exercise.correctAnswer && (
-                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 ml-2" />
+              className={cn(
+                'flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border p-3 text-left font-mono text-xs transition-all duration-200 disabled:cursor-default sm:text-[13px]',
+                !isSubmitted &&
+                  'border-slate-200 bg-white hover:-translate-y-px hover:border-violet-300 hover:bg-violet-50/60 hover:shadow-soft active:scale-[0.99]',
+                isSubmitted && isAnswer &&
+                  'border-emerald-400 bg-emerald-50 text-emerald-900 shadow-[0_10px_24px_-16px_rgba(5,150,105,0.9)]',
+                isSubmitted && isSelected && !isAnswer &&
+                  'border-rose-400 bg-rose-50 text-rose-900',
+                isSubmitted && !isSelected && !isAnswer &&
+                  'border-slate-200 bg-slate-50/60 text-slate-400 opacity-70'
               )}
-              {isSubmitted && option === selectedOption && !isCorrect && (
-                <XCircle className="w-4 h-4 text-rose-500 shrink-0 ml-2" />
+            >
+              <span className="flex min-w-0 items-center gap-2.5">
+                <span
+                  className={cn(
+                    'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[10px] font-extrabold transition-colors',
+                    isSubmitted && isAnswer
+                      ? 'bg-emerald-500 text-white'
+                      : isSubmitted && isSelected
+                      ? 'bg-rose-500 text-white'
+                      : 'bg-slate-100 text-slate-500'
+                  )}
+                >
+                  {LETTERS[idx] ?? idx + 1}
+                </span>
+                <span className="min-w-0 break-words">{option}</span>
+              </span>
+              {isSubmitted && isAnswer && (
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2.5} />
+              )}
+              {isSubmitted && isSelected && !isAnswer && (
+                <XCircle className="h-4 w-4 shrink-0 text-rose-500" strokeWidth={2.5} />
               )}
             </button>
           );
         })}
       </div>
 
-      {/* Feedback Section */}
       {isSubmitted && (
-        <div
-          className={`p-4 rounded-xl border animate-in fade-in duration-200 ${
-            isCorrect
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-950'
-              : 'bg-rose-50 border-rose-200 text-rose-950'
-          }`}
+        <FeedbackPanel
+          correct={isCorrect}
+          celebrate={isCorrect}
+          heading={isCorrect ? 'Tepat sekali! 🎉' : 'Belum tepat — lihat alasannya yuk'}
+          onRetry={isCorrect ? undefined : handleReset}
         >
-          <div className="flex items-center gap-2 font-bold text-sm mb-1">
-            {isCorrect ? (
-              <>
-                <CheckCircle className="w-4 h-4 text-emerald-600" />
-                <span>Jawabanmu Tepat! 🎉</span>
-              </>
-            ) : (
-              <>
-                <XCircle className="w-4 h-4 text-rose-600" />
-                <span>Belum tepat. Coba periksa kembali alasannya di bawah:</span>
-              </>
-            )}
-          </div>
-          <p className="text-xs sm:text-sm leading-relaxed mb-3">{exercise.explanation}</p>
-
-          {!isCorrect && (
-            <button
-              onClick={handleReset}
-              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-rose-200/80 hover:bg-rose-300/80 text-rose-900 rounded-lg transition"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              Coba Lagi
-            </button>
-          )}
-        </div>
+          {exercise.explanation}
+        </FeedbackPanel>
       )}
-    </div>
+    </ExerciseCard>
   );
 };
+
+export default PredictOutputExercise;

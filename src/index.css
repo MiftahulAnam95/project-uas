@@ -1,48 +1,526 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   DESIGN SYSTEM — Tugas Project UAS
+   Palet: brand (indigo-violet) + aksen cyan / amber / emerald / rose
+   Prinsip: terang & profesional, tapi hidup (gradasi, kedalaman, gerak halus)
+   ========================================================================== */
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, monospace;
+
+  /* Brand — indigo yang digeser sedikit ke violet agar tidak generik */
+  --color-brand-50: #eef0ff;
+  --color-brand-100: #e0e3ff;
+  --color-brand-200: #c6cbff;
+  --color-brand-300: #a3a7fb;
+  --color-brand-400: #8479f5;
+  --color-brand-500: #6a5ae8;
+  --color-brand-600: #5a45d6;
+  --color-brand-700: #4b36b4;
+  --color-brand-800: #3b2c8c;
+  --color-brand-900: #2a2065;
+  --color-brand-950: #17113c;
+
+  /* Aksen sekunder */
+  --color-grape-50: #fdf4ff;
+  --color-grape-100: #fae8ff;
+  --color-grape-200: #e9d5ff;
+  --color-grape-300: #d8b4fe;
+  --color-grape-400: #c084fc;
+  --color-grape-500: #a855f7;
+  --color-grape-600: #9333ea;
+  --color-aqua-50: #ecfeff;
+  --color-aqua-100: #cffafe;
+  --color-aqua-200: #a5f3fc;
+  --color-aqua-300: #67e8f9;
+  --color-aqua-400: #22d3ee;
+  --color-aqua-500: #06b6d4;
+  --color-aqua-600: #0891b2;
+
+  --radius-4xl: 2rem;
+  --radius-5xl: 2.5rem;
+
+  --shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.04),
+    0 10px 30px -14px rgba(15, 23, 42, 0.18);
+  --shadow-lift: 0 2px 6px rgba(15, 23, 42, 0.05),
+    0 26px 50px -22px rgba(74, 60, 170, 0.35);
+  --shadow-glow: 0 14px 40px -10px rgba(106, 90, 232, 0.5);
+  --shadow-inset-hair: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: #f5f6fc;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    color: #0F172A;
-    background-color: #F8FAFC;
+    margin: 0;
+    font-family: var(--font-sans);
+    color: #0f172a;
+    background-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
-  code, pre, kbd, samp {
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Latar aurora lembut + grid halus: memberi kedalaman tanpa berisik */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(58rem 38rem at 8% -12%, rgba(106, 90, 232, 0.16), transparent 62%),
+      radial-gradient(48rem 34rem at 102% -4%, rgba(34, 211, 238, 0.14), transparent 58%),
+      radial-gradient(52rem 40rem at 50% 116%, rgba(168, 85, 247, 0.12), transparent 62%),
+      linear-gradient(180deg, #fbfbff 0%, #f6f7fd 45%, #f3f5fc 100%);
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(80rem 50rem at 50% 0%, #000 5%, transparent 78%);
+    -webkit-mask-image: radial-gradient(80rem 50rem at 50% 0%, #000 5%, transparent 78%);
+  }
+
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: var(--font-mono);
+  }
+
+  ::selection {
+    background: rgba(106, 90, 232, 0.9);
+    color: #fff;
+  }
+
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+    border-radius: 0.5rem;
   }
 }
 
-/* Custom smooth scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* --------------------------------------------------------------------------
+   Keyframes
+   -------------------------------------------------------------------------- */
+@keyframes uas-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes uas-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes uas-pop {
+  0%   { opacity: 0; transform: scale(0.94); }
+  60%  { transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes uas-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+@keyframes uas-float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-18px) rotate(3deg); }
+}
+@keyframes uas-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@keyframes uas-shimmer {
+  from { transform: translateX(-120%) skewX(-18deg); }
+  to   { transform: translateX(220%) skewX(-18deg); }
+}
+@keyframes uas-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes uas-ring {
+  0%   { transform: scale(0.85); opacity: 0.65; }
+  70%  { transform: scale(1.7); opacity: 0; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+@keyframes uas-shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-3px); }
+  40%, 60% { transform: translateX(3px); }
+}
+@keyframes uas-spin-slow {
+  to { transform: rotate(360deg); }
+}
+@keyframes uas-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes uas-dash {
+  to { stroke-dashoffset: -24; }
 }
 
-::-webkit-scrollbar-track {
-  background: #F1F5F9;
+@layer components {
+  /* ---------------- Scroll reveal ---------------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---------------- Permukaan / kartu ---------------- */
+  .surface {
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .surface-solid {
+    background: #fff;
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .lift {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lift);
+  }
+
+  /* Garis gradasi tipis di tepi atas kartu */
+  .accent-top {
+    position: relative;
+    overflow: hidden;
+  }
+  .accent-top::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-brand-500), var(--color-grape-500), var(--color-aqua-400));
+    opacity: 0.9;
+  }
+
+  /* ---------------- Tombol ---------------- */
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    border-radius: 0.9rem;
+    transition: transform 0.18s ease, box-shadow 0.25s ease,
+      background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    cursor: pointer;
+    overflow: hidden;
+    isolation: isolate;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+  .btn-primary {
+    color: #fff;
+    background-image: linear-gradient(120deg, var(--color-brand-600), var(--color-brand-500) 45%, var(--color-grape-500));
+    background-size: 180% 180%;
+    box-shadow: 0 10px 24px -10px rgba(90, 69, 214, 0.75),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+  .btn-primary:hover {
+    background-position: 100% 50%;
+    box-shadow: 0 16px 34px -12px rgba(90, 69, 214, 0.85),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  .btn-dark {
+    color: #fff;
+    background-image: linear-gradient(120deg, #111827, #1f2937 55%, #312e81);
+    background-size: 180% 180%;
+    box-shadow: 0 12px 28px -14px rgba(15, 23, 42, 0.9);
+  }
+  .btn-dark:hover { background-position: 100% 50%; }
+
+  .btn-soft {
+    color: var(--color-brand-700);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(198, 203, 255, 0.9);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  .btn-soft:hover {
+    background: var(--color-brand-50);
+    border-color: var(--color-brand-300);
+    color: var(--color-brand-800);
+  }
+
+  .btn-ghost {
+    color: #475569;
+    background: transparent;
+  }
+  .btn-ghost:hover { background: rgba(148, 163, 184, 0.14); color: #0f172a; }
+
+  /* Kilau sapuan saat hover */
+  .shine::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 45%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-140%) skewX(-18deg);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .shine:hover::after { animation: uas-shimmer 0.85s ease-out; }
+
+  /* ---------------- Teks & dekorasi ---------------- */
+  .text-gradient {
+    background-image: linear-gradient(100deg, var(--color-brand-600), var(--color-grape-500) 55%, var(--color-aqua-500));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .text-gradient-warm {
+    background-image: linear-gradient(100deg, #f59e0b, #f43f5e 60%, #a855f7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .text-gradient-light {
+    background-image: linear-gradient(100deg, #a5b4fc, #c4b5fd 45%, #67e8f9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .glass-dark {
+    background: rgba(9, 11, 26, 0.72);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+  }
+
+  /* Panel gelap ber-aurora untuk header halaman */
+  .aurora {
+    position: relative;
+    overflow: hidden;
+    background-color: #0b1020;
+    background-image:
+      radial-gradient(40rem 22rem at 12% -10%, rgba(106, 90, 232, 0.55), transparent 60%),
+      radial-gradient(34rem 20rem at 88% 0%, rgba(34, 211, 238, 0.35), transparent 60%),
+      radial-gradient(36rem 24rem at 70% 120%, rgba(168, 85, 247, 0.4), transparent 62%),
+      linear-gradient(160deg, #12142b 0%, #0b1020 55%, #0d1226 100%);
+  }
+  .aurora-rose {
+    background-image:
+      radial-gradient(40rem 22rem at 12% -10%, rgba(244, 63, 94, 0.45), transparent 60%),
+      radial-gradient(34rem 20rem at 88% 0%, rgba(251, 146, 60, 0.3), transparent 60%),
+      radial-gradient(36rem 24rem at 70% 120%, rgba(168, 85, 247, 0.35), transparent 62%),
+      linear-gradient(160deg, #1b1226 0%, #120c1c 55%, #170f22 100%);
+  }
+  .aurora-emerald {
+    background-image:
+      radial-gradient(40rem 22rem at 12% -10%, rgba(16, 185, 129, 0.4), transparent 60%),
+      radial-gradient(34rem 20rem at 88% 0%, rgba(34, 211, 238, 0.3), transparent 60%),
+      radial-gradient(36rem 24rem at 70% 120%, rgba(106, 90, 232, 0.4), transparent 62%),
+      linear-gradient(160deg, #0c1a20 0%, #08131a 55%, #0b1a24 100%);
+  }
+  .aurora-cyan {
+    background-image:
+      radial-gradient(40rem 22rem at 12% -10%, rgba(6, 182, 212, 0.42), transparent 60%),
+      radial-gradient(34rem 20rem at 88% 0%, rgba(56, 189, 248, 0.3), transparent 60%),
+      radial-gradient(36rem 24rem at 70% 120%, rgba(106, 90, 232, 0.38), transparent 62%),
+      linear-gradient(160deg, #08181f 0%, #06131a 55%, #0a1b24 100%);
+  }
+  .aurora-amber {
+    background-image:
+      radial-gradient(40rem 22rem at 12% -10%, rgba(245, 158, 11, 0.4), transparent 60%),
+      radial-gradient(34rem 20rem at 88% 0%, rgba(244, 63, 94, 0.28), transparent 60%),
+      radial-gradient(36rem 24rem at 70% 120%, rgba(106, 90, 232, 0.4), transparent 62%),
+      linear-gradient(160deg, #1c1526 0%, #14101f 55%, #1a1329 100%);
+  }
+  /* Jaring halus di atas aurora */
+  .aurora::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(70% 90% at 30% 0%, #000, transparent 75%);
+    -webkit-mask-image: radial-gradient(70% 90% at 30% 0%, #000, transparent 75%);
+  }
+
+  .dot-grid {
+    background-image: radial-gradient(rgba(106, 90, 232, 0.22) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  /* ---------------- Animasi siap pakai ---------------- */
+  .anim-rise   { animation: uas-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .anim-fade   { animation: uas-fade 0.4s ease both; }
+  .anim-pop    { animation: uas-pop 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .anim-float  { animation: uas-float 6s ease-in-out infinite; }
+  .anim-float-slow { animation: uas-float-slow 11s ease-in-out infinite; }
+  .anim-pan    { animation: uas-pan 9s ease infinite; }
+  .anim-shake  { animation: uas-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+  .anim-spin-slow { animation: uas-spin-slow 22s linear infinite; }
+  .caret::after {
+    content: "";
+    display: inline-block;
+    width: 0.55ch;
+    height: 1.05em;
+    margin-left: 2px;
+    vertical-align: -0.18em;
+    background: currentColor;
+    animation: uas-caret 1s step-end infinite;
+  }
+  .pulse-ring::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background: currentColor;
+    opacity: 0.35;
+    animation: uas-ring 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  /* Bingkai gradasi (untuk kartu spesial) */
+  .gradient-ring {
+    position: relative;
+    background: #fff;
+    background-clip: padding-box;
+    border: 1px solid transparent;
+  }
+  .gradient-ring::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: linear-gradient(120deg, var(--color-brand-400), var(--color-grape-400), var(--color-aqua-400), var(--color-brand-400));
+    background-size: 260% 260%;
+    animation: uas-pan 8s ease infinite;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
 }
 
+@layer utilities {
+  .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  .thin-scrollbar { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+  .thin-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+  .thin-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #c7d2fe, #a5b4fc);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  .thin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #a5b4fc, #818cf8);
+    background-clip: content-box;
+  }
+
+  .code-scrollbar { scrollbar-width: thin; scrollbar-color: #334155 transparent; }
+  .code-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+  .code-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); }
+  .code-scrollbar::-webkit-scrollbar-thumb {
+    background: #3f4a63;
+    border-radius: 9999px;
+  }
+  .code-scrollbar::-webkit-scrollbar-thumb:hover { background: #55617e; }
+
+  .tabular { font-variant-numeric: tabular-nums; }
+
+  .mask-fade-x {
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+}
+
+/* Global scrollbar (peramban webkit) */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #eef1f8; }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 4px;
+  background: linear-gradient(180deg, #c3c9dd, #a8b0c9);
+  border-radius: 9999px;
+  border: 2px solid #eef1f8;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: linear-gradient(180deg, #a3a7fb, #8479f5);
 }
 
-/* Code block highlight styles */
-.code-token-keyword { color: #F43F5E; font-weight: 600; }
-.code-token-string { color: #10B981; }
-.code-token-number { color: #F59E0B; }
-.code-token-function { color: #38BDF8; font-weight: 500; }
-.code-token-comment { color: #64748B; font-style: italic; }
-.code-token-variable { color: #E2E8F0; }
-.code-token-operator { color: #A78BFA; }
-.code-token-builtin { color: #FB7185; }
+/* Token syntax highlighting untuk blok kode gelap */
+.code-token-keyword { color: #ff7ab2; font-weight: 600; }
+.code-token-string { color: #7dffc4; }
+.code-token-number { color: #ffd479; }
+.code-token-function { color: #6fd3ff; font-weight: 500; }
+.code-token-comment { color: #7c8aa5; font-style: italic; }
+.code-token-variable { color: #e6ebff; }
+.code-token-operator { color: #c9a7ff; }
+.code-token-builtin { color: #ffa8a8; }
 
-/* Focus outline for accessibility */
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
-  outline: 2px solid #4F46E5;
-  outline-offset: 2px;
+/* Hormati pengguna yang mengurangi animasi */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  .lift:hover { transform: none; }
+}
+
+@media print {
+  body::before, body::after { display: none; }
+  .aurora { background: #fff !important; color: #0f172a !important; }
 }

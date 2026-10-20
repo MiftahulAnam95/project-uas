@@ -57,6 +57,26 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
    - Progres bab, skor kuis, latihan, dan checklist tersimpan otomatis di perangkat pengguna.
    - Dilengkapi dialog konfirmasi untuk mengatur ulang progres.
 
+7. **Tampilan yang Hidup namun Tetap Profesional**:
+   - Sistem desain terpusat (token warna `brand`/`grape`/`aqua`, bayangan lembut, radius besar) di `src/index.css`.
+   - Latar "aurora" bergradasi + grid halus, kartu kaca (*glassmorphism*), dan aksen warna unik untuk tiap bab.
+   - Animasi muncul saat digulir (*scroll reveal*), terminal yang mengetik sendiri di beranda, cincin progres SVG, serta tombol "kembali ke atas".
+   - Menghormati `prefers-reduced-motion` sehingga seluruh animasi otomatis dinonaktifkan bagi pengguna yang sensitif gerakan.
+
+---
+
+## 🎨 Sistem Desain
+
+| Bagian | Penjelasan |
+| --- | --- |
+| `src/index.css` | Token tema Tailwind v4 (`@theme`), keyframes, kelas komponen (`.aurora`, `.surface`, `.btn`, `.reveal`, `.shine`) |
+| `src/theme/accents.ts` | Palet aksen per bab (9 warna berputar) agar kurikulum terasa berwarna tapi konsisten |
+| `src/components/common/` | `Button`, `Card`, `PageHeader`, `SectionHeading`, `ProgressRing`, `Reveal`, `BackToTop`, `Callout`, `Badge`, `Modal`, `TypingTerminal` |
+| `src/components/code-block/` | `CodeBlock` (editor penuh: jalankan, salin, bedah per baris) dan `MiniCode` (potongan kode ringkas) |
+| `src/utils/highlightSyntax.tsx` | Pewarna sintaks Python ringan tanpa dependensi tambahan |
+
+Tipografi memakai **Plus Jakarta Sans** (teks) dan **JetBrains Mono** (kode).
+
 ---
 
 ## 🛠️ Teknologi yang Digunakan

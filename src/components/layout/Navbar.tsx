@@ -16,8 +16,16 @@ import {
 import { ChapterId } from '../../types';
 import { CHAPTERS } from '../../data/lessons';
 import { Modal } from '../common/Modal';
+import { ProgressRing } from '../common/ProgressRing';
+import { cn } from '../../utils/cn';
 
-export type ActiveTab = 'home' | 'chapter' | 'flow' | 'debugging' | 'glossary' | 'project';
+export type ActiveTab =
+  | 'home'
+  | 'chapter'
+  | 'flow'
+  | 'debugging'
+  | 'glossary'
+  | 'project';
 
 interface NavbarProps {
   activeTab: ActiveTab;
@@ -29,6 +37,78 @@ interface NavbarProps {
   onResetProgress: () => void;
   onOpenSidebar?: () => void;
 }
+
+interface NavItem {
+  id: ActiveTab;
+  label: string;
+  shortDesc: string;
+  badge?: string;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  /** Gradasi tile ikon */
+  tile: string;
+  /** Warna teks saat aktif */
+  activeText: string;
+  /** Warna cincin saat aktif */
+  activeRing: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  {
+    id: 'home',
+    label: 'Beranda',
+    shortDesc: 'Ringkasan & peta belajar',
+    icon: Home,
+    tile: 'from-brand-500 to-grape-500',
+    activeText: 'text-brand-700',
+    activeRing: 'ring-brand-200',
+  },
+  {
+    id: 'chapter',
+    label: 'Materi',
+    shortDesc: 'Kurikulum 11 bab berurutan',
+    badge: '11',
+    icon: BookOpen,
+    tile: 'from-sky-500 to-cyan-400',
+    activeText: 'text-sky-700',
+    activeRing: 'ring-sky-200',
+  },
+  {
+    id: 'flow',
+    label: 'Simulasi Alur',
+    shortDesc: 'Visualisasi data & terminal',
+    icon: Activity,
+    tile: 'from-violet-500 to-fuchsia-500',
+    activeText: 'text-violet-700',
+    activeRing: 'ring-violet-200',
+  },
+  {
+    id: 'debugging',
+    label: 'Bantuan Error',
+    shortDesc: 'Solusi 6 error umum Python',
+    icon: Bug,
+    tile: 'from-rose-500 to-orange-400',
+    activeText: 'text-rose-700',
+    activeRing: 'ring-rose-200',
+  },
+  {
+    id: 'glossary',
+    label: 'Kamus',
+    shortDesc: 'Istilah koding bahasa sederhana',
+    icon: BookMarked,
+    tile: 'from-teal-500 to-emerald-400',
+    activeText: 'text-teal-700',
+    activeRing: 'ring-teal-200',
+  },
+  {
+    id: 'project',
+    label: 'Proyek Akhir',
+    shortDesc: 'Kode utuh 3 file & evaluasi',
+    icon: CheckSquare,
+    tile: 'from-amber-500 to-orange-400',
+    activeText: 'text-amber-700',
+    activeRing: 'ring-amber-200',
+  },
+];
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
@@ -42,8 +122,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  const currentChapter = CHAPTERS.find((c) => c.id === currentChapterId) || CHAPTERS[0];
+  const currentChapter =
+    CHAPTERS.find((c) => c.id === currentChapterId) || CHAPTERS[0];
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -55,52 +144,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mobileMenuOpen]);
 
-  const navItems: Array<{
-    id: ActiveTab;
-    label: string;
-    shortDesc: string;
-    badge?: string;
-    icon: React.ComponentType<{ className?: string }>;
-  }> = [
-    {
-      id: 'home',
-      label: 'Beranda',
-      shortDesc: 'Ringkasan & peta belajar',
-      icon: Home,
-    },
-    {
-      id: 'chapter',
-      label: 'Materi',
-      shortDesc: 'Kurikulum 11 bab berurutan',
-      badge: '11',
-      icon: BookOpen,
-    },
-    {
-      id: 'flow',
-      label: 'Simulasi Alur',
-      shortDesc: 'Visualisasi data & terminal',
-      icon: Activity,
-    },
-    {
-      id: 'debugging',
-      label: 'Bantuan Error',
-      shortDesc: 'Solusi 6 error umum Python',
-      icon: Bug,
-    },
-    {
-      id: 'glossary',
-      label: 'Kamus',
-      shortDesc: 'Istilah koding bahasa sederhana',
-      icon: BookMarked,
-    },
-    {
-      id: 'project',
-      label: 'Proyek Akhir',
-      shortDesc: 'Kode utuh 3 file & evaluasi',
-      icon: CheckSquare,
-    },
-  ];
-
   const handleNavClick = (tab: ActiveTab) => {
     onNavigateTab(tab);
     setMobileMenuOpen(false);
@@ -108,34 +151,45 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+      <header
+        className={cn(
+          'sticky top-0 z-40 border-b bg-white/80 backdrop-blur-xl transition-all duration-300',
+          scrolled
+            ? 'border-slate-200/90 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.35)]'
+            : 'border-slate-200/60 shadow-none'
+        )}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-3 h-16">
-            {/* Left: Brand Identity */}
+            {/* ---------- Identitas ---------- */}
             <button
               type="button"
               onClick={() => handleNavClick('home')}
-              className="flex items-center gap-2.5 text-left group cursor-pointer shrink-0 rounded-xl py-1 pr-1 focus-visible:outline-2 focus-visible:outline-indigo-600"
+              className="group flex shrink-0 cursor-pointer items-center gap-2.5 rounded-xl py-1 pr-1 text-left"
             >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center text-white shadow-xs ring-1 ring-indigo-600/20 group-hover:scale-105 transition-transform shrink-0">
-                <ClipboardCheck className="w-4 h-4 stroke-[2.25]" />
-              </div>
-              <div className="leading-tight">
-                <span className="block font-extrabold text-[15px] sm:text-base text-slate-900 tracking-tight whitespace-nowrap group-hover:text-indigo-700 transition-colors">
+              <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-600 via-brand-500 to-grape-500 text-white shadow-[0_10px_24px_-10px_rgba(106,90,232,0.9)] transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
+                <ClipboardCheck className="h-4.5 w-4.5" strokeWidth={2.4} />
+                <span
+                  aria-hidden="true"
+                  className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-brand-400/40 to-grape-400/30 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100"
+                />
+              </span>
+              <span className="leading-tight">
+                <span className="block whitespace-nowrap text-[15px] font-extrabold tracking-tight text-slate-900 transition-colors group-hover:text-brand-700 sm:text-base">
                   Tugas Project UAS
                 </span>
-                <span className="hidden xl:block text-[11px] font-medium text-slate-500 whitespace-nowrap">
+                <span className="hidden whitespace-nowrap text-[11px] font-medium text-slate-500 xl:block">
                   Belajar coding pelan-pelan, sampai paham
                 </span>
-              </div>
+              </span>
             </button>
 
-            {/* Center: Desktop Segmented Navigation */}
+            {/* ---------- Navigasi desktop ---------- */}
             <nav
               aria-label="Navigasi Utama"
-              className="hidden lg:flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200/75 gap-0.5 xl:gap-1"
+              className="hidden items-center gap-0.5 rounded-2xl border border-slate-200/80 bg-slate-100/70 p-1 lg:flex"
             >
-              {navItems.map((item) => {
+              {NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
                 return (
@@ -143,87 +197,105 @@ export const Navbar: React.FC<NavbarProps> = ({
                     key={item.id}
                     type="button"
                     onClick={() => handleNavClick(item.id)}
-                    className={`flex items-center gap-1.5 px-2.5 xl:px-3.5 py-1.5 rounded-lg text-[13px] whitespace-nowrap transition-all cursor-pointer ${
+                    aria-current={isActive ? 'page' : undefined}
+                    className={cn(
+                      'group relative flex cursor-pointer items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[13px] whitespace-nowrap transition-all duration-200 xl:px-3.5',
                       isActive
-                        ? 'bg-white text-indigo-700 font-semibold shadow-xs ring-1 ring-slate-900/5'
-                        : 'text-slate-600 font-medium hover:text-slate-900 hover:bg-white/60'
-                    }`}
+                        ? cn(
+                            'bg-white font-bold shadow-[0_4px_14px_-6px_rgba(15,23,42,0.35)] ring-1',
+                            item.activeText,
+                            item.activeRing
+                          )
+                        : 'font-medium text-slate-600 hover:bg-white/70 hover:text-slate-900'
+                    )}
                   >
                     <Icon
-                      className={`w-3.5 h-3.5 xl:w-4 xl:h-4 shrink-0 ${
-                        isActive ? 'text-indigo-600' : 'text-slate-400'
-                      }`}
+                      className={cn(
+                        'h-3.5 w-3.5 shrink-0 transition-transform duration-300 xl:h-4 xl:w-4',
+                        isActive
+                          ? cn(item.activeText, 'scale-110')
+                          : 'text-slate-400 group-hover:scale-110 group-hover:text-slate-600'
+                      )}
+                      strokeWidth={isActive ? 2.5 : 2}
                     />
                     <span>{item.label}</span>
                     {item.badge && (
                       <span
-                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none ${
+                        className={cn(
+                          'rounded-full px-1.5 py-0.5 text-[10px] leading-none font-extrabold tabular transition-colors',
                           isActive
-                            ? 'bg-indigo-100 text-indigo-700'
+                            ? 'bg-brand-100 text-brand-700'
                             : 'bg-slate-200/80 text-slate-600'
-                        }`}
+                        )}
                       >
                         {item.badge}
                       </span>
+                    )}
+                    {isActive && (
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'absolute inset-x-3 -bottom-[5px] h-0.5 rounded-full bg-gradient-to-r',
+                          item.tile
+                        )}
+                      />
                     )}
                   </button>
                 );
               })}
             </nav>
 
-            {/* Right: Desktop Progress & Reset Action */}
-            <div className="hidden lg:flex items-center gap-2 shrink-0">
+            {/* ---------- Progres & aksi (desktop) ---------- */}
+            <div className="hidden shrink-0 items-center gap-2 lg:flex">
               <button
                 type="button"
                 onClick={() => handleNavClick('chapter')}
-                className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-indigo-50/50 border border-slate-200 hover:border-indigo-200 transition cursor-pointer whitespace-nowrap"
                 title={`Progres belajar: ${completedCount} dari ${totalChapters} bab selesai (${percentage}%)`}
+                className="group flex cursor-pointer items-center gap-2.5 rounded-2xl border border-slate-200 bg-white/70 py-1.5 pl-2 pr-3 transition hover:border-brand-200 hover:bg-brand-50/60 hover:shadow-soft"
               >
-                <div className="w-12 xl:w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full transition-all duration-300 rounded-full ${
-                      percentage === 100 ? 'bg-emerald-500' : 'bg-indigo-600'
-                    }`}
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-                <span className="text-xs font-bold text-slate-700 tabular-nums">
-                  {completedCount}/{totalChapters}
-                </span>
-                <span className="hidden xl:inline text-[11px] font-semibold text-indigo-600 tabular-nums">
-                  ({percentage}%)
+                <ProgressRing
+                  value={percentage}
+                  size={30}
+                  stroke={4}
+                  label={
+                    <span className="text-[9px] font-extrabold tabular text-slate-700">
+                      {percentage}
+                    </span>
+                  }
+                />
+                <span className="leading-tight">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Progres
+                  </span>
+                  <span className="block text-xs font-extrabold tabular text-slate-800">
+                    {completedCount}
+                    <span className="text-slate-400">/{totalChapters} bab</span>
+                  </span>
                 </span>
               </button>
 
-              <div className="h-5 w-px bg-slate-200" aria-hidden="true" />
+              <span className="h-5 w-px bg-slate-200" aria-hidden="true" />
 
               <button
                 type="button"
                 onClick={() => setShowResetModal(true)}
-                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl text-slate-400 transition hover:rotate-[-25deg] hover:bg-rose-50 hover:text-rose-600"
                 title="Atur ulang progres belajar"
                 aria-label="Atur ulang progres belajar"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Right: Mobile & Tablet Compact Progress + Menu Trigger */}
-            <div className="flex lg:hidden items-center gap-2 shrink-0">
+            {/* ---------- Progres & menu (mobile/tablet) ---------- */}
+            <div className="flex shrink-0 items-center gap-2 lg:hidden">
               <button
                 type="button"
                 onClick={() => handleNavClick('chapter')}
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 tabular-nums whitespace-nowrap"
                 aria-label={`Progres belajar ${completedCount} dari ${totalChapters} bab`}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/70 px-2 py-1.5 text-xs font-extrabold tabular text-slate-700"
               >
-                <div className="w-8 sm:w-12 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full transition-all duration-300 rounded-full ${
-                      percentage === 100 ? 'bg-emerald-500' : 'bg-indigo-600'
-                    }`}
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
+                <ProgressRing value={percentage} size={22} stroke={3.5} />
                 <span>
                   {completedCount}/{totalChapters}
                 </span>
@@ -232,38 +304,52 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`w-9 h-9 flex items-center justify-center rounded-xl border transition cursor-pointer ${
+                className={cn(
+                  'flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border transition',
                   mobileMenuOpen
-                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                }`}
+                    ? 'border-brand-200 bg-brand-50 text-brand-700'
+                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                )}
                 aria-expanded={mobileMenuOpen}
-                aria-label={mobileMenuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}
+                aria-label={
+                  mobileMenuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'
+                }
               >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {mobileMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Subtle Progress Hairline Bar */}
-        {percentage > 0 && (
-          <div className="h-[2px] w-full bg-slate-100 overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-indigo-500 via-indigo-600 to-emerald-500 transition-all duration-500"
-              style={{ width: `${percentage}%` }}
-            />
+        {/* ---------- Bar progres gradasi ---------- */}
+        <div
+          className="relative h-[3px] w-full overflow-hidden bg-slate-100"
+          aria-hidden="true"
+        >
+          <div
+            className="relative h-full bg-gradient-to-r from-brand-500 via-grape-500 to-aqua-400 transition-[width] duration-700 ease-out"
+            style={{ width: `${Math.max(percentage, 0)}%` }}
+          >
+            {percentage > 0 && percentage < 100 && (
+              <span className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.75),transparent)] bg-[length:60%_100%] bg-no-repeat"
+                style={{ animation: 'uas-shimmer 2.4s ease-in-out infinite' }}
+              />
+            )}
           </div>
-        )}
+        </div>
 
-        {/* Contextual Chapter Sub-bar for Mobile/Tablet when inside Materi */}
+        {/* ---------- Sub-bar bab (mobile/tablet) ---------- */}
         {activeTab === 'chapter' && !mobileMenuOpen && (
-          <div className="lg:hidden bg-slate-50/95 border-t border-slate-200/80 px-4 sm:px-6 py-2 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 min-w-0 text-xs">
-              <span className="font-bold text-indigo-700 bg-indigo-50 border border-indigo-200/80 px-2 py-0.5 rounded-md shrink-0">
+          <div className="flex items-center justify-between gap-3 border-t border-slate-200/70 bg-white/70 px-4 py-2 backdrop-blur-xl sm:px-6 lg:hidden">
+            <div className="flex min-w-0 items-center gap-2 text-xs">
+              <span className="shrink-0 rounded-lg bg-gradient-to-r from-brand-600 to-grape-500 px-2 py-0.5 font-extrabold text-white shadow-sm">
                 Bab {currentChapter.number}/11
               </span>
-              <span className="font-medium text-slate-700 truncate">
+              <span className="truncate font-semibold text-slate-700">
                 {currentChapter.title}
               </span>
             </div>
@@ -272,45 +358,49 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={onOpenSidebar}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs shrink-0 cursor-pointer"
+                className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700 shadow-soft transition hover:border-brand-200 hover:text-brand-700"
               >
-                <List className="w-3.5 h-3.5 text-indigo-600" />
+                <List className="h-3.5 w-3.5 text-brand-600" />
                 <span>Daftar Bab</span>
               </button>
             )}
           </div>
         )}
 
-        {/* Mobile Dropdown Panel + Backdrop */}
+        {/* ---------- Panel menu mobile ---------- */}
         {mobileMenuOpen && (
           <>
             <div
-              className="lg:hidden fixed inset-x-0 top-16 bottom-0 bg-slate-900/25 backdrop-blur-[1px] z-30"
+              className="fixed inset-x-0 top-16 bottom-0 z-30 bg-slate-950/30 backdrop-blur-[2px] lg:hidden anim-fade"
               onClick={() => setMobileMenuOpen(false)}
               aria-hidden="true"
             />
-            <div className="lg:hidden relative z-40 border-t border-slate-200 bg-white px-4 sm:px-6 pt-4 pb-5 shadow-xl space-y-4">
-              {/* Progress Summary Card */}
-              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/90 space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-slate-800">Progres Belajar Kamu</span>
-                  <span className="font-bold text-indigo-600 tabular-nums">
-                    {completedCount} dari {totalChapters} bab ({percentage}%)
-                  </span>
-                </div>
-                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      percentage === 100 ? 'bg-emerald-500' : 'bg-indigo-600'
-                    }`}
-                    style={{ width: `${percentage}%` }}
-                  />
+            <div className="relative z-40 space-y-4 border-t border-slate-200 bg-white/95 px-4 pt-4 pb-5 shadow-[0_30px_60px_-24px_rgba(2,6,23,0.45)] backdrop-blur-xl sm:px-6 lg:hidden anim-rise">
+              {/* Ringkasan progres */}
+              <div className="flex items-center gap-3 rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 to-white p-3.5">
+                <ProgressRing
+                  value={percentage}
+                  size={44}
+                  stroke={5}
+                  label={
+                    <span className="text-[10px] font-extrabold tabular text-brand-700">
+                      {percentage}%
+                    </span>
+                  }
+                />
+                <div className="min-w-0">
+                  <div className="text-xs font-extrabold text-slate-800">
+                    Progres Belajar Kamu
+                  </div>
+                  <div className="text-[11px] font-semibold text-brand-600 tabular">
+                    {completedCount} dari {totalChapters} bab selesai
+                  </div>
                 </div>
               </div>
 
-              {/* Navigation Links Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                {navItems.map((item) => {
+              {/* Daftar navigasi */}
+              <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                {NAV_ITEMS.map((item, idx) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
                   return (
@@ -318,43 +408,53 @@ export const Navbar: React.FC<NavbarProps> = ({
                       key={item.id}
                       type="button"
                       onClick={() => handleNavClick(item.id)}
-                      className={`w-full flex items-center justify-between gap-3 p-3 rounded-xl text-left transition cursor-pointer ${
+                      style={{ animationDelay: `${idx * 35}ms` }}
+                      className={cn(
+                        'flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border p-3 text-left transition anim-rise',
                         isActive
-                          ? 'bg-indigo-50/90 text-indigo-900 border border-indigo-200/80'
-                          : 'text-slate-700 hover:bg-slate-50 border border-transparent'
-                      }`}
+                          ? 'border-brand-200 bg-brand-50/80 shadow-soft'
+                          : 'border-transparent text-slate-700 hover:border-slate-200 hover:bg-slate-50'
+                      )}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div
-                          className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                            isActive
-                              ? 'bg-indigo-600 text-white'
-                              : 'bg-slate-100 text-slate-500'
-                          }`}
+                      <span className="flex min-w-0 items-center gap-3">
+                        <span
+                          className={cn(
+                            'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-sm transition-transform duration-300',
+                            item.tile,
+                            isActive ? 'scale-105' : 'opacity-80'
+                          )}
                         >
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-sm font-bold leading-snug truncate">
+                          <Icon className="h-4 w-4" strokeWidth={2.3} />
+                        </span>
+                        <span className="min-w-0">
+                          <span
+                            className={cn(
+                              'block truncate text-sm font-bold leading-snug',
+                              isActive ? 'text-brand-900' : 'text-slate-800'
+                            )}
+                          >
                             {item.label}
-                          </div>
-                          <div className="text-[11px] text-slate-500 truncate">
+                          </span>
+                          <span className="block truncate text-[11px] text-slate-500">
                             {item.shortDesc}
-                          </div>
-                        </div>
-                      </div>
+                          </span>
+                        </span>
+                      </span>
                       <ChevronRight
-                        className={`w-4 h-4 shrink-0 ${
-                          isActive ? 'text-indigo-600' : 'text-slate-300'
-                        }`}
+                        className={cn(
+                          'h-4 w-4 shrink-0 transition-transform',
+                          isActive
+                            ? 'translate-x-0.5 text-brand-500'
+                            : 'text-slate-300'
+                        )}
                       />
                     </button>
                   );
                 })}
               </div>
 
-              {/* Safe Reset Action Footer */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+              {/* Aksi reset */}
+              <div className="flex items-center justify-between border-t border-slate-100 pt-3">
                 <span className="text-[11px] text-slate-400">
                   Progres tersimpan otomatis di browser ini
                 </span>
@@ -364,9 +464,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setMobileMenuOpen(false);
                     setShowResetModal(true);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-rose-600 transition hover:bg-rose-50"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
+                  <RotateCcw className="h-3.5 w-3.5" />
                   <span>Reset Progres</span>
                 </button>
               </div>
@@ -375,7 +475,6 @@ export const Navbar: React.FC<NavbarProps> = ({
         )}
       </header>
 
-      {/* Confirmation Modal for Resetting Progress */}
       <Modal
         isOpen={showResetModal}
         onClose={() => setShowResetModal(false)}

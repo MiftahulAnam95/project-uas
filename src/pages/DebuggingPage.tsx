@@ -1,7 +1,48 @@
 import React, { useState } from 'react';
-import { Bug, CheckCircle2, XCircle, AlertCircle, Wrench, Terminal, HelpCircle } from 'lucide-react';
+import {
+  Bug,
+  CheckCircle2,
+  XCircle,
+  Wrench,
+  Terminal,
+  HelpCircle,
+  LifeBuoy,
+  SearchCode,
+  ArrowRight,
+  ShieldAlert,
+} from 'lucide-react';
 import { PYTHON_ERRORS } from '../data/errors';
 import { PythonErrorGuide } from '../types';
+import { PageHeader } from '../components/common/PageHeader';
+import { Card } from '../components/common/Card';
+import { Reveal } from '../components/common/Reveal';
+import { MiniCode } from '../components/code-block/MiniCode';
+import { FeedbackPanel } from '../components/learning/FeedbackPanel';
+import { celebrateSmall } from '../utils/celebrate';
+import { cn } from '../utils/cn';
+
+const LETTERS = ['A', 'B', 'C', 'D', 'E'];
+
+const READ_TRACEBACK_STEPS = [
+  {
+    icon: SearchCode,
+    title: 'Baca dari baris paling bawah',
+    desc: 'Nama error dan alasannya selalu ada di kalimat terakhir traceback.',
+    tile: 'from-rose-500 to-orange-400',
+  },
+  {
+    icon: Terminal,
+    title: 'Cari nama file & nomor baris',
+    desc: 'Python menyebut "File pencatat.py, line 12" — itulah lokasi kejadian.',
+    tile: 'from-amber-500 to-yellow-400',
+  },
+  {
+    icon: Wrench,
+    title: 'Perbaiki satu hal, jalankan lagi',
+    desc: 'Ubah satu bagian saja lalu jalankan ulang. Jangan mengubah banyak hal sekaligus.',
+    tile: 'from-emerald-500 to-teal-400',
+  },
+];
 
 export const DebuggingPage: React.FC = () => {
   const [selectedErrorId, setSelectedErrorId] = useState<string>(PYTHON_ERRORS[0].id);
@@ -18,6 +59,12 @@ export const DebuggingPage: React.FC = () => {
 
   const handleSubmitPractice = (errId: string) => {
     setPracticeSubmitted((prev) => ({ ...prev, [errId]: true }));
+    if (
+      practiceAnswers[errId] ===
+      PYTHON_ERRORS.find((e) => e.id === errId)?.practiceSnippet.correctIndex
+    ) {
+      celebrateSmall();
+    }
   };
 
   const handleResetPractice = (errId: string) => {
@@ -33,204 +80,329 @@ export const DebuggingPage: React.FC = () => {
     });
   };
 
+  const selected = practiceAnswers[currentError.id];
+  const submitted = practiceSubmitted[currentError.id];
+  const practiceCorrect = selected === currentError.practiceSnippet.correctIndex;
+
   return (
-    <div className="max-w-6xl mx-auto py-6 sm:py-10 space-y-10">
-      {/* Header Banner */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xs space-y-3">
-        <div className="flex items-center gap-2 text-rose-600 text-xs font-bold uppercase tracking-wider">
-          <Bug className="w-4 h-4" />
-          <span>Bab 8 & Pusat Bantuan Debugging</span>
+    <div className="max-w-6xl mx-auto space-y-10 py-6 sm:py-10">
+      {/* ============================ HEADER ============================ */}
+      <PageHeader
+        eyebrow="Bab 8 · Pusat bantuan debugging"
+        icon={Bug}
+        accent="rose"
+        title="Error yang Sering Muncul & Cara Mengatasinya"
+        highlight="Cara Mengatasinya"
+        description="Jangan panik saat melihat teks merah di layar! Pesan error Python adalah petunjuk akurat dari penerjemahnya untuk membantumu menemukan baris yang perlu diperbaiki."
+        stats={[
+          { label: 'Error dibahas', value: String(PYTHON_ERRORS.length) },
+          { label: 'Latihan tebak', value: String(PYTHON_ERRORS.length) },
+          { label: 'Level', value: 'Pemula' },
+        ]}
+      />
+
+      {/* ================== CARA MEMBACA TRACEBACK ================== */}
+      <Reveal>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {READ_TRACEBACK_STEPS.map((s, idx) => {
+            const Icon = s.icon;
+            return (
+              <div
+                key={s.title}
+                className="group relative flex items-start gap-3 overflow-hidden rounded-3xl border border-slate-200/80 bg-white/85 p-4 shadow-soft backdrop-blur transition hover:-translate-y-1 hover:shadow-lift"
+              >
+                <span
+                  className={cn(
+                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-sm transition-transform duration-300 group-hover:-rotate-6',
+                    s.tile
+                  )}
+                >
+                  <Icon className="h-5 w-5" strokeWidth={2.2} />
+                </span>
+                <div className="min-w-0">
+                  <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
+                    Langkah {idx + 1}
+                  </div>
+                  <h3 className="text-sm font-extrabold tracking-tight text-slate-900">
+                    {s.title}
+                  </h3>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600">{s.desc}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-          Error yang Sering Muncul & Cara Mengatasinya
-        </h1>
-        <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl">
-          Jangan panik saat melihat teks merah di layar! Pesan error di Python adalah petunjuk akurat dari penerjemah untuk membantumu menemukan bagian kode yang perlu diperbaiki.
-        </p>
+      </Reveal>
+
+      {/* ================== PILIHAN ERROR ================== */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-500">
+          <LifeBuoy className="h-4 w-4 text-rose-500" />
+          Pilih error yang sedang kamu hadapi
+        </div>
+        <div className="thin-scrollbar -mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-2">
+          {PYTHON_ERRORS.map((err) => {
+            const isSelected = err.id === currentError.id;
+            const isSolved = practiceSubmitted[err.id] && practiceCorrect;
+            return (
+              <button
+                key={err.id}
+                type="button"
+                onClick={() => setSelectedErrorId(err.id)}
+                className={cn(
+                  'group flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl border px-4 py-2.5 text-xs font-extrabold transition-all duration-200 sm:text-[13px]',
+                  isSelected
+                    ? 'border-transparent bg-gradient-to-r from-rose-600 to-orange-500 text-white shadow-[0_14px_30px_-14px_rgba(225,29,72,0.9)]'
+                    : 'border-slate-200 bg-white/85 text-slate-700 shadow-soft hover:-translate-y-0.5 hover:border-rose-200 hover:bg-rose-50/60 hover:text-rose-700'
+                )}
+              >
+                <span
+                  className={cn(
+                    'font-mono text-[11px] font-bold tracking-tight',
+                    isSelected ? 'text-white/80' : 'text-slate-400 group-hover:text-rose-400'
+                  )}
+                >
+                  {err.errorName}
+                </span>
+                {isSolved && (
+                  <CheckCircle2
+                    className={cn(
+                      'h-3.5 w-3.5',
+                      isSelected ? 'text-white' : 'text-emerald-500'
+                    )}
+                    strokeWidth={3}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Error Tabs Navigator */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2">
-        {PYTHON_ERRORS.map((err) => {
-          const isSelected = err.id === currentError.id;
-          return (
-            <button
-              key={err.id}
-              onClick={() => setSelectedErrorId(err.id)}
-              className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition cursor-pointer flex items-center gap-2 ${
-                isSelected
-                  ? 'bg-rose-600 text-white shadow-md shadow-rose-200'
-                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              <span>{err.errorName}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Main Error Detail Card */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xs space-y-8">
-        {/* Error Header */}
-        <div className="space-y-2 pb-6 border-b border-slate-100">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-mono text-xs font-bold">
-            <AlertCircle className="w-3.5 h-3.5" />
-            <span>{currentError.errorName}</span>
+      {/* ================== DETAIL ERROR ================== */}
+      <Card key={currentError.id} className="space-y-8 p-5 anim-fade sm:p-8">
+        {/* Kepala detail */}
+        <div className="space-y-4 border-b border-slate-100 pb-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 font-mono text-xs font-extrabold text-rose-700 shadow-soft">
+              <ShieldAlert className="h-3.5 w-3.5" />
+              {currentError.errorName}
+            </span>
+            <span className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-500">
+              {PYTHON_ERRORS.findIndex((e) => e.id === currentError.id) + 1} dari{' '}
+              {PYTHON_ERRORS.length}
+            </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
+
+          <h2 className="text-lg font-extrabold leading-snug tracking-tight text-slate-900 sm:text-2xl">
             {currentError.title}
           </h2>
-          <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 text-amber-950 text-xs sm:text-sm leading-relaxed">
-            <strong>Arti dalam bahasa manusia:</strong> {currentError.simpleMeaning}
+
+          <div className="relative overflow-hidden rounded-3xl border border-amber-200/90 bg-gradient-to-br from-amber-50 via-white to-orange-50/60 p-4 sm:p-5">
+            <div className="flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-400 text-white shadow-[0_10px_22px_-12px_rgba(217,119,6,0.9)]">
+                <HelpCircle className="h-4.5 w-4.5" strokeWidth={2.2} />
+              </span>
+              <p className="text-xs leading-relaxed text-amber-950 sm:text-sm">
+                <strong className="font-extrabold">Arti dalam bahasa manusia:</strong>{' '}
+                {currentError.simpleMeaning}
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Side-by-side or stacked Broken Code vs Fixed Code */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Broken Code & Traceback */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold text-rose-700 uppercase">
-              <XCircle className="w-4 h-4" />
-              <span>Contoh Kode yang Salah (Menyebabkan Error)</span>
+        {/* Salah vs Benar */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Kode salah */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-rose-500 to-orange-400 text-white shadow-sm">
+                <XCircle className="h-4 w-4" strokeWidth={2.5} />
+              </span>
+              <h3 className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-rose-700">
+                Kode yang salah (memicu error)
+              </h3>
             </div>
-
-            <div className="bg-slate-900 rounded-2xl border border-rose-900/40 p-4 font-mono text-xs text-slate-200 overflow-x-auto">
-              <pre className="whitespace-pre">{currentError.sampleBrokenCode}</pre>
-            </div>
-
-            {/* Simulated Terminal Output */}
+            <MiniCode
+              code={currentError.sampleBrokenCode}
+              tone="danger"
+              label="contoh_salah.py"
+            />
             <div className="space-y-1.5">
-              <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1">
-                <Terminal className="w-3.5 h-3.5" />
-                <span>Pesan Traceback Asli di Terminal:</span>
+              <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">
+                <Terminal className="h-3.5 w-3.5" />
+                Pesan traceback asli di terminal
               </div>
-              <div className="bg-black/90 rounded-2xl border border-rose-800/50 p-4 font-mono text-xs text-rose-300 overflow-x-auto leading-relaxed">
-                <pre className="whitespace-pre-wrap">{currentError.terminalOutput}</pre>
-              </div>
+              <MiniCode
+                code={currentError.terminalOutput}
+                asOutput
+                tone="danger"
+                label="traceback"
+                className="[&_pre]:text-rose-300/95"
+              />
             </div>
           </div>
 
-          {/* Fixed Code & How to Fix */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold text-emerald-700 uppercase">
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Contoh Kode Setelah Diperbaiki</span>
+          {/* Kode benar */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-400 text-white shadow-sm">
+                <CheckCircle2 className="h-4 w-4" strokeWidth={2.5} />
+              </span>
+              <h3 className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-emerald-700">
+                Kode setelah diperbaiki
+              </h3>
             </div>
-
-            <div className="bg-slate-900 rounded-2xl border border-emerald-900/40 p-4 font-mono text-xs text-emerald-300 overflow-x-auto">
-              <pre className="whitespace-pre">{currentError.sampleFixedCode}</pre>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-emerald-900 uppercase">
-                <Wrench className="w-4 h-4 text-emerald-700" />
-                <span>Cara Memperbaiki:</span>
+            <MiniCode
+              code={currentError.sampleFixedCode}
+              tone="success"
+              label="sudah_diperbaiki.py"
+            />
+            <div className="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-teal-50/60 p-4">
+              <div className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.14em] text-emerald-700">
+                <Wrench className="h-3.5 w-3.5" />
+                Cara memperbaiki
               </div>
-              <p className="text-xs sm:text-sm text-emerald-950 leading-relaxed">
+              <p className="mt-2 text-xs leading-relaxed text-emerald-950/85 sm:text-[13px]">
                 {currentError.howToFix}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Common Causes List */}
-        <div className="space-y-3 pt-4 border-t border-slate-100">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
-            Penyebab Umum yang Sering Terjadi:
+        {/* Penyebab umum */}
+        <div className="space-y-3 border-t border-slate-100 pt-6">
+          <h3 className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-600">
+            Penyebab umum yang sering terjadi
           </h3>
-          <ul className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <ul className="grid grid-cols-1 gap-3 md:grid-cols-3">
             {currentError.commonCauses.map((cause, idx) => (
               <li
                 key={idx}
-                className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed"
+                className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-soft transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-lift"
               >
-                &bull; {cause}
+                <span className="flex items-start gap-2.5">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-rose-500 to-orange-400 text-[10px] font-extrabold text-white shadow-sm">
+                    {idx + 1}
+                  </span>
+                  <span className="text-xs leading-relaxed text-slate-700">{cause}</span>
+                </span>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Interactive Practice Snippet */}
-        <div className="pt-6 border-t border-slate-100 space-y-4">
-          <div className="flex items-center gap-2 text-indigo-700 text-xs font-bold uppercase tracking-wider">
-            <HelpCircle className="w-4 h-4" />
-            <span>Uji Pemahaman: Tebak Cara Memperbaiki Error Ini</span>
+        {/* Latihan tebak perbaikan */}
+        <div className="space-y-4 rounded-4xl border border-brand-200/70 bg-gradient-to-br from-brand-50/80 via-white to-white p-4 sm:p-6">
+          <div className="flex items-start gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-grape-500 text-white shadow-[0_12px_26px_-14px_rgba(106,90,232,0.9)]">
+              <HelpCircle className="h-5 w-5" strokeWidth={2.2} />
+            </span>
+            <div>
+              <div className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-brand-600">
+                Uji pemahaman
+              </div>
+              <h3 className="text-base font-extrabold tracking-tight text-slate-900">
+                Tebak cara memperbaiki error ini
+              </h3>
+            </div>
           </div>
 
-          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
-            <p className="text-sm font-semibold text-slate-900">
-              {currentError.practiceSnippet.question}
-            </p>
+          <p className="text-sm font-semibold text-slate-800">
+            {currentError.practiceSnippet.question}
+          </p>
 
-            <div className="bg-slate-900 text-slate-200 font-mono text-xs p-3.5 rounded-xl overflow-x-auto">
-              <pre>{currentError.practiceSnippet.buggyCode}</pre>
-            </div>
+          <MiniCode
+            code={currentError.practiceSnippet.buggyCode}
+            tone="danger"
+            label="kode bermasalah"
+          />
 
-            {/* Options */}
-            <div className="space-y-2 pt-2">
-              {currentError.practiceSnippet.options.map((opt, optIdx) => {
-                const selected = practiceAnswers[currentError.id];
-                const submitted = practiceSubmitted[currentError.id];
-                const isCorrect = optIdx === currentError.practiceSnippet.correctIndex;
+          <div className="space-y-2 pt-1">
+            {currentError.practiceSnippet.options.map((opt, optIdx) => {
+              const isAnswer = optIdx === currentError.practiceSnippet.correctIndex;
+              const isPicked = selected === optIdx;
 
-                let optStyle = 'border-slate-200 bg-white hover:bg-slate-100 text-slate-700';
+              return (
+                <button
+                  key={optIdx}
+                  type="button"
+                  onClick={() => handleSelectPracticeOption(currentError.id, optIdx)}
+                  disabled={submitted}
+                  className={cn(
+                    'flex w-full items-center justify-between gap-3 rounded-2xl border p-3 text-left text-xs transition-all duration-200 sm:text-[13px]',
+                    !submitted &&
+                      (isPicked
+                        ? 'border-brand-500 bg-white font-semibold text-brand-900 shadow-[0_10px_24px_-16px_rgba(106,90,232,0.9)] ring-2 ring-brand-200'
+                        : 'border-slate-200 bg-white/85 text-slate-700 hover:-translate-y-px hover:border-brand-200 hover:bg-white hover:shadow-soft cursor-pointer'),
+                    submitted && isAnswer && 'border-emerald-400 bg-emerald-50 text-emerald-950',
+                    submitted && isPicked && !isAnswer && 'border-rose-400 bg-rose-50 text-rose-950',
+                    submitted && !isPicked && !isAnswer && 'border-slate-200 bg-white/60 text-slate-400 opacity-70',
+                    submitted && 'cursor-default'
+                  )}
+                >
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <span
+                      className={cn(
+                        'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[10px] font-extrabold transition-colors',
+                        submitted && isAnswer
+                          ? 'bg-emerald-500 text-white'
+                          : submitted && isPicked
+                          ? 'bg-rose-500 text-white'
+                          : isPicked
+                          ? 'bg-brand-600 text-white'
+                          : 'bg-slate-100 text-slate-500'
+                      )}
+                    >
+                      {LETTERS[optIdx] ?? optIdx + 1}
+                    </span>
+                    <span className="min-w-0 font-mono text-[11px] sm:text-xs">
+                      {opt}
+                    </span>
+                  </span>
+                  {submitted && isAnswer && (
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2.5} />
+                  )}
+                  {submitted && isPicked && !isAnswer && (
+                    <XCircle className="h-4 w-4 shrink-0 text-rose-500" strokeWidth={2.5} />
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-                if (submitted) {
-                  if (isCorrect) {
-                    optStyle = 'border-emerald-500 bg-emerald-50 text-emerald-950 font-bold';
-                  } else if (selected === optIdx) {
-                    optStyle = 'border-rose-400 bg-rose-50 text-rose-950';
-                  } else {
-                    optStyle = 'border-slate-200 bg-white/50 text-slate-400 opacity-60';
-                  }
-                } else if (selected === optIdx) {
-                  optStyle = 'border-indigo-600 bg-indigo-50 text-indigo-900 font-semibold ring-1 ring-indigo-500';
-                }
-
-                return (
-                  <button
-                    key={optIdx}
-                    type="button"
-                    onClick={() => handleSelectPracticeOption(currentError.id, optIdx)}
-                    disabled={submitted}
-                    className={`w-full text-left p-3 rounded-xl border text-xs sm:text-sm flex items-center justify-between transition cursor-pointer disabled:cursor-default ${optStyle}`}
-                  >
-                    <span>{opt}</span>
-                    {submitted && isCorrect && (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 ml-2" />
-                    )}
-                    {submitted && selected === optIdx && !isCorrect && (
-                      <XCircle className="w-4 h-4 text-rose-500 shrink-0 ml-2" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Practice Action */}
-            {!practiceSubmitted[currentError.id] ? (
+          {!submitted ? (
+            <div className="flex flex-wrap items-center gap-3 pt-1">
               <button
+                type="button"
                 onClick={() => handleSubmitPractice(currentError.id)}
-                disabled={practiceAnswers[currentError.id] === undefined}
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-semibold transition disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
+                disabled={selected === undefined}
+                className="btn btn-primary px-5 py-2.5 text-xs disabled:cursor-not-allowed"
               >
+                <ArrowRight className="h-4 w-4" />
                 Periksa Jawaban
               </button>
-            ) : (
-              <div className="mt-3 p-4 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
-                <div className="font-bold text-slate-900">Pembahasan:</div>
-                <p>{currentError.practiceSnippet.explanation}</p>
-                <button
-                  onClick={() => handleResetPractice(currentError.id)}
-                  className="text-xs font-semibold text-indigo-600 hover:underline pt-1 block cursor-pointer"
-                >
-                  Coba Pertanyaan Ini Lagi
-                </button>
-              </div>
-            )}
-          </div>
+              <span className="text-[11px] font-semibold text-slate-500">
+                {selected === undefined
+                  ? 'Pilih salah satu jawaban dulu, ya.'
+                  : 'Jawaban terpilih siap diperiksa.'}
+              </span>
+            </div>
+          ) : (
+            <FeedbackPanel
+              correct={practiceCorrect}
+              celebrate={practiceCorrect}
+              heading={practiceCorrect ? 'Tepat! Kamu sudah bisa membaca error ini.' : 'Belum tepat.'}
+              onRetry={practiceCorrect ? undefined : () => handleResetPractice(currentError.id)}
+              retryLabel="Coba Pertanyaan Ini Lagi"
+            >
+              {currentError.practiceSnippet.explanation}
+            </FeedbackPanel>
+          )}
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
+
+export default DebuggingPage;
