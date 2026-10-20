@@ -141,29 +141,6 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
           { label: 'Contoh kode', value: String(codeCount) },
           { label: 'Latihan & kuis', value: String(exerciseCount) },
         ]}
-        actions={
-          <Button
-            size="md"
-            onClick={() => onToggleComplete(chapter.id)}
-            className={cn(
-              isCompleted
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 shadow-[0_12px_28px_-12px_rgba(16,185,129,0.9)] hover:from-emerald-400 hover:to-teal-300'
-                : 'border border-white/20 bg-white/10 text-white backdrop-blur hover:bg-white/20'
-            )}
-          >
-            {isCompleted ? (
-              <>
-                <PartyPopper className="h-4 w-4" />
-                Bab Sudah Selesai
-              </>
-            ) : (
-              <>
-                <CheckCircle2 className="h-4 w-4" />
-                Tandai Bab Selesai
-              </>
-            )}
-          </Button>
-        }
         className={cn(
           // Tiap bab punya rona gradasi sendiri lewat aksen strip di bawah
           'mb-8'
@@ -391,6 +368,83 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
                   </li>
                 ))}
               </ul>
+            </div>
+          </Reveal>
+
+          {/* Tandai bab selesai — diletakkan di akhir materi */}
+          <Reveal>
+            <div
+              className={cn(
+                'relative overflow-hidden rounded-4xl border p-6 shadow-soft sm:p-8',
+                isCompleted
+                  ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-teal-50'
+                  : 'border-brand-200/70 bg-gradient-to-br from-brand-50 via-white to-aqua-50/50'
+              )}
+            >
+              <div
+                aria-hidden="true"
+                className={cn(
+                  'pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full blur-3xl',
+                  isCompleted ? 'bg-emerald-200/40' : 'bg-grape-200/40'
+                )}
+              />
+              <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <span
+                    className={cn(
+                      'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white',
+                      isCompleted
+                        ? 'from-emerald-500 to-teal-400 shadow-[0_10px_24px_-10px_rgba(5,150,105,0.9)]'
+                        : 'from-brand-500 to-grape-500 shadow-[0_10px_24px_-10px_rgba(106,90,232,0.9)]'
+                    )}
+                  >
+                    {isCompleted ? (
+                      <PartyPopper className="h-5 w-5" strokeWidth={2.2} />
+                    ) : (
+                      <CheckCircle2 className="h-5 w-5" strokeWidth={2.2} />
+                    )}
+                  </span>
+                  <div>
+                    <h3 className="text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">
+                      {isCompleted
+                        ? `Bab ${chapter.number} sudah selesai!`
+                        : 'Sudah sampai di akhir bab ini?'}
+                    </h3>
+                    <p className="mt-0.5 max-w-xl text-xs leading-relaxed text-slate-500 sm:text-[13px]">
+                      {isCompleted
+                        ? 'Progresmu tersimpan di perangkat ini. Kamu bisa mengulang materi kapan saja atau lanjut ke bab berikutnya.'
+                        : 'Tandai bab ini selesai supaya progres belajarmu tercatat, lalu lanjut ke bab berikutnya dengan tenang.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+                  {isCompleted ? (
+                    <>
+                      <span className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 px-5 py-2.5 text-sm font-extrabold text-slate-950 shadow-[0_12px_28px_-12px_rgba(5,150,105,0.9)]">
+                        <CheckCircle2 className="h-4 w-4" strokeWidth={2.6} />
+                        Bab Sudah Selesai
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => onToggleComplete(chapter.id)}
+                        className="cursor-pointer text-[11px] font-semibold text-slate-400 underline decoration-slate-300 underline-offset-2 transition hover:text-slate-600"
+                      >
+                        Batalkan tanda selesai
+                      </button>
+                    </>
+                  ) : (
+                    <Button
+                      size="lg"
+                      onClick={() => onToggleComplete(chapter.id)}
+                      className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 shadow-[0_12px_28px_-12px_rgba(5,150,105,0.9)] hover:from-emerald-400 hover:to-teal-300 sm:w-auto"
+                    >
+                      <CheckCircle2 className="h-4.5 w-4.5" strokeWidth={2.5} />
+                      Tandai Bab Selesai
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           </Reveal>
 
