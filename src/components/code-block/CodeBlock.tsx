@@ -1,7 +1,20 @@
 import React, { useState } from 'react';
-import { Copy, Check, Play, ChevronDown, ChevronUp, Terminal as TerminalIcon, Sparkles } from 'lucide-react';
+import {
+  Copy,
+  Check,
+  Play,
+  ChevronDown,
+  ChevronUp,
+  Terminal as TerminalIcon,
+  Sparkles,
+  FileCode2,
+  Loader2,
+  Info,
+} from 'lucide-react';
 import { LineExplanation } from '../../types';
 import { executePythonCode } from '../../utils/pythonRunner';
+import { cn } from '../../utils/cn';
+import { highlightSyntax } from '../../utils/highlightSyntax';
 
 interface CodeBlockProps {
   code: string;
@@ -14,6 +27,7 @@ interface CodeBlockProps {
   isSimulated?: boolean;
 }
 
+/** Jendela kode bergaya editor: bisa dijalankan, disalin, dan dibedah per baris. */
 export const CodeBlock: React.FC<CodeBlockProps> = ({
   code,
   filename,
@@ -31,6 +45,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
   const [isRunning, setIsRunning] = useState(false);
 
   const lines = code.trim().split('\n');
+  const explorableCount = lineExplanations?.length ?? 0;
 
   const handleCopy = async () => {
     try {
@@ -38,7 +53,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // fallback
+      // clipboard tidak tersedia — abaikan dengan tenang
     }
   };
 
@@ -60,76 +75,109 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
   };
 
   const activeOutput = customOutput !== null ? customOutput : output;
+  const isErrorOutput =
+    !!activeOutput &&
+    /Traceback|Error|error:|Exception/i.test(activeOutput.split('\n')[0] || '');
 
   return (
-    <div className="rounded-2xl border border-slate-700/60 bg-slate-900 shadow-xl overflow-hidden my-6">
-      {/* Editor Header Bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-slate-950/80 border-b border-slate-800 text-xs text-slate-300">
-        <div className="flex items-center gap-3">
+    <figure className="group/code my-6 overflow-hidden rounded-3xl border border-slate-700/50 bg-slate-950 shadow-[0_28px_60px_-30px_rgba(2,6,23,0.85)] transition-shadow duration-300 hover:shadow-[0_32px_70px_-28px_rgba(74,60,170,0.55)]">
+      {/* Pita gradasi tipis */}
+      <div
+        aria-hidden="true"
+        className="h-px w-full bg-gradient-to-r from-transparent via-brand-400/70 to-transparent"
+      />
+
+      {/* ---------- Bar kepala editor ---------- */}
+      <figcaption className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-gradient-to-b from-slate-900 to-slate-900/60 px-3 py-2.5 sm:px-4">
+        <div className="flex min-w-0 items-center gap-3">
           <div className="flex items-center gap-1.5" aria-hidden="true">
-            <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
-            <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
-            <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+            <span className="h-2.5 w-2.5 rounded-full bg-rose-500/85 transition-colors group-hover/code:bg-rose-400" />
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-400/85 transition-colors group-hover/code:bg-amber-300" />
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/85 transition-colors group-hover/code:bg-emerald-400" />
           </div>
-          <span className="font-mono text-slate-400 font-medium tracking-wide">
-            {filename || 'program.py'}
+          <span className="flex min-w-0 items-center gap-1.5">
+            <FileCode2 className="h-3.5 w-3.5 shrink-0 text-brand-400" />
+            <span className="truncate font-mono text-xs font-semibold text-slate-300">
+              {filename || 'program.py'}
+            </span>
           </span>
           {title && (
-            <span className="hidden sm:inline-block text-slate-500 border-l border-slate-700/80 pl-3">
+            <span className="hidden truncate border-l border-slate-700/70 pl-3 text-[11px] text-slate-500 sm:inline-block">
               {title}
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          {lineExplanations && lineExplanations.length > 0 && (
+        <div className="flex items-center gap-1.5">
+          {explorableCount > 0 && (
             <button
+              type="button"
               onClick={() => setShowLineByLine(!showLineByLine)}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition ${
+              className={cn(
+                'flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-bold transition',
                 showLineByLine
-                  ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-              }`}
+                  ? 'border-brand-400/50 bg-brand-500/20 text-brand-200'
+                  : 'border-slate-700 bg-slate-800/70 text-slate-300 hover:border-slate-600 hover:bg-slate-800'
+              )}
               title="Lihat penjelasan per baris"
+              aria-expanded={showLineByLine}
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Penjelasan Per Baris</span>
-              {showLineByLine ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              <Sparkles className="h-3.5 w-3.5" />
+              <span className="hidden md:inline">Bedah Per Baris</span>
+              <span className="rounded-full bg-slate-950/60 px-1.5 text-[10px] tabular">
+                {explorableCount}
+              </span>
+              {showLineByLine ? (
+                <ChevronUp className="h-3.5 w-3.5" />
+              ) : (
+                <ChevronDown className="h-3.5 w-3.5" />
+              )}
             </button>
           )}
 
           <button
+            type="button"
             onClick={handleRun}
             disabled={isRunning}
-            className="flex items-center gap-1.5 px-3 py-1 bg-emerald-600/90 hover:bg-emerald-500 text-white rounded-md text-xs font-semibold shadow-xs transition active:scale-95 disabled:opacity-50"
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 px-3 py-1 text-[11px] font-extrabold text-slate-950 shadow-[0_8px_18px_-8px_rgba(16,185,129,0.9)] transition hover:brightness-110 active:scale-95 disabled:cursor-wait disabled:opacity-70"
             title="Jalankan contoh kode ini"
           >
-            <Play className="w-3 h-3 fill-current" />
-            <span>{isRunning ? 'Menjalankan...' : 'Jalankan'}</span>
+            {isRunning ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Play className="h-3 w-3 fill-current" />
+            )}
+            <span>{isRunning ? 'Menjalankan…' : 'Jalankan'}</span>
           </button>
 
           <button
+            type="button"
             onClick={handleCopy}
-            className="flex items-center gap-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md text-xs transition active:scale-95"
+            className={cn(
+              'flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-bold transition active:scale-95',
+              copied
+                ? 'border-emerald-400/50 bg-emerald-500/15 text-emerald-300'
+                : 'border-slate-700 bg-slate-800/70 text-slate-300 hover:border-slate-600 hover:bg-slate-800'
+            )}
             title="Salin kode ke papan klip"
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400 font-medium">Tersalin!</span>
+                <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                <span>Tersalin!</span>
               </>
             ) : (
               <>
-                <Copy className="w-3.5 h-3.5" />
-                <span>Salin</span>
+                <Copy className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Salin</span>
               </>
             )}
           </button>
         </div>
-      </div>
+      </figcaption>
 
-      {/* Code Text Area */}
-      <div className="overflow-x-auto p-4 font-mono text-sm leading-relaxed text-slate-200">
+      {/* ---------- Area kode ---------- */}
+      <div className="code-scrollbar overflow-x-auto bg-[#0a0e1c] px-2 py-3 font-mono text-[13px] leading-relaxed text-slate-200 sm:px-3">
         <pre className="m-0">
           <code>
             {lines.map((lineText, idx) => {
@@ -142,25 +190,36 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
                 <div
                   key={idx}
                   onClick={() => {
-                    if (lineExpl) {
-                      setSelectedLine(isSelected ? null : lineNum);
-                    }
+                    if (lineExpl) setSelectedLine(isSelected ? null : lineNum);
                   }}
-                  className={`flex items-start group rounded transition-colors px-1 py-0.5 ${
-                    isHighlighted ? 'bg-indigo-950/60 border-l-2 border-indigo-400' : ''
-                  } ${
-                    isSelected ? 'bg-indigo-900/40 border-l-2 border-indigo-400' : ''
-                  } ${
-                    lineExpl ? 'cursor-pointer hover:bg-slate-800/70' : ''
-                  }`}
+                  className={cn(
+                    'group/line -mx-2 flex items-start rounded-lg px-2 py-[3px] transition-colors sm:-mx-3 sm:px-3',
+                    isHighlighted &&
+                      'bg-gradient-to-r from-brand-500/20 via-brand-500/10 to-transparent shadow-[inset_2px_0_0_0_var(--color-brand-400)]',
+                    isSelected &&
+                      'bg-gradient-to-r from-aqua-400/20 via-aqua-400/5 to-transparent shadow-[inset_2px_0_0_0_var(--color-aqua-400)]',
+                    lineExpl && !isSelected && 'cursor-pointer hover:bg-slate-800/60',
+                    !isHighlighted && !isSelected && !lineExpl && 'hover:bg-slate-800/30'
+                  )}
+                  title={lineExpl && showLineByLine ? 'Klik untuk penjelasan baris ini' : undefined}
                 >
-                  <span className="select-none text-slate-600 w-8 text-right pr-4 text-xs shrink-0 font-normal group-hover:text-slate-400">
+                  <span
+                    className={cn(
+                      'w-8 shrink-0 select-none pr-4 text-right text-[11px] font-normal tabular transition-colors',
+                      isSelected
+                        ? 'text-aqua-300'
+                        : isHighlighted
+                        ? 'text-brand-300'
+                        : 'text-slate-600 group-hover/line:text-slate-400'
+                    )}
+                  >
                     {lineNum}
                   </span>
                   <span className="flex-1 whitespace-pre">{highlightSyntax(lineText)}</span>
-                  {lineExpl && showLineByLine && (
-                    <span className="ml-2 text-xs text-indigo-400/80 bg-indigo-950/60 border border-indigo-800/40 px-1.5 py-0.5 rounded select-none shrink-0 hidden sm:inline-block">
-                      klik untuk info
+                  {lineExpl && showLineByLine && !isSelected && (
+                    <span className="ml-2 hidden shrink-0 select-none items-center gap-1 rounded-md border border-brand-500/30 bg-brand-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-brand-300 sm:inline-flex">
+                      <Info className="h-3 w-3" />
+                      klik
                     </span>
                   )}
                 </div>
@@ -170,120 +229,73 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
         </pre>
       </div>
 
-      {/* Interactive Line-by-Line Popover Explanation */}
+      {/* ---------- Penjelasan baris terpilih ---------- */}
       {selectedLine && lineExplanations && (
-        <div className="bg-indigo-950/90 border-t border-indigo-800/60 p-4 text-sm text-indigo-100 flex items-start gap-3 animate-in fade-in duration-150">
-          <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 border-t border-brand-500/25 bg-gradient-to-r from-brand-950/80 to-slate-900/60 p-4 anim-rise">
+          <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-aqua-400 to-brand-500 text-white shadow-sm">
+            <Sparkles className="h-3.5 w-3.5" strokeWidth={2.4} />
+          </span>
           <div className="space-y-1">
-            <div className="font-semibold text-indigo-300 text-xs">
-              Penjelasan Baris {selectedLine}:
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-aqua-300">
+              Penjelasan baris {selectedLine}
             </div>
-            <p className="text-slate-200 leading-relaxed text-xs sm:text-sm">
+            <p className="text-xs leading-relaxed text-slate-200 sm:text-sm">
               {lineExplanations.find((e) => e.line === selectedLine)?.explanation}
             </p>
           </div>
+          <button
+            type="button"
+            onClick={() => setSelectedLine(null)}
+            className="ml-auto shrink-0 cursor-pointer rounded-lg px-2 py-1 text-[11px] font-semibold text-slate-400 transition hover:bg-white/5 hover:text-slate-200"
+            aria-label="Tutup penjelasan baris"
+          >
+            Tutup
+          </button>
         </div>
       )}
 
-      {/* Code General Explanation (Part B) */}
+      {/* ---------- Penjelasan umum ---------- */}
       {explanation && (
-        <div className="bg-slate-950/60 border-t border-slate-800/80 px-4 py-3 text-xs sm:text-sm text-slate-300">
-          <div className="font-semibold text-indigo-300 text-xs mb-1 uppercase tracking-wider">
-            Penjelasan:
+        <div className="border-t border-slate-800 bg-slate-900/50 px-4 py-3.5">
+          <div className="mb-1 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.16em] text-brand-300">
+            <Info className="h-3.5 w-3.5" />
+            Penjelasan
           </div>
-          <p className="leading-relaxed text-slate-300">{explanation}</p>
+          <p className="text-xs leading-relaxed text-slate-300 sm:text-sm">{explanation}</p>
         </div>
       )}
 
-      {/* Terminal Output Area (Part C) */}
+      {/* ---------- Output terminal ---------- */}
       {activeOutput && (
-        <div className="border-t border-slate-800 bg-black/90 p-4 text-xs font-mono">
-          <div className="flex items-center justify-between text-slate-500 mb-2 select-none">
-            <span className="flex items-center gap-1.5 text-emerald-400 font-semibold tracking-wide">
-              <TerminalIcon className="w-3.5 h-3.5" />
-              HASIL OUTPUT PROGRAM:
+        <div className="border-t border-slate-800 bg-black/70 p-3 sm:p-4">
+          <div className="mb-2 flex select-none items-center justify-between gap-2">
+            <span
+              className={cn(
+                'flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.16em]',
+                isErrorOutput ? 'text-rose-400' : 'text-emerald-400'
+              )}
+            >
+              <TerminalIcon className="h-3.5 w-3.5" />
+              Hasil output program
             </span>
-            <span className="text-slate-600 text-[10px]">
-              {isSimulated ? 'Simulasi Output' : 'Python Runtime Output'}
+            <span className="rounded-full border border-slate-700/70 bg-slate-900 px-2 py-0.5 font-mono text-[10px] text-slate-500">
+              {isSimulated ? 'simulasi' : 'python runtime'}
             </span>
           </div>
-          <pre className="text-emerald-300/90 whitespace-pre-wrap leading-relaxed select-text overflow-x-auto bg-slate-950/80 p-3 rounded-lg border border-slate-800/80">
+          <pre
+            className={cn(
+              'code-scrollbar select-text overflow-x-auto whitespace-pre-wrap rounded-xl border bg-[#05070f] p-3 font-mono text-[11px] leading-relaxed sm:text-xs anim-fade',
+              isErrorOutput
+                ? 'border-rose-900/50 text-rose-300'
+                : 'border-slate-800 text-emerald-300/95'
+            )}
+          >
             {activeOutput}
           </pre>
         </div>
       )}
-    </div>
+    </figure>
   );
 };
 
-// Syntax highlighting parser
-function highlightSyntax(line: string): React.ReactNode {
-  // Comments
-  const commentIdx = line.indexOf('#');
-  if (commentIdx !== -1) {
-    const codePart = line.slice(0, commentIdx);
-    const commentPart = line.slice(commentIdx);
-    return (
-      <>
-        {renderTokens(codePart)}
-        <span className="code-token-comment">{commentPart}</span>
-      </>
-    );
-  }
-  return renderTokens(line);
-}
-
-function renderTokens(text: string): React.ReactNode {
-  // Regex tokenization for keywords, strings, numbers, builtins
-  const tokenRegex =
-    /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:def|return|if|elif|else|while|for|in|import|from|as|global|break|continue|and|or|not|is|None|True|False)\b|\b(?:print|input|int|str|float|len|range|append|replace|strip|capitalize|isdigit|items)\b|\b\d+\b|[+\-*/%=><!&|^~]+|[a-zA-Z_]\w*|[^\s\w]+|\s+)/g;
-
-  const matches = text.match(tokenRegex);
-  if (!matches) return text;
-
-  const keywords = new Set([
-    'def', 'return', 'if', 'elif', 'else', 'while', 'for', 'in', 'import', 'from', 'as', 'global', 'break', 'continue', 'and', 'or', 'not', 'is', 'None', 'True', 'False',
-  ]);
-  const builtins = new Set([
-    'print', 'input', 'int', 'str', 'float', 'len', 'range', 'append', 'replace', 'strip', 'capitalize', 'isdigit', 'items',
-  ]);
-
-  return matches.map((token, i) => {
-    if (token.startsWith('"') || token.startsWith("'")) {
-      return (
-        <span key={i} className="code-token-string">
-          {token}
-        </span>
-      );
-    }
-    if (keywords.has(token)) {
-      return (
-        <span key={i} className="code-token-keyword">
-          {token}
-        </span>
-      );
-    }
-    if (builtins.has(token)) {
-      return (
-        <span key={i} className="code-token-builtin">
-          {token}
-        </span>
-      );
-    }
-    if (/^\d+$/.test(token)) {
-      return (
-        <span key={i} className="code-token-number">
-          {token}
-        </span>
-      );
-    }
-    if (/^[+\-*/%=><!&|^~]+$/.test(token)) {
-      return (
-        <span key={i} className="code-token-operator">
-          {token}
-        </span>
-      );
-    }
-    return <span key={i}>{token}</span>;
-  });
-}
+export default CodeBlock;

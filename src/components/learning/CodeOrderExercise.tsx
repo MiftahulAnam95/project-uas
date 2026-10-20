@@ -1,20 +1,41 @@
 import React, { useState } from 'react';
-import { ArrowUp, ArrowDown, ListOrdered, CheckCircle2, RotateCcw } from 'lucide-react';
+import {
+  ArrowUp,
+  ArrowDown,
+  ListOrdered,
+  Shuffle,
+  GripVertical,
+} from 'lucide-react';
 import { SequenceExercise, SequenceExerciseItem } from '../../types';
+import { ExerciseCard } from './ExerciseCard';
+import { FeedbackPanel } from './FeedbackPanel';
+import { celebrateSmall } from '../../utils/celebrate';
+import { cn } from '../../utils/cn';
 
 interface CodeOrderExerciseProps {
   exercise: SequenceExercise;
   onCompleted?: () => void;
 }
 
+const shuffle = (items: SequenceExerciseItem[]) => {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  // Hindari kebetulan sudah terurut sejak awal
+  const alreadySorted = copy.every((it, idx) => it.order === idx + 1);
+  if (alreadySorted && copy.length > 1) {
+    [copy[0], copy[1]] = [copy[1], copy[0]];
+  }
+  return copy;
+};
+
 export const CodeOrderExercise: React.FC<CodeOrderExerciseProps> = ({
   exercise,
   onCompleted,
 }) => {
-  // Initialize with shuffled items
-  const [items, setItems] = useState<SequenceExerciseItem[]>(() => {
-    return [...exercise.items].sort(() => Math.random() - 0.5);
-  });
+  const [items, setItems] = useState<SequenceExerciseItem[]>(() => shuffle(exercise.items));
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const moveItem = (index: number, direction: 'up' | 'down') => {
@@ -23,126 +44,172 @@ export const CodeOrderExercise: React.FC<CodeOrderExerciseProps> = ({
     if (targetIndex < 0 || targetIndex >= items.length) return;
 
     const newItems = [...items];
-    const temp = newItems[index];
-    newItems[index] = newItems[targetIndex];
-    newItems[targetIndex] = temp;
+    [newItems[index], newItems[targetIndex]] = [newItems[targetIndex], newItems[index]];
     setItems(newItems);
   };
 
   const isOrderCorrect = items.every((item, idx) => item.order === idx + 1);
+  const correctCount = items.filter((item, idx) => item.order === idx + 1).length;
 
   const handleCheck = () => {
     setIsSubmitted(true);
-    if (isOrderCorrect && onCompleted) {
-      onCompleted();
+    if (isOrderCorrect) {
+      celebrateSmall();
+      onCompleted?.();
     }
   };
 
   const handleReset = () => {
-    setItems([...exercise.items].sort(() => Math.random() - 0.5));
+    setItems(shuffle(exercise.items));
     setIsSubmitted(false);
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 my-6 transition hover:shadow-md">
-      <div className="flex items-center gap-2 mb-2 text-indigo-700">
-        <ListOrdered className="w-5 h-5" />
-        <span className="text-xs font-bold uppercase tracking-wider">
-          Latihan Interaktif: Susun Urutan Alur
+    <ExerciseCard
+      kind="Susun urutan alur"
+      icon={ListOrdered}
+      title={exercise.title}
+      prompt={exercise.prompt}
+      accent="teal"
+      aside={
+        <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-500 tabular">
+          {items.length} langkah
         </span>
-      </div>
-
-      <h4 className="text-base sm:text-lg font-bold text-slate-900 mb-1">
-        {exercise.title}
-      </h4>
-      <p className="text-sm text-slate-600 mb-4">{exercise.prompt}</p>
-
-      {/* Item List with Up/Down buttons */}
-      <div className="space-y-2 mb-5">
+      }
+    >
+      {/* Daftar langkah */}
+      <ol className="space-y-2">
         {items.map((item, idx) => {
-          const isCorrectPosition = isSubmitted && item.order === idx + 1;
-          const isWrongPosition = isSubmitted && item.order !== idx + 1;
-
+          const inPlace = item.order === idx + 1;
           return (
-            <div
+            <li
               key={item.id}
-              className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 transition-colors ${
-                isCorrectPosition
-                  ? 'border-emerald-500 bg-emerald-50/80 text-emerald-950'
-                  : isWrongPosition
-                  ? 'border-rose-300 bg-rose-50/80 text-rose-950'
-                  : 'border-slate-200 bg-slate-50 text-slate-800'
-              }`}
+              className={cn(
+                'group relative flex items-center gap-3 overflow-hidden rounded-2xl border p-3 transition-all duration-200',
+                !isSubmitted && 'border-slate-200 bg-white hover:border-teal-200 hover:shadow-soft',
+                isSubmitted && inPlace && 'border-emerald-300 bg-emerald-50/80',
+                isSubmitted && !inPlace && 'border-rose-300 bg-rose-50/70'
+              )}
             >
-              <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-slate-200/80 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
-                  {idx + 1}
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'absolute inset-y-0 left-0 w-1 transition-colors',
+                  isSubmitted
+                    ? inPlace
+                      ? 'bg-emerald-400'
+                      : 'bg-rose-400'
+                    : 'bg-gradient-to-b from-teal-400 to-emerald-400 opacity-0 group-hover:opacity-100'
+                )}
+              />
+
+              <GripVertical className="ml-1 h-4 w-4 shrink-0 text-slate-300" aria-hidden="true" />
+
+              <span
+                className={cn(
+                  'flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-[11px] font-extrabold tabular transition-colors',
+                  isSubmitted
+                    ? inPlace
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-rose-500 text-white'
+                    : 'bg-slate-100 text-slate-600 group-hover:bg-teal-100 group-hover:text-teal-700'
+                )}
+              >
+                {idx + 1}
+              </span>
+
+              <span className="min-w-0 flex-1 text-[13px] font-medium leading-snug text-slate-800">
+                {item.text}
+              </span>
+
+              {isSubmitted && !inPlace && (
+                <span className="shrink-0 rounded-lg bg-white/80 px-2 py-0.5 text-[10px] font-bold text-rose-600 ring-1 ring-rose-200">
+                  seharusnya #{item.order}
                 </span>
-                <span className="text-sm font-medium">{item.text}</span>
-              </div>
+              )}
 
               {!isSubmitted && (
-                <div className="flex items-center gap-1 shrink-0">
+                <span className="flex shrink-0 items-center gap-1">
                   <button
+                    type="button"
                     onClick={() => moveItem(idx, 'up')}
                     disabled={idx === 0}
-                    className="p-1 rounded-md hover:bg-slate-200 text-slate-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                    title="Pindahkan ke atas"
+                    className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:-translate-y-px hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:translate-y-0"
+                    title="Geser ke atas"
+                    aria-label={`Geser langkah "${item.text}" ke atas`}
                   >
-                    <ArrowUp className="w-4 h-4" />
+                    <ArrowUp className="h-3.5 w-3.5" />
                   </button>
                   <button
+                    type="button"
                     onClick={() => moveItem(idx, 'down')}
                     disabled={idx === items.length - 1}
-                    className="p-1 rounded-md hover:bg-slate-200 text-slate-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                    title="Pindahkan ke bawah"
+                    className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:translate-y-px hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:translate-y-0"
+                    title="Geser ke bawah"
+                    aria-label={`Geser langkah "${item.text}" ke bawah`}
                   >
-                    <ArrowDown className="w-4 h-4" />
+                    <ArrowDown className="h-3.5 w-3.5" />
                   </button>
-                </div>
+                </span>
               )}
-            </div>
+            </li>
           );
         })}
-      </div>
+      </ol>
 
-      {!isSubmitted ? (
-        <button
-          onClick={handleCheck}
-          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition cursor-pointer"
-        >
-          Periksa Urutan
-        </button>
-      ) : (
-        <div
-          className={`p-4 rounded-xl border animate-in fade-in duration-200 ${
-            isOrderCorrect
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-950'
-              : 'bg-rose-50 border-rose-200 text-rose-950'
-          }`}
-        >
-          <div className="flex items-center gap-2 font-bold text-sm mb-1">
-            {isOrderCorrect ? (
-              <>
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Luar biasa! Urutan alur program sudah tepat.</span>
-              </>
-            ) : (
-              <span>Urutan belum tepat. Coba periksa kembali alur logikanya.</span>
-            )}
-          </div>
-          <p className="text-xs sm:text-sm leading-relaxed mb-3">{exercise.explanation}</p>
-          {!isOrderCorrect && (
+      {/* Aksi */}
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-[11px] font-semibold text-slate-500">
+          {isSubmitted ? (
+            <>
+              <span className="font-extrabold text-slate-700 tabular">{correctCount}</span> dari{' '}
+              <span className="tabular">{items.length}</span> langkah sudah di posisi benar.
+            </>
+          ) : (
+            <>Gunakan tombol panah untuk memindahkan langkah.</>
+          )}
+        </p>
+
+        <div className="flex gap-2">
+          {!isSubmitted && (
             <button
-              onClick={handleReset}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-rose-200/70 hover:bg-rose-300 text-rose-900 rounded-lg transition"
+              type="button"
+              onClick={() => setItems(shuffle(exercise.items))}
+              className="btn btn-soft px-3.5 py-2.5 text-xs"
+              title="Acak ulang urutan"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              Acak dan Coba Lagi
+              <Shuffle className="h-3.5 w-3.5" />
+              Acak
+            </button>
+          )}
+          {!isSubmitted ? (
+            <button type="button" onClick={handleCheck} className="btn btn-primary px-5 py-2.5 text-xs">
+              Periksa Urutan
+            </button>
+          ) : (
+            <button type="button" onClick={handleReset} className="btn btn-soft px-5 py-2.5 text-xs">
+              <Shuffle className="h-3.5 w-3.5" />
+              Acak & Coba Lagi
             </button>
           )}
         </div>
+      </div>
+
+      {isSubmitted && (
+        <FeedbackPanel
+          correct={isOrderCorrect}
+          celebrate={isOrderCorrect}
+          heading={
+            isOrderCorrect
+              ? 'Luar biasa! Urutan alur programnya sudah tepat.'
+              : 'Urutannya belum tepat — periksa lagi alur logikanya.'
+          }
+        >
+          {exercise.explanation}
+        </FeedbackPanel>
       )}
-    </div>
+    </ExerciseCard>
   );
 };
+
+export default CodeOrderExercise;

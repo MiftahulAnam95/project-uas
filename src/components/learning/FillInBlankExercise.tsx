@@ -1,6 +1,18 @@
 import React, { useState } from 'react';
-import { Sparkles, CheckCircle2, XCircle, HelpCircle, RotateCcw } from 'lucide-react';
+import {
+  PenLine,
+  HelpCircle,
+  Lightbulb,
+  CheckCircle2,
+  Send,
+  RotateCcw,
+} from 'lucide-react';
 import { FillInBlankExercise as FillExerciseType } from '../../types';
+import { highlightSyntax } from '../../utils/highlightSyntax';
+import { ExerciseCard } from './ExerciseCard';
+import { FeedbackPanel } from './FeedbackPanel';
+import { celebrateSmall } from '../../utils/celebrate';
+import { cn } from '../../utils/cn';
 
 interface FillInBlankExerciseProps {
   exercise: FillExerciseType;
@@ -15,14 +27,17 @@ export const FillInBlankExercise: React.FC<FillInBlankExerciseProps> = ({
   const [hintLevel, setHintLevel] = useState<number>(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const isCorrect = userInput.trim().toLowerCase() === exercise.missingToken.trim().toLowerCase();
+  const isCorrect =
+    userInput.trim().toLowerCase() === exercise.missingToken.trim().toLowerCase();
+  const locked = isSubmitted && isCorrect;
 
   const handleCheck = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userInput.trim()) return;
+    if (!userInput.trim() || locked) return;
     setIsSubmitted(true);
-    if (isCorrect && onCompleted) {
-      onCompleted();
+    if (isCorrect) {
+      celebrateSmall();
+      onCompleted?.();
     }
   };
 
@@ -31,124 +46,159 @@ export const FillInBlankExercise: React.FC<FillInBlankExerciseProps> = ({
     setIsSubmitted(false);
   };
 
+  /** Render template: bagian kosong jadi "slot" yang bisa diisi. */
+  const renderTemplate = () =>
+    exercise.templateCode.split('\n').map((line, lineIdx) => {
+      const parts = line.split('_____');
+      return (
+        <div key={lineIdx} className="flex min-h-[1.6em] items-center whitespace-pre">
+          {parts.map((part, i) => (
+            <React.Fragment key={i}>
+              <span>{highlightSyntax(part)}</span>
+              {i < parts.length - 1 && (
+                <span
+                  className={cn(
+                    'mx-1 inline-flex min-w-[5.5rem] items-center justify-center rounded-lg border border-dashed px-2 py-0.5 font-sans text-[11px] font-bold transition-colors',
+                    !isSubmitted &&
+                      'border-brand-400/70 bg-brand-500/15 text-brand-200',
+                    isSubmitted &&
+                      (isCorrect
+                        ? 'border-emerald-400/70 bg-emerald-500/20 text-emerald-200'
+                        : 'border-rose-400/70 bg-rose-500/20 text-rose-200')
+                  )}
+                >
+                  {isSubmitted
+                    ? userInput.trim() || '—'
+                    : 'isi di sini'}
+                </span>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      );
+    });
+
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 my-6 transition hover:shadow-md">
-      <div className="flex items-center gap-2 mb-2 text-indigo-700">
-        <Sparkles className="w-5 h-5" />
-        <span className="text-xs font-bold uppercase tracking-wider">
-          Latihan Interaktif: Lengkapi Kode
-        </span>
+    <ExerciseCard
+      kind="Lengkapi kode"
+      icon={PenLine}
+      title={exercise.title}
+      prompt={exercise.prompt}
+      accent="sky"
+      aside={
+        locked ? (
+          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">
+            <CheckCircle2 className="h-3 w-3" strokeWidth={3} />
+            Terisi
+          </span>
+        ) : undefined
+      }
+    >
+      {/* Template kode dengan slot kosong */}
+      <div className="code-scrollbar overflow-x-auto rounded-2xl border border-slate-700/60 bg-[#0a0e1c] p-3.5 font-mono text-xs leading-relaxed text-slate-200 shadow-[0_16px_36px_-24px_rgba(2,6,23,0.9)] sm:text-[13px]">
+        {renderTemplate()}
       </div>
 
-      <h4 className="text-base sm:text-lg font-bold text-slate-900 mb-2">
-        {exercise.title}
-      </h4>
-      <p className="text-sm text-slate-600 mb-4">{exercise.prompt}</p>
-
-      {/* Code Template Box */}
-      <div className="bg-slate-900 text-slate-100 font-mono text-sm p-4 rounded-xl mb-4 border border-slate-800">
-        <pre className="whitespace-pre">
-          {exercise.templateCode.replace(
-            '_____',
-            isSubmitted
-              ? `[ ${userInput || '_____'} ]`
-              : '[ ...bagian kosong... ]'
-          )}
-        </pre>
-      </div>
-
-      {/* Input Form */}
-      <form onSubmit={handleCheck} className="space-y-4">
-        <div className="flex flex-col sm:flex-row gap-2">
+      {/* Form jawaban */}
+      <form onSubmit={handleCheck} className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <div className="relative flex-1">
           <input
             type="text"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
-            disabled={isSubmitted && isCorrect}
-            placeholder="Ketik kata/fungsi yang hilang di sini..."
-            className="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 font-mono text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 bg-slate-50/50"
+            disabled={locked}
+            placeholder="Ketik kata / fungsi yang hilang…"
+            autoComplete="off"
+            spellCheck={false}
+            className={cn(
+              'w-full rounded-2xl border bg-white px-4 py-3 font-mono text-sm text-slate-800 shadow-soft outline-none transition placeholder:font-sans placeholder:text-slate-400',
+              !isSubmitted &&
+                'border-slate-200 focus:border-brand-400 focus:ring-4 focus:ring-brand-100',
+              isSubmitted && isCorrect && 'border-emerald-300 bg-emerald-50/60',
+              isSubmitted && !isCorrect && 'border-rose-300 bg-rose-50/60'
+            )}
             required
           />
-          <button
-            type="submit"
-            disabled={isSubmitted && isCorrect}
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition active:scale-95 disabled:opacity-50 cursor-pointer"
-          >
-            Periksa Jawaban
-          </button>
         </div>
+        <button
+          type="submit"
+          disabled={locked || !userInput.trim()}
+          className={cn(
+            'btn btn-primary px-5 py-3 text-sm disabled:cursor-not-allowed',
+            locked && 'pointer-events-none opacity-60'
+          )}
+        >
+          {locked ? <CheckCircle2 className="h-4 w-4" /> : <Send className="h-4 w-4" />}
+          {locked ? 'Jawaban Benar' : 'Periksa Jawaban'}
+        </button>
       </form>
 
-      {/* Progressive Hints Section */}
-      <div className="mt-3 flex items-center justify-between">
+      {/* Petunjuk bertingkat */}
+      <div className="mt-3">
         {hintLevel === 0 && (
           <button
+            type="button"
             onClick={() => setHintLevel(1)}
-            className="inline-flex items-center gap-1.5 text-xs text-amber-700 font-medium hover:text-amber-800 hover:underline cursor-pointer"
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] font-extrabold text-amber-800 transition hover:-translate-y-px hover:bg-amber-100"
           >
-            <HelpCircle className="w-3.5 h-3.5" />
-            Butuh Petunjuk?
+            <HelpCircle className="h-3.5 w-3.5" />
+            Butuh petunjuk?
           </button>
         )}
-        {hintLevel === 1 && (
-          <div className="w-full bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-2">
-            <div>💡 <strong>Petunjuk 1:</strong> {exercise.hint1}</div>
-            {exercise.hint2 && (
+
+        {hintLevel > 0 && (
+          <div className="space-y-2 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50/60 p-3.5 anim-rise">
+            <div className="flex items-start gap-2 text-xs text-amber-950">
+              <Lightbulb className="mt-px h-4 w-4 shrink-0 text-amber-500" />
+              <p className="leading-relaxed">
+                <strong className="font-extrabold">Petunjuk 1:</strong> {exercise.hint1}
+              </p>
+            </div>
+            {exercise.hint2 && hintLevel === 1 && (
               <button
+                type="button"
                 onClick={() => setHintLevel(2)}
-                className="text-amber-800 font-semibold underline hover:text-amber-950 block text-[11px]"
+                className="ml-6 cursor-pointer text-[11px] font-extrabold text-amber-700 underline decoration-dotted underline-offset-2 transition hover:text-amber-900"
               >
-                Masih kesulitan? Buka Petunjuk 2
+                Masih kesulitan? Buka petunjuk 2 →
               </button>
             )}
-          </div>
-        )}
-        {hintLevel === 2 && exercise.hint2 && (
-          <div className="w-full bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1">
-            <div>💡 <strong>Petunjuk 1:</strong> {exercise.hint1}</div>
-            <div>💡 <strong>Petunjuk 2:</strong> {exercise.hint2}</div>
+            {exercise.hint2 && hintLevel === 2 && (
+              <div className="flex items-start gap-2 text-xs text-amber-950 anim-rise">
+                <Lightbulb className="mt-px h-4 w-4 shrink-0 text-orange-500" />
+                <p className="leading-relaxed">
+                  <strong className="font-extrabold">Petunjuk 2:</strong> {exercise.hint2}
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {/* Result Feedback */}
+      {/* Umpan balik */}
       {isSubmitted && (
-        <div
-          className={`mt-4 p-4 rounded-xl border animate-in fade-in duration-200 ${
+        <FeedbackPanel
+          correct={isCorrect}
+          celebrate={isCorrect}
+          heading={
             isCorrect
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-950'
-              : 'bg-rose-50 border-rose-200 text-rose-950'
-          }`}
+              ? 'Benar! Bagian itu sudah kamu pahami.'
+              : `Kunci yang tepat: "${exercise.missingToken}"`
+          }
+          onRetry={isCorrect ? undefined : handleReset}
+          retryLabel="Isi Ulang"
         >
-          <div className="flex items-center gap-2 font-bold text-sm mb-1">
-            {isCorrect ? (
-              <>
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Benar! Kamu sudah memahami bagian ini.</span>
-              </>
-            ) : (
-              <>
-                <XCircle className="w-4 h-4 text-rose-600" />
-                <span>Belum tepat. Coba periksa kembali penjelasannya:</span>
-              </>
-            )}
-          </div>
-          <p className="text-xs sm:text-sm leading-relaxed mb-3">
-            {isCorrect
-              ? exercise.explanation
-              : `Kata kunci yang benar adalah "${exercise.missingToken}". ${exercise.explanation}`}
-          </p>
+          {exercise.explanation}
           {!isCorrect && (
-            <button
-              onClick={handleReset}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-rose-200/70 hover:bg-rose-300 text-rose-900 rounded-lg transition"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              Coba Lagi
-            </button>
+            <span className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-bold text-rose-700">
+              <RotateCcw className="h-3 w-3" />
+              Mengetik ulang membantu memori ototmu, lho.
+            </span>
           )}
-        </div>
+        </FeedbackPanel>
       )}
-    </div>
+    </ExerciseCard>
   );
 };
+
+export default FillInBlankExercise;

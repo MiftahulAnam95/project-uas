@@ -24,4 +24,16 @@ export default defineConfig({
     outDir: "dist",
     emptyOutDir: true,
   },
+  server: {
+    // Dengarkan semua antarmuka agar bisa dipratinjau dari luar sandbox,
+    // dan terima permintaan dari host pratinjau (proxy) mana pun.
+    host: "0.0.0.0",
+    port: 5173,
+    allowedHosts: true,
+  },
+  preview: {
+    host: "0.0.0.0",
+    port: 4173,
+    allowedHosts: true,
+  },
 });

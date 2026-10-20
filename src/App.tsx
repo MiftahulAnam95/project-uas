@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, BookOpen } from 'lucide-react';
 import { Navbar, ActiveTab } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { Footer } from './components/layout/Footer';
+import { BackToTop } from './components/common/BackToTop';
 import { HomePage } from './pages/HomePage';
 import { ChapterPage } from './pages/ChapterPage';
 import { FlowVisualizerPage } from './pages/FlowVisualizerPage';
@@ -78,6 +79,14 @@ export function App() {
     document.title = `Tugas Project UAS — ${tabTitles[activeTab]}`;
   }, [activeTab, currentChapterId]);
 
+  // Kunci scroll saat drawer bab terbuka di layar kecil
+  useEffect(() => {
+    document.body.style.overflow = sidebarOpen ? 'hidden' : 'unset';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [sidebarOpen]);
+
   const handleNavigateTab = (tab: ActiveTab, chapterId?: ChapterId) => {
     setActiveTab(tab);
     if (chapterId) {
@@ -99,9 +108,11 @@ export function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // `key` ini membuat tiap perpindahan halaman bermain animasi masuk yang halus
+  const viewKey = activeTab === 'chapter' ? `chapter-${currentChapterId}` : activeTab;
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
-      {/* Top Navbar */}
+    <div className="flex min-h-screen flex-col text-slate-900">
       <Navbar
         activeTab={activeTab}
         currentChapterId={currentChapterId}
@@ -113,13 +124,15 @@ export function App() {
         onOpenSidebar={() => setSidebarOpen(true)}
       />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex flex-1 flex-col">
         {activeTab === 'chapter' ? (
-          <div className="flex-1 flex max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 gap-8">
-            {/* Desktop Left Sidebar (visible on xl & lg) */}
-            <div className="hidden lg:block w-72 shrink-0">
-              <div className="sticky top-24 h-[calc(100vh-7rem)] rounded-2xl overflow-hidden border border-slate-200 shadow-xs">
+          <div
+            key={viewKey}
+            className="mx-auto flex w-full max-w-7xl flex-1 gap-8 px-4 py-6 sm:px-6 lg:px-8 anim-fade"
+          >
+            {/* Sidebar desktop */}
+            <div className="hidden w-72 shrink-0 lg:block">
+              <div className="sticky top-[5.5rem] h-[calc(100vh-7.5rem)] overflow-hidden rounded-3xl border border-slate-200/80 bg-white/70 shadow-soft backdrop-blur-xl">
                 <Sidebar
                   currentChapterId={currentChapterId}
                   onSelectChapter={handleSelectChapter}
@@ -128,23 +141,31 @@ export function App() {
               </div>
             </div>
 
-            {/* Mobile Sidebar Drawer Modal */}
+            {/* Drawer bab untuk mobile/tablet */}
             {sidebarOpen && (
-              <div className="lg:hidden fixed inset-0 z-50 flex">
+              <div className="fixed inset-0 z-50 flex lg:hidden">
                 <div
-                  className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs"
+                  className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm anim-fade"
                   onClick={() => setSidebarOpen(false)}
+                  aria-hidden="true"
                 />
-                <div className="relative w-80 max-w-[85vw] bg-white h-full z-10 shadow-2xl flex flex-col">
-                  <div className="px-4 py-3.5 border-b border-slate-100 flex items-center justify-between">
-                    <h3 className="font-bold text-sm text-slate-900">Pilih Bab Pembelajaran</h3>
+                <div
+                  className="relative z-10 flex h-full w-80 max-w-[85vw] flex-col bg-white shadow-[0_0_80px_rgba(2,6,23,0.5)] anim-rise"
+                  role="dialog"
+                  aria-label="Pilih bab pembelajaran"
+                >
+                  <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3.5">
+                    <h3 className="flex items-center gap-2 text-sm font-extrabold text-slate-900">
+                      <BookOpen className="h-4 w-4 text-brand-600" />
+                      Pilih Bab Pembelajaran
+                    </h3>
                     <button
                       type="button"
                       onClick={() => setSidebarOpen(false)}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                      className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
                       aria-label="Tutup daftar bab"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
                   <div className="flex-1 overflow-y-auto">
@@ -158,8 +179,8 @@ export function App() {
               </div>
             )}
 
-            {/* Middle Chapter Content */}
-            <main className="flex-1 min-w-0">
+            {/* Konten bab */}
+            <main className="min-w-0 flex-1">
               <ChapterPage
                 chapterId={currentChapterId}
                 onSelectChapter={handleSelectChapter}
@@ -172,7 +193,10 @@ export function App() {
             </main>
           </div>
         ) : (
-          <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+          <main
+            key={viewKey}
+            className="mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8 anim-fade"
+          >
             {activeTab === 'home' && (
               <HomePage
                 onNavigateTab={handleNavigateTab}
@@ -180,6 +204,7 @@ export function App() {
                 totalChapters={totalChapters}
                 lastVisitedChapter={currentChapterId}
                 percentage={percentage}
+                completedChapters={progress.completedChapters}
               />
             )}
             {activeTab === 'flow' && <FlowVisualizerPage />}
@@ -198,8 +223,8 @@ export function App() {
         )}
       </div>
 
-      {/* Global Footer */}
       <Footer onNavigateTab={handleNavigateTab} />
+      <BackToTop />
     </div>
   );
 }
