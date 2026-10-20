@@ -116,7 +116,10 @@ Tipografi memakai **Plus Jakarta Sans** (teks) dan **JetBrains Mono** (kode).
    npm run dev
    ```
 
-4. Buka tautan lokal yang ditampilkan di terminal (biasanya `http://localhost:5173`) di browser pilihanmu.
+4. Buka tautan lokal yang ditampilkan di terminal (biasanya `http://localhost:5173`). Alamat `/` otomatis diarahkan ke `dev.html`, yaitu template sumber aplikasi.
+
+> [!NOTE]
+> `dev.html` adalah **template sumber** yang dipakai Vite saat pengembangan. `index.html` di root repositori adalah **hasil build** yang disajikan GitHub Pages — jangan mengeditnya secara manual, karena akan ditimpa otomatis oleh workflow.
 
 ---
 
@@ -129,6 +132,13 @@ npm run build
 ```
 
 Hasil build akan otomatis berada di folder `dist/` dalam bentuk file statis yang siap di-deploy ke server statis mana pun. Berkat `vite-plugin-singlefile`, seluruh JavaScript dan CSS sudah **digabung menjadi satu file `index.html`** (tanpa folder `assets/`), sehingga tidak ada masalah path saat di-hosting di sub-folder GitHub Pages.
+
+Untuk menyegarkan `index.html` di root repositori secara manual (misalnya sebelum commit tanpa lewat GitHub Actions):
+
+```bash
+npm run build
+cp dist/index.html index.html
+```
 
 Untuk menguji hasil build secara lokal:
 
@@ -159,22 +169,25 @@ vercel --prod # production
 
 ### 2. Deployment ke GitHub Pages (Otomatis)
 
-Workflow [`deploy-pages.yml`](./.github/workflows/deploy-pages.yml) sudah disiapkan: setiap push ke branch `main`, GitHub Actions akan menjalankan `npm ci`, `npm run build`, lalu mem-publish folder `dist/` ke GitHub Pages.
+Workflow [`deploy-pages.yml`](./.github/workflows/deploy-pages.yml) sudah disiapkan: setiap push ke branch `main`, GitHub Actions akan menjalankan `npm ci` dan `npm run build`, lalu menangani publikasi sesuai **mode** yang sedang aktif di repository.
 
-> [!IMPORTANT]
-> **Wajib dilakukan sekali saja (1 klik).**
-> Selama **Source** di Settings &rarr; Pages masih bernilai **"Deploy from a branch"**, GitHub akan menyajikan file `index.html` versi *source* (yang masih menunjuk ke `/src/main.tsx`), sehingga halaman tampil **kosong/putih**.
-> Ubah ke **GitHub Actions** dengan langkah di bawah, lalu jalankan ulang workflow.
+Workflow ini mendukung **dua mode** sekaligus, jadi situs tetap tampil apa pun pengaturan Pages-nya:
 
-**Langkah aktivasi:**
+| Mode di Settings &rarr; Pages | Cara kerja workflow |
+| --- | --- |
+| **Deploy from a branch** (`main` / root) — mode bawaan | Hasil build disalin otomatis ke `index.html` di root, lalu GitHub Pages menyajikannya. |
+| **GitHub Actions** | Folder `dist/` diunggah dan dipublikasikan lewat `actions/deploy-pages`. |
 
-1. Buka **Settings** &rarr; **Pages** pada repository GitHub &rarr; tautan langsung:
-   https://github.com/MiftahulAnam95/project-uas/settings/pages
-2. Pada **Build and deployment** &rarr; **Source**, pilih **GitHub Actions** (bukan "Deploy from a branch").
-3. Buka tab **Actions** &rarr; pilih workflow **Deploy ke GitHub Pages** &rarr; **Run workflow** (atau cukup push ke `main`).
-4. Setelah proses hijau ✅, situs aktif di `https://miftahulanam95.github.io/project-uas/`.
+> [!NOTE]
+> Sebelumnya halaman tampil **kosong/putih** karena Pages memakai mode "Deploy from a branch" sementara `index.html` di root masih berupa template sumber yang memanggil `/src/main.tsx`. Sekarang `index.html` di root selalu berisi hasil build, sehingga mode apa pun aman.
 
-> Langkah di atas cukup dilakukan sekali. Setelah itu, setiap `git push` ke `main` otomatis men-deploy ulang situsnya.
+Disarankan (opsional) untuk berpindah ke mode **GitHub Actions** agar lebih rapi:
+
+1. Buka **Settings** &rarr; **Pages**: https://github.com/MiftahulAnam95/project-uas/settings/pages
+2. Pada **Build and deployment** &rarr; **Source**, pilih **GitHub Actions**.
+3. Buka tab **Actions** &rarr; workflow **Deploy ke GitHub Pages** &rarr; **Run workflow** (atau cukup push ke `main`).
+
+Situs aktif di `https://miftahulanam95.github.io/project-uas/`.
 
 > Untuk mengganti nama repository, tidak perlu mengubah konfigurasi apa pun. `base: "./"` di `vite.config.ts` membuat path aset tetap relatif, sehingga situs tetap jalan di `username.github.io/nama-repo-apa-saja/`.
 
@@ -193,8 +206,9 @@ npm run build
 
 | Gejala | Penyebab & Solusi |
 | --- | --- |
-| Halaman GitHub Pages tampil **kosong/putih** | **Pages Source** masih "Deploy from a branch", sehingga yang disajikan adalah `index.html` versi source (924 byte, memanggil `/src/main.tsx` yang tidak ada saat production). Ubah ke **GitHub Actions** di [Settings &rarr; Pages](https://github.com/MiftahulAnam95/project-uas/settings/pages), lalu jalankan ulang workflow **Deploy ke GitHub Pages**. |
-| Halaman GitHub Pages tampil daftar file / kode README, bukan aplikasi | Sama seperti di atas — pastikan **Source: GitHub Actions** dan deployment terakhir berstatus hijau ✅ di tab Actions. |
+| Halaman GitHub Pages tampil **kosong/putih** | Dulu terjadi karena Pages menyajikan `index.html` versi *source* (memanggil `/src/main.tsx`). Sekarang workflow menyalin hasil build ke `index.html` di root. Jika masih kosong: buka tab **Actions**, jalankan ulang **Deploy ke GitHub Pages**, lalu pastikan commit terakhir mengubah `index.html` di root. Selalu terbuka di jendela **incognito**/hard refresh (`Ctrl` + `F5`) agar tidak memakai cache lama. |
+| Halaman GitHub Pages tampil daftar file / kode README, bukan aplikasi | Berarti `index.html` di root bukan hasil build. Jalankan workflow **Deploy ke GitHub Pages** (atau `npm run build && cp dist/index.html index.html` lalu push). |
+| Halaman putih padahal build hijau ✅ | Buka DevTools &rarr; Console. Jika ada pesan `Failed to load module script`, berarti yang tersaji masih file sumber; tunggu workflow sinkronisasi selesai (± 1 menit) lalu muat ulang. |
 | Halaman putih kosong juga di Vercel | Biasanya aset gagal dimuat karena `base` salah. Pastikan `base: "./"` di `vite.config.ts` dan build ulang. |
 | Error 404 saat refresh halaman | Aplikasi memakai *hash routing* (`#bab-1`, `#flow`), jadi URL yang benar selalu menyertakan `#`. Untuk Vercel, `vercel.json` sudah menangani fallback ke `index.html`. |
 | Link ke bab tertentu tidak bisa dibagikan | Gunakan format `https://miftahulanam95.github.io/project-uas/#bab-3`. |

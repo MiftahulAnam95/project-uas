@@ -14,7 +14,28 @@ export default defineConfig({
   // root domain (Vercel) maupun dari sub-folder (GitHub Pages:
   // https://<user>.github.io/<repo>/) tanpa perlu ubah konfigurasi.
   base: "./",
-  plugins: [react(), tailwindcss(), viteSingleFile()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    viteSingleFile(),
+    {
+      // Di mode development, "/" diarahkan ke dev.html (template sumber).
+      // index.html di root repo adalah HASIL BUILD yang dipakai GitHub Pages,
+      // jadi jangan dipakai sebagai entry saat `npm run dev`.
+      name: "dev-entry-redirect",
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          const url = req.url?.split("?")[0];
+          if (url === "/" || url === "/index.html") {
+            res.writeHead(302, { Location: "/dev.html" });
+            res.end();
+            return;
+          }
+          next();
+        });
+      },
+    },
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
@@ -23,6 +44,11 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    rollupOptions: {
+      // Template sumber ada di dev.html; scripts/finalize-build.mjs
+      // mengganti namanya menjadi dist/index.html setelah build.
+      input: path.resolve(__dirname, "dev.html"),
+    },
   },
   server: {
     // Dengarkan semua antarmuka agar bisa dipratinjau dari luar sandbox,
@@ -30,6 +56,7 @@ export default defineConfig({
     host: "0.0.0.0",
     port: 5173,
     allowedHosts: true,
+    open: "/dev.html",
   },
   preview: {
     host: "0.0.0.0",
