@@ -28,7 +28,7 @@ import { Reveal } from '../components/common/Reveal';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { SectionHeading } from '../components/common/SectionHeading';
-import { TypingTerminal } from '../components/common/TypingTerminal';
+import { HeroTerminal } from '../components/common/HeroTerminal';
 import { cn } from '../utils/cn';
 
 interface HomePageProps {
@@ -268,7 +268,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             )}
           </div>
 
-          {/* Kolom visual: terminal yang mengetik sendiri */}
+          {/* Kolom visual: terminal statis berisi contoh sesi program */}
           <div className="lg:col-span-6">
             <div className="relative">
               {/* Kartu kode kecil mengambang */}
@@ -287,7 +287,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 Status: AMAN ✓
               </div>
 
-              <TypingTerminal />
+              <HeroTerminal />
             </div>
           </div>
         </div>
