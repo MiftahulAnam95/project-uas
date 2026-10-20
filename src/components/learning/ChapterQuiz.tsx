@@ -4,6 +4,7 @@ import { QuizQuestion, ChapterId } from '../../types';
 import { MiniCode } from '../code-block/MiniCode';
 import { ProgressRing } from '../common/ProgressRing';
 import { celebrateBig, celebrateSmall } from '../../utils/celebrate';
+import { formatInlineText } from '../../utils/formatText';
 import { cn } from '../../utils/cn';
 
 interface ChapterQuizProps {
@@ -176,7 +177,7 @@ export const ChapterQuiz: React.FC<ChapterQuizProps> = ({
                 </span>
                 <div className="min-w-0 flex-1">
                   <h4 className="text-sm font-bold leading-snug text-slate-900 sm:text-[15px]">
-                    {q.question}
+                    {formatInlineText(q.question)}
                   </h4>
                   {q.codeSnippet && <MiniCode code={q.codeSnippet} label="potongan kode" />}
                 </div>
@@ -225,7 +226,7 @@ export const ChapterQuiz: React.FC<ChapterQuizProps> = ({
                           {LETTERS[optIdx] ?? optIdx + 1}
                         </span>
                         <span className="min-w-0 font-mono text-[11px] sm:text-xs sm:font-sans sm:text-[13px]">
-                          {opt}
+                          {formatInlineText(opt)}
                         </span>
                       </span>
                       {isSubmitted && isAnswer && (
@@ -247,7 +248,7 @@ export const ChapterQuiz: React.FC<ChapterQuizProps> = ({
                   </span>
                   <p className="text-xs leading-relaxed text-slate-700 sm:text-[13px]">
                     <strong className="font-extrabold text-slate-900">Pembahasan:</strong>{' '}
-                    {q.explanation}
+                    {formatInlineText(q.explanation)}
                   </p>
                 </div>
               )}

@@ -19,6 +19,7 @@ import { Reveal } from '../components/common/Reveal';
 import { MiniCode } from '../components/code-block/MiniCode';
 import { FeedbackPanel } from '../components/learning/FeedbackPanel';
 import { celebrateSmall } from '../utils/celebrate';
+import { formatInlineText } from '../utils/formatText';
 import { cn } from '../utils/cn';
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E'];
@@ -205,7 +206,7 @@ export const DebuggingPage: React.FC = () => {
               </span>
               <p className="text-xs leading-relaxed text-amber-950 sm:text-sm">
                 <strong className="font-extrabold">Arti dalam bahasa manusia:</strong>{' '}
-                {currentError.simpleMeaning}
+                {formatInlineText(currentError.simpleMeaning)}
               </p>
             </div>
           </div>
@@ -264,7 +265,7 @@ export const DebuggingPage: React.FC = () => {
                 Cara memperbaiki
               </div>
               <p className="mt-2 text-xs leading-relaxed text-emerald-950/85 sm:text-[13px]">
-                {currentError.howToFix}
+                {formatInlineText(currentError.howToFix)}
               </p>
             </div>
           </div>
@@ -285,7 +286,9 @@ export const DebuggingPage: React.FC = () => {
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-rose-500 to-orange-400 text-[10px] font-extrabold text-white shadow-sm">
                     {idx + 1}
                   </span>
-                  <span className="text-xs leading-relaxed text-slate-700">{cause}</span>
+                  <span className="text-xs leading-relaxed text-slate-700">
+                    {formatInlineText(cause)}
+                  </span>
                 </span>
               </li>
             ))}
@@ -309,7 +312,7 @@ export const DebuggingPage: React.FC = () => {
           </div>
 
           <p className="text-sm font-semibold text-slate-800">
-            {currentError.practiceSnippet.question}
+            {formatInlineText(currentError.practiceSnippet.question)}
           </p>
 
           <MiniCode
@@ -396,7 +399,7 @@ export const DebuggingPage: React.FC = () => {
               onRetry={practiceCorrect ? undefined : () => handleResetPractice(currentError.id)}
               retryLabel="Coba Pertanyaan Ini Lagi"
             >
-              {currentError.practiceSnippet.explanation}
+              {formatInlineText(currentError.practiceSnippet.explanation)}
             </FeedbackPanel>
           )}
         </div>

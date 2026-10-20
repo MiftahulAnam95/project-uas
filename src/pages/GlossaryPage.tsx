@@ -14,6 +14,7 @@ import { ActiveTab } from '../components/layout/Navbar';
 import { PageHeader } from '../components/common/PageHeader';
 import { MiniCode } from '../components/code-block/MiniCode';
 import { Reveal } from '../components/common/Reveal';
+import { formatInlineText } from '../utils/formatText';
 import { cn } from '../utils/cn';
 
 interface GlossaryPageProps {
@@ -206,14 +207,15 @@ export const GlossaryPage: React.FC<GlossaryPageProps> = ({ onNavigateTab }) => 
                   </div>
 
                   <p className="relative mt-4 text-sm leading-relaxed text-slate-700">
-                    {term.simpleDefinition}
+                    {formatInlineText(term.simpleDefinition)}
                   </p>
 
                   {term.analogy && (
                     <div className="relative mt-3.5 flex items-start gap-2.5 rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50/90 to-fuchsia-50/50 p-3">
                       <Lightbulb className="mt-px h-4 w-4 shrink-0 text-violet-600" />
                       <p className="text-xs leading-relaxed text-violet-950">
-                        <strong className="font-extrabold">Perumpamaan:</strong> {term.analogy}
+                        <strong className="font-extrabold">Perumpamaan:</strong>{' '}
+                        {formatInlineText(term.analogy)}
                       </p>
                     </div>
                   )}

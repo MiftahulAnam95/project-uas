@@ -12,6 +12,7 @@ import { highlightSyntax } from '../../utils/highlightSyntax';
 import { ExerciseCard } from './ExerciseCard';
 import { FeedbackPanel } from './FeedbackPanel';
 import { celebrateSmall } from '../../utils/celebrate';
+import { formatInlineText } from '../../utils/formatText';
 import { cn } from '../../utils/cn';
 
 interface FillInBlankExerciseProps {
@@ -83,7 +84,7 @@ export const FillInBlankExercise: React.FC<FillInBlankExerciseProps> = ({
       kind="Lengkapi kode"
       icon={PenLine}
       title={exercise.title}
-      prompt={exercise.prompt}
+      prompt={formatInlineText(exercise.prompt)}
       accent="sky"
       aside={
         locked ? (
@@ -151,7 +152,8 @@ export const FillInBlankExercise: React.FC<FillInBlankExerciseProps> = ({
             <div className="flex items-start gap-2 text-xs text-amber-950">
               <Lightbulb className="mt-px h-4 w-4 shrink-0 text-amber-500" />
               <p className="leading-relaxed">
-                <strong className="font-extrabold">Petunjuk 1:</strong> {exercise.hint1}
+                <strong className="font-extrabold">Petunjuk 1:</strong>{' '}
+                {formatInlineText(exercise.hint1)}
               </p>
             </div>
             {exercise.hint2 && hintLevel === 1 && (
@@ -167,7 +169,8 @@ export const FillInBlankExercise: React.FC<FillInBlankExerciseProps> = ({
               <div className="flex items-start gap-2 text-xs text-amber-950 anim-rise">
                 <Lightbulb className="mt-px h-4 w-4 shrink-0 text-orange-500" />
                 <p className="leading-relaxed">
-                  <strong className="font-extrabold">Petunjuk 2:</strong> {exercise.hint2}
+                  <strong className="font-extrabold">Petunjuk 2:</strong>{' '}
+                  {formatInlineText(exercise.hint2)}
                 </p>
               </div>
             )}
@@ -188,7 +191,7 @@ export const FillInBlankExercise: React.FC<FillInBlankExerciseProps> = ({
           onRetry={isCorrect ? undefined : handleReset}
           retryLabel="Isi Ulang"
         >
-          {exercise.explanation}
+          {formatInlineText(exercise.explanation)}
           {!isCorrect && (
             <span className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-bold text-rose-700">
               <RotateCcw className="h-3 w-3" />
