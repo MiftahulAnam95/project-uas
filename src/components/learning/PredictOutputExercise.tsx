@@ -5,6 +5,7 @@ import { ExerciseCard } from './ExerciseCard';
 import { FeedbackPanel } from './FeedbackPanel';
 import { MiniCode } from '../code-block/MiniCode';
 import { celebrateSmall } from '../../utils/celebrate';
+import { formatInlineText } from '../../utils/formatText';
 import { cn } from '../../utils/cn';
 
 interface PredictOutputExerciseProps {
@@ -42,7 +43,7 @@ export const PredictOutputExercise: React.FC<PredictOutputExerciseProps> = ({
       kind="Prediksi hasil kode"
       icon={HelpCircle}
       title={exercise.title}
-      prompt={exercise.prompt}
+      prompt={formatInlineText(exercise.prompt)}
       accent="violet"
       aside={
         isSubmitted ? (
@@ -125,7 +126,7 @@ export const PredictOutputExercise: React.FC<PredictOutputExerciseProps> = ({
           heading={isCorrect ? 'Tepat sekali! 🎉' : 'Belum tepat — lihat alasannya yuk'}
           onRetry={isCorrect ? undefined : handleReset}
         >
-          {exercise.explanation}
+          {formatInlineText(exercise.explanation)}
         </FeedbackPanel>
       )}
     </ExerciseCard>

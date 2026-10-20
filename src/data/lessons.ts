@@ -309,7 +309,7 @@ C:\\keuangan_mahasiswa> _____ main.py`,
       {
         id: 'langkah-1-print',
         title: 'Langkah 1: Menampilkan Teks ke Layar (print)',
-        content: `Perintah \`print()\` digunakan untuk menyuruh komputer menampilkan tulisan atau angka ke layar konsol. Tulisan yang ingin ditampilkan harus diapit tanda petik dua (\`"...\`") atau petik satu (\`'...\`').`,
+        content: `Perintah \`print()\` digunakan untuk menyuruh komputer menampilkan tulisan atau angka ke layar konsol. Tulisan yang ingin ditampilkan harus diapit tanda petik dua (\`"..."\`) atau petik satu (\`'...'\`).`,
         analogy: 'Seperti pengumuman di pengeras suara kampus atau tulisan di papan pengumuman mading.',
         codeSnippets: [
           {

@@ -15,6 +15,7 @@ import { LineExplanation } from '../../types';
 import { executePythonCode } from '../../utils/pythonRunner';
 import { cn } from '../../utils/cn';
 import { highlightSyntax } from '../../utils/highlightSyntax';
+import { formatInlineText } from '../../utils/formatText';
 
 interface CodeBlockProps {
   code: string;
@@ -240,7 +241,10 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
               Penjelasan baris {selectedLine}
             </div>
             <p className="text-xs leading-relaxed text-slate-200 sm:text-sm">
-              {lineExplanations.find((e) => e.line === selectedLine)?.explanation}
+              {formatInlineText(
+                lineExplanations.find((e) => e.line === selectedLine)?.explanation,
+                'dark'
+              )}
             </p>
           </div>
           <button
@@ -261,7 +265,9 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
             <Info className="h-3.5 w-3.5" />
             Penjelasan
           </div>
-          <p className="text-xs leading-relaxed text-slate-300 sm:text-sm">{explanation}</p>
+          <p className="text-xs leading-relaxed text-slate-300 sm:text-sm">
+            {formatInlineText(explanation, 'dark')}
+          </p>
         </div>
       )}
 

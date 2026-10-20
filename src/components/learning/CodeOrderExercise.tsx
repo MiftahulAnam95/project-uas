@@ -10,6 +10,7 @@ import { SequenceExercise, SequenceExerciseItem } from '../../types';
 import { ExerciseCard } from './ExerciseCard';
 import { FeedbackPanel } from './FeedbackPanel';
 import { celebrateSmall } from '../../utils/celebrate';
+import { formatInlineText } from '../../utils/formatText';
 import { cn } from '../../utils/cn';
 
 interface CodeOrderExerciseProps {
@@ -69,7 +70,7 @@ export const CodeOrderExercise: React.FC<CodeOrderExerciseProps> = ({
       kind="Susun urutan alur"
       icon={ListOrdered}
       title={exercise.title}
-      prompt={exercise.prompt}
+      prompt={formatInlineText(exercise.prompt)}
       accent="teal"
       aside={
         <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-500 tabular">
@@ -119,7 +120,7 @@ export const CodeOrderExercise: React.FC<CodeOrderExerciseProps> = ({
               </span>
 
               <span className="min-w-0 flex-1 text-[13px] font-medium leading-snug text-slate-800">
-                {item.text}
+                {formatInlineText(item.text)}
               </span>
 
               {isSubmitted && !inPlace && (
@@ -205,7 +206,7 @@ export const CodeOrderExercise: React.FC<CodeOrderExerciseProps> = ({
               : 'Urutannya belum tepat — periksa lagi alur logikanya.'
           }
         >
-          {exercise.explanation}
+          {formatInlineText(exercise.explanation)}
         </FeedbackPanel>
       )}
     </ExerciseCard>

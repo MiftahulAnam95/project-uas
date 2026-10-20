@@ -25,6 +25,7 @@ import { PredictOutputExercise } from '../components/learning/PredictOutputExerc
 import { FillInBlankExercise } from '../components/learning/FillInBlankExercise';
 import { CodeOrderExercise } from '../components/learning/CodeOrderExercise';
 import { ChapterQuiz } from '../components/learning/ChapterQuiz';
+import { formatInlineText } from '../utils/formatText';
 import { cn } from '../utils/cn';
 
 interface ChapterPageProps {
@@ -132,7 +133,7 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
         description={
           <>
             <span className="font-semibold text-white">{chapter.subtitle}</span>
-            <span className="mt-2 block">{chapter.description}</span>
+            <span className="mt-2 block">{formatInlineText(chapter.description, 'dark')}</span>
           </>
         }
         stats={[
@@ -188,7 +189,7 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
                 >
                   {idx + 1}
                 </span>
-                <span>{goal}</span>
+                <span>{formatInlineText(goal, 'dark')}</span>
               </li>
             ))}
           </ul>
@@ -253,12 +254,12 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
                 </div>
 
                 <div className="space-y-4 whitespace-pre-line text-sm leading-relaxed text-slate-700 sm:text-[15px]">
-                  {section.content}
+                  {formatInlineText(section.content)}
                 </div>
 
                 {section.analogy && (
                   <Callout type="analogy" title="Perumpamaan Sehari-hari">
-                    {section.analogy}
+                    {formatInlineText(section.analogy)}
                   </Callout>
                 )}
 
@@ -284,7 +285,7 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
                   <Callout type="info" title="Catatan Penting">
                     <ul className="ml-4 list-disc space-y-1.5 marker:text-sky-500">
                       {section.importantNotes.map((note, i) => (
-                        <li key={i}>{note}</li>
+                        <li key={i}>{formatInlineText(note)}</li>
                       ))}
                     </ul>
                   </Callout>
@@ -294,7 +295,7 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
                   <Callout type="warning" title="Kesalahan Umum Pemula">
                     <ul className="ml-4 list-disc space-y-1.5 marker:text-amber-600">
                       {section.commonMistakes.map((mistake, i) => (
-                        <li key={i}>{mistake}</li>
+                        <li key={i}>{formatInlineText(mistake)}</li>
                       ))}
                     </ul>
                   </Callout>
@@ -386,7 +387,7 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
                       className="mt-px h-4 w-4 shrink-0 text-emerald-600"
                       strokeWidth={2.4}
                     />
-                    <span>{point}</span>
+                    <span>{formatInlineText(point)}</span>
                   </li>
                 ))}
               </ul>
