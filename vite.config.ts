@@ -10,10 +10,18 @@ const __dirname = path.dirname(__filename);
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Path relatif ("base: './'") membuat hasil build bisa dibuka dari
+  // root domain (Vercel) maupun dari sub-folder (GitHub Pages:
+  // https://<user>.github.io/<repo>/) tanpa perlu ubah konfigurasi.
+  base: "./",
   plugins: [react(), tailwindcss(), viteSingleFile()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
+  },
+  build: {
+    outDir: "dist",
+    emptyOutDir: true,
   },
 });
