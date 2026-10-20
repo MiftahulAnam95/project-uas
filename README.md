@@ -6,6 +6,15 @@ Website pembelajaran interaktif berbahasa Indonesia yang disiapkan sebagai **Tug
 
 Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru pertama kali belajar pemrograman komputer. Tanpa menggunakan backend khusus, seluruh aplikasi berjalan 100% di peramban (client-side) dan dapat dipublikasikan ke **GitHub Pages** maupun **Vercel**.
 
+### 🔗 Demo Online
+
+| Platform | URL |
+| --- | --- |
+| **GitHub Pages** | https://miftahulanam95.github.io/project-uas/ |
+| **Vercel** | Import repo ini di [vercel.com/new](https://vercel.com/new) — konfigurasi sudah otomatis (lihat panduan di bawah) |
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/MiftahulAnam95/project-uas)
+
 ---
 
 ## 🌟 Fitur Utama Platform
@@ -65,24 +74,27 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
 ## 💻 Cara Instalasi & Menjalankan di Komputer Lokal
 
 ### Prasyarat
-- Pastikan [Node.js](https://nodejs.org/) (versi 18 ke atas) telah terpasang di komputermu.
+- Pastikan [Node.js](https://nodejs.org/) (versi 20 ke atas) telah terpasang di komputermu.
 
 ### Langkah-langkah:
 1. Unduh atau clone repository ini:
-   \`\`\`bash
-   git clone https://github.com/username/tugas-project-uas.git
-   cd tugas-project-uas
-   \`\`\`
+
+   ```bash
+   git clone https://github.com/MiftahulAnam95/project-uas.git
+   cd project-uas
+   ```
 
 2. Pasang semua dependensi proyek:
-   \`\`\`bash
+
+   ```bash
    npm install
-   \`\`\`
+   ```
 
 3. Jalankan server pengembangan lokal:
-   \`\`\`bash
+
+   ```bash
    npm run dev
-   \`\`\`
+   ```
 
 4. Buka tautan lokal yang ditampilkan di terminal (biasanya `http://localhost:5173`) di browser pilihanmu.
 
@@ -92,35 +104,71 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
 
 Untuk menghasilkan file statis siap rilis:
 
-\`\`\`bash
+```bash
 npm run build
-\`\`\`
+```
 
-Hasil build akan otomatis berada di folder \`dist/\` dalam bentuk file statis yang siap di-deploy ke server statis mana pun.
+Hasil build akan otomatis berada di folder `dist/` dalam bentuk file statis yang siap di-deploy ke server statis mana pun. Berkat `vite-plugin-singlefile`, seluruh JavaScript dan CSS sudah **digabung menjadi satu file `index.html`** (tanpa folder `assets/`), sehingga tidak ada masalah path saat di-hosting di sub-folder GitHub Pages.
 
 Untuk menguji hasil build secara lokal:
-\`\`\`bash
+
+```bash
 npm run preview
-\`\`\`
+```
 
 ---
 
 ## 🚀 Panduan Deployment
 
-### 1. Deployment ke Vercel
-1. Masuk ke dashboard [Vercel](https://vercel.com/).
-2. Buat proyek baru dan hubungkan ke repository GitHub proyek ini.
-3. Konfigurasi build otomatis:
-   - **Framework Preset**: Vite
-   - **Build Command**: \`npm run build\`
-   - **Output Directory**: \`dist\`
-4. Klik **Deploy**. Website akan langsung aktif dalam hitungan detik.
+### 1. Deployment ke Vercel (Otomatis)
 
-### 2. Deployment ke GitHub Pages
-1. Pastikan kode sudah di-push ke repository GitHub.
-2. Di repository GitHub, buka **Settings** &rarr; **Pages**.
-3. Di bagian **Build and deployment**, pilih **GitHub Actions** atau deploy dari branch \`gh-pages\` menggunakan build file dari folder \`dist\`.
-4. Navigasi platform menggunakan hash routing (`#bab-1`, `#flow`, dll.) sehingga seluruh tautan dijamin bebas dari error 404 pada GitHub Pages.
+Konfigurasi Vercel sudah disiapkan di file [`vercel.json`](./vercel.json), jadi tidak perlu mengatur apa pun secara manual.
+
+1. Buka [vercel.com/new](https://vercel.com/new) lalu login (bisa pakai akun GitHub).
+2. Pilih **Import Git Repository** &rarr; `MiftahulAnam95/project-uas`.
+3. Vercel otomatis mendeteksi **Framework Preset: Vite**, **Build Command: `npm run build`**, dan **Output Directory: `dist`**. Langsung klik **Deploy**.
+4. Situs aktif di domain `*.vercel.app` yang diberikan Vercel (setiap `git push` ke branch `main` akan otomatis di-deploy ulang).
+
+Alternatif lewat CLI:
+
+```bash
+npm i -g vercel
+vercel        # preview
+vercel --prod # production
+```
+
+### 2. Deployment ke GitHub Pages (Otomatis)
+
+Workflow [`deploy-pages.yml`](./.github/workflows/deploy-pages.yml) sudah disiapkan: setiap push ke branch `main`, GitHub Actions akan menjalankan `npm ci`, `npm run build`, lalu mem-publish folder `dist/` ke GitHub Pages.
+
+**Sekali saja, aktifkan di repository:**
+
+1. Buka **Settings** &rarr; **Pages** pada repository GitHub.
+2. Pada **Build and deployment** &rarr; **Source**, pilih **GitHub Actions** (bukan "Deploy from a branch").
+3. Buka tab **Actions** &rarr; pilih workflow **Deploy ke GitHub Pages** &rarr; **Run workflow** (atau cukup push ke `main`).
+4. Setelah proses hijau ✅, situs aktif di `https://miftahulanam95.github.io/project-uas/`.
+
+> Untuk mengganti nama repository, tidak perlu mengubah konfigurasi apa pun. `base: "./"` di `vite.config.ts` membuat path aset tetap relatif, sehingga situs tetap jalan di `username.github.io/nama-repo-apa-saja/`.
+
+### 3. Deployment Manual (Opsional)
+
+Kalau ingin meng-upload hasil build ke hosting statis lain (Netlify, cPanel, dsb.):
+
+```bash
+npm run build
+# upload seluruh isi folder dist/ (index.html + .nojekyll)
+```
+
+---
+
+## 🩺 Troubleshooting
+
+| Gejala | Penyebab & Solusi |
+| --- | --- |
+| Halaman GitHub Pages tampil daftar file / kode README, bukan aplikasi | **Pages Source** masih "Deploy from a branch". Ubah ke **GitHub Actions** lalu jalankan workflow. |
+| Halaman putih kosong (blank) | Biasanya aset gagal dimuat karena `base` salah. Pastikan `base: "./"` di `vite.config.ts` dan build ulang. |
+| Error 404 saat refresh halaman | Aplikasi memakai *hash routing* (`#bab-1`, `#flow`), jadi URL yang benar selalu menyertakan `#`. Untuk Vercel, `vercel.json` sudah menangani fallback ke `index.html`. |
+| Link ke bab tertentu tidak bisa dibagikan | Gunakan format `https://miftahulanam95.github.io/project-uas/#bab-3`. |
 
 ---
 
