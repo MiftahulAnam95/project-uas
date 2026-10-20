@@ -71,7 +71,7 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
 | --- | --- |
 | `src/index.css` | Token tema Tailwind v4 (`@theme`), keyframes, kelas komponen (`.aurora`, `.surface`, `.btn`, `.reveal`, `.shine`) |
 | `src/theme/accents.ts` | Palet aksen per bab (9 warna berputar) agar kurikulum terasa berwarna tapi konsisten |
-| `src/components/common/` | `Button`, `Card`, `PageHeader`, `SectionHeading`, `ProgressRing`, `Reveal`, `BackToTop`, `Callout`, `Badge`, `Modal`, `TypingTerminal` |
+| `src/components/common/` | `Button`, `Card`, `PageHeader`, `SectionHeading`, `ProgressRing`, `Reveal`, `BackToTop`, `Callout`, `Badge`, `Modal`, `HeroTerminal` |
 | `src/components/code-block/` | `CodeBlock` (editor penuh: jalankan, salin, bedah per baris) dan `MiniCode` (potongan kode ringkas) |
 | `src/utils/highlightSyntax.tsx` | Pewarna sintaks Python ringan tanpa dependensi tambahan |
 
