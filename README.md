@@ -141,12 +141,20 @@ vercel --prod # production
 
 Workflow [`deploy-pages.yml`](./.github/workflows/deploy-pages.yml) sudah disiapkan: setiap push ke branch `main`, GitHub Actions akan menjalankan `npm ci`, `npm run build`, lalu mem-publish folder `dist/` ke GitHub Pages.
 
-**Sekali saja, aktifkan di repository:**
+> [!IMPORTANT]
+> **Wajib dilakukan sekali saja (1 klik).**
+> Selama **Source** di Settings &rarr; Pages masih bernilai **"Deploy from a branch"**, GitHub akan menyajikan file `index.html` versi *source* (yang masih menunjuk ke `/src/main.tsx`), sehingga halaman tampil **kosong/putih**.
+> Ubah ke **GitHub Actions** dengan langkah di bawah, lalu jalankan ulang workflow.
 
-1. Buka **Settings** &rarr; **Pages** pada repository GitHub.
+**Langkah aktivasi:**
+
+1. Buka **Settings** &rarr; **Pages** pada repository GitHub &rarr; tautan langsung:
+   https://github.com/MiftahulAnam95/project-uas/settings/pages
 2. Pada **Build and deployment** &rarr; **Source**, pilih **GitHub Actions** (bukan "Deploy from a branch").
 3. Buka tab **Actions** &rarr; pilih workflow **Deploy ke GitHub Pages** &rarr; **Run workflow** (atau cukup push ke `main`).
 4. Setelah proses hijau ✅, situs aktif di `https://miftahulanam95.github.io/project-uas/`.
+
+> Langkah di atas cukup dilakukan sekali. Setelah itu, setiap `git push` ke `main` otomatis men-deploy ulang situsnya.
 
 > Untuk mengganti nama repository, tidak perlu mengubah konfigurasi apa pun. `base: "./"` di `vite.config.ts` membuat path aset tetap relatif, sehingga situs tetap jalan di `username.github.io/nama-repo-apa-saja/`.
 
@@ -165,8 +173,9 @@ npm run build
 
 | Gejala | Penyebab & Solusi |
 | --- | --- |
-| Halaman GitHub Pages tampil daftar file / kode README, bukan aplikasi | **Pages Source** masih "Deploy from a branch". Ubah ke **GitHub Actions** lalu jalankan workflow. |
-| Halaman putih kosong (blank) | Biasanya aset gagal dimuat karena `base` salah. Pastikan `base: "./"` di `vite.config.ts` dan build ulang. |
+| Halaman GitHub Pages tampil **kosong/putih** | **Pages Source** masih "Deploy from a branch", sehingga yang disajikan adalah `index.html` versi source (924 byte, memanggil `/src/main.tsx` yang tidak ada saat production). Ubah ke **GitHub Actions** di [Settings &rarr; Pages](https://github.com/MiftahulAnam95/project-uas/settings/pages), lalu jalankan ulang workflow **Deploy ke GitHub Pages**. |
+| Halaman GitHub Pages tampil daftar file / kode README, bukan aplikasi | Sama seperti di atas — pastikan **Source: GitHub Actions** dan deployment terakhir berstatus hijau ✅ di tab Actions. |
+| Halaman putih kosong juga di Vercel | Biasanya aset gagal dimuat karena `base` salah. Pastikan `base: "./"` di `vite.config.ts` dan build ulang. |
 | Error 404 saat refresh halaman | Aplikasi memakai *hash routing* (`#bab-1`, `#flow`), jadi URL yang benar selalu menyertakan `#`. Untuk Vercel, `vercel.json` sudah menangani fallback ke `index.html`. |
 | Link ke bab tertentu tidak bisa dibagikan | Gunakan format `https://miftahulanam95.github.io/project-uas/#bab-3`. |
 
