@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    color: #0F172A;
+    background-color: #F8FAFC;
+  }
+
+  code, pre, kbd, samp {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+}
+
+/* Custom smooth scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Code block highlight styles */
+.code-token-keyword { color: #F43F5E; font-weight: 600; }
+.code-token-string { color: #10B981; }
+.code-token-number { color: #F59E0B; }
+.code-token-function { color: #38BDF8; font-weight: 500; }
+.code-token-comment { color: #64748B; font-style: italic; }
+.code-token-variable { color: #E2E8F0; }
+.code-token-operator { color: #A78BFA; }
+.code-token-builtin { color: #FB7185; }
+
+/* Focus outline for accessibility */
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid #4F46E5;
+  outline-offset: 2px;
+}
