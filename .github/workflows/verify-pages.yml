@@ -1,0 +1,22 @@
+name: Verify Pages Output
+on:
+  push:
+    branches: [arena/a0a7b106-project-uas]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl site
+        run: |
+          echo "=== status ==="
+          curl -sS -o /tmp/p.html -w "code=%{http_code} size=%{size_download}\n" -L https://miftahulanam95.github.io/project-uas/ || true
+          echo "=== first 400 chars ==="
+          head -c 400 /tmp/p.html || true
+          echo
+          echo "=== markers ==="
+          grep -c 'src="/src/main.tsx"' /tmp/p.html && echo "LEGACY_RAW_INDEX" || echo "no-raw-src"
+          grep -c '<div id="root">' /tmp/p.html && echo "HAS_ROOT_DIV" || echo "no-root-div"
+          grep -c 'Tugas Project UAS' /tmp/p.html && echo "HAS_TITLE" || echo "no-title"
