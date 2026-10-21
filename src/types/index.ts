@@ -74,6 +74,45 @@ export interface SequenceExercise {
   explanation: string;
 }
 
+/** Soal pilihan ganda untuk uji pemahaman per langkah. */
+export interface StepChoiceQuestion {
+  id: string;
+  type: 'choice';
+  question: string;
+  code?: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+  hint?: string;
+}
+
+/** Soal isian singkat untuk uji pemahaman per langkah. */
+export interface StepFillQuestion {
+  id: string;
+  type: 'fill';
+  question: string;
+  code?: string;
+  placeholder?: string;
+  /** Beberapa ejaan jawaban yang diterima (huruf besar/kecil diabaikan). */
+  acceptedAnswers: string[];
+  explanation: string;
+  hint?: string;
+}
+
+export type StepCheckQuestion = StepChoiceQuestion | StepFillQuestion;
+
+/**
+ * Paket "Uji Pemahaman" yang menempel pada satu langkah materi.
+ * Semua soal harus dijawab benar sebelum langkah dianggap dikuasai.
+ */
+export interface StepPractice {
+  id: string;
+  stepNumber: number;
+  /** Kalimat inti yang harus diingat dari langkah ini. */
+  keyTakeaway: string;
+  questions: StepCheckQuestion[];
+}
+
 export interface ChapterSection {
   id: string;
   title: string;
@@ -82,6 +121,14 @@ export interface ChapterSection {
   codeSnippets?: CodeSnippet[];
   importantNotes?: string[];
   commonMistakes?: string[];
+  /** Nomor urut langkah (dipakai untuk peta langkah & uji pemahaman). */
+  stepNumber?: number;
+  /** Label pendek langkah, mis. "print()". */
+  stepLabel?: string;
+  /** Kalimat pengingat singkat untuk peta langkah. */
+  stepTagline?: string;
+  /** Uji pemahaman khusus langkah ini. */
+  practice?: StepPractice;
 }
 
 export interface Chapter {

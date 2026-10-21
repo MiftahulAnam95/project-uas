@@ -25,6 +25,8 @@ import { PredictOutputExercise } from '../components/learning/PredictOutputExerc
 import { FillInBlankExercise } from '../components/learning/FillInBlankExercise';
 import { CodeOrderExercise } from '../components/learning/CodeOrderExercise';
 import { ChapterQuiz } from '../components/learning/ChapterQuiz';
+import { StepCheckPractice } from '../components/learning/StepCheckPractice';
+import { StepRoadmap, StepRoadmapItem } from '../components/learning/StepRoadmap';
 import { formatInlineText } from '../utils/formatText';
 import { cn } from '../utils/cn';
 
@@ -32,6 +34,7 @@ interface ChapterPageProps {
   chapterId: ChapterId;
   onSelectChapter: (id: ChapterId) => void;
   completedChapters: ChapterId[];
+  completedExercises: string[];
   onToggleComplete: (id: ChapterId) => void;
   savedQuizScore?: number;
   onSaveQuizScore: (id: ChapterId, score: number) => void;
@@ -42,6 +45,7 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
   chapterId,
   onSelectChapter,
   completedChapters,
+  completedExercises,
   onToggleComplete,
   savedQuizScore = 0,
   onSaveQuizScore,
@@ -64,9 +68,26 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
       (chapter.predictExercises?.length ?? 0) +
       (chapter.fillInBlankExercises?.length ?? 0) +
       (chapter.sequenceExercise ? 1 : 0) +
-      (chapter.quiz && chapter.quiz.length > 0 ? 1 : 0),
+      (chapter.quiz && chapter.quiz.length > 0 ? 1 : 0) +
+      chapter.sections.filter((s) => s.practice).length,
     [chapter]
   );
+
+  const stepItems: StepRoadmapItem[] = useMemo(
+    () =>
+      chapter.sections
+        .filter((s) => s.stepNumber && s.practice)
+        .map((s) => ({
+          number: s.stepNumber as number,
+          sectionId: s.id,
+          label: s.stepLabel || s.title,
+          tagline: s.stepTagline || '',
+          mastered: completedExercises.includes(s.practice!.id),
+        })),
+    [chapter, completedExercises]
+  );
+
+  const completedStepCount = stepItems.filter((item) => item.mastered).length;
 
   const codeCount = useMemo(
     () =>
@@ -140,6 +161,14 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
           { label: 'Sub-materi', value: String(chapter.sections.length) },
           { label: 'Contoh kode', value: String(codeCount) },
           { label: 'Latihan & kuis', value: String(exerciseCount) },
+          ...(stepItems.length
+            ? [
+                {
+                  label: 'Langkah dikuasai',
+                  value: `${completedStepCount}/${stepItems.length}`,
+                },
+              ]
+            : []),
         ]}
         className={cn(
           // Tiap bab punya rona gradasi sendiri lewat aksen strip di bawah
@@ -172,6 +201,8 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
           </ul>
         </div>
       </PageHeader>
+
+      {stepItems.length > 0 && <StepRoadmap items={stepItems} />}
 
       {/* ======================= ISI ======================= */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -209,8 +240,17 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
                   <div className="min-w-0 flex-1">
                     <div className="mb-1 flex flex-wrap items-center gap-2">
                       <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-500 tabular">
-                        Bagian {idx + 1}/{chapter.sections.length}
+                        {section.stepNumber
+                          ? `Langkah ${section.stepNumber}/${stepItems.length}`
+                          : `Bagian ${idx + 1}/${chapter.sections.length}`}
                       </span>
+                      {section.practice &&
+                        completedExercises.includes(section.practice.id) && (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">
+                            <CheckCircle2 className="h-3 w-3" strokeWidth={3} />
+                            Dikuasai
+                          </span>
+                        )}
                       {activeSectionId === section.id && (
                         <span
                           className={cn(
@@ -276,6 +316,14 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
                       ))}
                     </ul>
                   </Callout>
+                )}
+
+                {section.practice && (
+                  <StepCheckPractice
+                    practice={section.practice}
+                    isMastered={completedExercises.includes(section.practice.id)}
+                    onCompleted={() => onMarkExerciseDone(section.practice!.id)}
+                  />
                 )}
               </section>
             </Reveal>

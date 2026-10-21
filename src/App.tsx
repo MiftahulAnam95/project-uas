@@ -185,6 +185,7 @@ export function App() {
                 chapterId={currentChapterId}
                 onSelectChapter={handleSelectChapter}
                 completedChapters={progress.completedChapters}
+                completedExercises={progress.completedExercises}
                 onToggleComplete={toggleChapterComplete}
                 savedQuizScore={progress.quizScores[currentChapterId]}
                 onSaveQuizScore={saveQuizScore}
