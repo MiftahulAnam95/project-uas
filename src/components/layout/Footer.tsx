@@ -23,7 +23,7 @@ interface FooterProps {
 
 const LEARNING_LINKS: Array<{ label: string; tab: ActiveTab; chapter?: ChapterId }> = [
   { label: 'Bab 1 — Kenalan Dulu', tab: 'chapter', chapter: 'bab-1' },
-  { label: 'Bab 3 — 9 Langkah Dasar', tab: 'chapter', chapter: 'bab-3' },
+  { label: 'Bab 3 — Sembilan Langkah Dasar', tab: 'chapter', chapter: 'bab-3' },
   { label: 'Bab 7 — Simulasi Alur', tab: 'flow' },
   { label: 'Bab 8 — Panduan Error', tab: 'debugging' },
   { label: 'Bab 11 — Tips Presentasi', tab: 'chapter', chapter: 'bab-11' },

@@ -22,7 +22,7 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
 1. **Kurikulum Lengkap 11 Bab Sesuai Modul**:
    - **Bab 1 — Kenalan Dulu**: Memahami masalah keuangan mahasiswa dan alasan modularitas 3 file (`pencatat.py`, `laporan.py`, `main.py`).
    - **Bab 2 — Persiapan**: Memasang Python 3, teks editor (VS Code), dan menjalankan file lewat terminal.
-   - **Bab 3 — Sembilan Langkah Dasar**: 9 pondasi koding (`print`, variabel, `input`, operator, `if/else`, `list`, `dict`, perulangan `for/while`, fungsi `def`, dan `import`).
+   - **Bab 3 — Sembilan Langkah Dasar**: 9 pondasi koding (`print`, variabel, `input`, operator, `if/else`, `list`, `dict`, perulangan `for/while`, fungsi `def`, dan `import`). Setiap langkah dilengkapi penjelasan ulang untuk pemula, contoh kode, kesalahan umum, dan **3 soal uji pemahaman** yang harus benar semua sebelum langkah dianggap dikuasai.
    - **Bab 4 — Bedah pencatat.py**: Logika penyimpanan data keuangan dan perhitungan matematika.
    - **Bab 5 — Bedah laporan.py**: Format Rupiah rapi, status peringatan (Aman/Waspada/Boros), dan validasi input.
    - **Bab 6 — Bedah main.py**: Menu interaktif terminal (CLI) dan penghubung antar-file.
@@ -39,6 +39,7 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
    - Tombol salin kode cepat.
 
 3. **Latihan Interaktif Beragam**:
+   - **Uji Pemahaman per Langkah (Bab 3)**: peta 9 langkah dengan status penguasaan, lalu 3 soal per langkah (konsep, membaca kode, dan isian singkat) beserta petunjuk dan pembahasan.
    - Prediksi hasil kode (*Predict Output*).
    - Lengkapi kode (*Fill in the Blank*) dengan sistem petunjuk bertahap (Petunjuk 1 & Petunjuk 2).
    - Susun urutan langkah program (*Code Sequence Ordering*).
