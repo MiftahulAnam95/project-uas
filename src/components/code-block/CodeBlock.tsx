@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { LineExplanation } from '../../types';
 import { executePythonCode } from '../../utils/pythonRunner';
+import { runPythonReal } from '../../utils/pyodideRunner';
 import { cn } from '../../utils/cn';
 import { highlightSyntax } from '../../utils/highlightSyntax';
 import { formatInlineText } from '../../utils/formatText';
@@ -44,6 +45,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
   const [selectedLine, setSelectedLine] = useState<number | null>(null);
   const [customOutput, setCustomOutput] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [runNote, setRunNote] = useState<string | null>(null);
 
   const lines = code.trim().split('\n');
   const explorableCount = lineExplanations?.length ?? 0;
@@ -58,11 +60,31 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
     }
   };
 
-  const handleRun = () => {
+  const handleRun = async () => {
     setIsRunning(true);
-    setTimeout(() => {
+    setRunNote(null);
+    try {
+      const res = await runPythonReal(code);
+      if (res.hasError) {
+        if (isSimulated && output) {
+          setCustomOutput(output);
+          setRunNote(
+            'Contoh ini adalah potongan kode, bukan file lengkap. Output di bawah adalah hasil yang diharapkan. Jalankan file lengkap di terminal untuk mencoba sendiri.'
+          );
+        } else {
+          setCustomOutput(res.error || 'Terjadi kesalahan eksekusi.');
+        }
+      } else {
+        setCustomOutput(res.output || '(Tidak ada output yang dicetak)');
+      }
+    } catch {
+      // Pyodide tidak tersedia (offline/CDN diblokir). Pakai output contoh
+      // atau simulator lama agar halaman tetap bisa dipelajari.
       if (isSimulated && output) {
         setCustomOutput(output);
+        setRunNote(
+          'Python online tidak bisa dimuat. Output di bawah adalah hasil yang diharapkan dari contoh ini.'
+        );
       } else {
         const res = executePythonCode(code);
         if (res.hasError) {
@@ -70,9 +92,13 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
         } else {
           setCustomOutput(res.output || '(Tidak ada output yang dicetak)');
         }
+        setRunNote(
+          'Python online tidak bisa dimuat. Output di bawah memakai simulator ringan, bukan Python sungguhan.'
+        );
       }
+    } finally {
       setIsRunning(false);
-    }, 250);
+    }
   };
 
   const activeOutput = customOutput !== null ? customOutput : output;
@@ -148,7 +174,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
             ) : (
               <Play className="h-3 w-3 fill-current" />
             )}
-            <span>{isRunning ? 'Menjalankan…' : 'Jalankan'}</span>
+            <span>{isRunning ? 'Menyiapkan Python…' : 'Jalankan'}</span>
           </button>
 
           <button
@@ -298,6 +324,11 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
           >
             {activeOutput}
           </pre>
+          {runNote && (
+            <p className="mt-2 rounded-lg border border-amber-900/40 bg-amber-950/30 px-2.5 py-1.5 text-[10px] leading-relaxed text-amber-300">
+              {runNote}
+            </p>
+          )}
         </div>
       )}
     </figure>

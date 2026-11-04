@@ -17,6 +17,7 @@ import { ChapterId } from '../types';
 import { CHAPTERS } from '../data/lessons';
 import { accentForChapter } from '../theme/accents';
 import { CodeBlock } from '../components/code-block/CodeBlock';
+import { MiniCode } from '../components/code-block/MiniCode';
 import { Callout } from '../components/common/Callout';
 import { PageHeader } from '../components/common/PageHeader';
 import { Reveal } from '../components/common/Reveal';
@@ -27,6 +28,13 @@ import { CodeOrderExercise } from '../components/learning/CodeOrderExercise';
 import { ChapterQuiz } from '../components/learning/ChapterQuiz';
 import { StepCheckPractice } from '../components/learning/StepCheckPractice';
 import { StepRoadmap, StepRoadmapItem } from '../components/learning/StepRoadmap';
+import { TryItYourself } from '../components/learning/TryItYourself';
+import { CommonErrorBox } from '../components/learning/CommonErrorBox';
+import { CheatSheet } from '../components/learning/CheatSheet';
+import { FixTheBug } from '../components/learning/FixTheBug';
+import { TraceTable } from '../components/learning/TraceTable';
+import { TerminalPreview } from '../components/learning/TerminalPreview';
+import { GlossaryText } from '../components/learning/GlossaryText';
 import { formatInlineText } from '../utils/formatText';
 import { cn } from '../utils/cn';
 
@@ -39,6 +47,7 @@ interface ChapterPageProps {
   savedQuizScore?: number;
   onSaveQuizScore: (id: ChapterId, score: number) => void;
   onMarkExerciseDone: (exerciseId: string) => void;
+  onNavigateProject?: () => void;
 }
 
 export const ChapterPage: React.FC<ChapterPageProps> = ({
@@ -202,6 +211,12 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
         </div>
       </PageHeader>
 
+      {chapter.openingAnalogy && (
+        <Callout type="analogy" title="Bayangkan begini">
+          <GlossaryText text={chapter.openingAnalogy} />
+        </Callout>
+      )}
+
       {stepItems.length > 0 && <StepRoadmap items={stepItems} />}
 
       {/* ======================= ISI ======================= */}
@@ -270,13 +285,13 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
                   </div>
                 </div>
 
-                <div className="space-y-4 whitespace-pre-line text-sm leading-relaxed text-slate-700 sm:text-[15px]">
-                  {formatInlineText(section.content)}
+                <div className="reading-content space-y-4 whitespace-pre-line text-[15px] leading-relaxed text-slate-700 sm:text-base">
+                  <GlossaryText text={section.content} />
                 </div>
 
                 {section.analogy && (
                   <Callout type="analogy" title="Perumpamaan Sehari-hari">
-                    {formatInlineText(section.analogy)}
+                    <GlossaryText text={section.analogy} />
                   </Callout>
                 )}
 
@@ -297,6 +312,32 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
                     ))}
                   </div>
                 )}
+
+                {section.projectConnection && (
+                  <Callout
+                    type="info"
+                    title={`Ini dipakai di proyek kita — ${section.projectConnection.file}`}
+                  >
+                    <p>{section.projectConnection.note}</p>
+                    {section.projectConnection.code && (
+                      <MiniCode
+                        code={section.projectConnection.code}
+                        label={section.projectConnection.file}
+                        className="mt-2"
+                      />
+                    )}
+                  </Callout>
+                )}
+
+                {section.traceTable && <TraceTable data={section.traceTable} />}
+
+                {section.terminalPreview && <TerminalPreview />}
+
+                {section.tryItYourself && section.tryItYourself.length > 0 && (
+                  <TryItYourself exercises={section.tryItYourself} />
+                )}
+
+                {section.commonError && <CommonErrorBox error={section.commonError} />}
 
                 {section.importantNotes && section.importantNotes.length > 0 && (
                   <Callout type="info" title="Catatan Penting">
@@ -328,6 +369,16 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
               </section>
             </Reveal>
           ))}
+
+          {chapter.traceTable && <TraceTable data={chapter.traceTable} />}
+
+          {chapter.tryItYourself && chapter.tryItYourself.length > 0 && (
+            <TryItYourself exercises={chapter.tryItYourself} title="Coba sendiri — latihan bertingkat" />
+          )}
+
+          {chapter.fixTheBug && <FixTheBug exercise={chapter.fixTheBug} />}
+
+          {chapter.commonError && <CommonErrorBox error={chapter.commonError} />}
 
           {/* Latihan interaktif */}
           {(chapter.predictExercises?.length || chapter.fillInBlankExercises?.length) && (
@@ -418,6 +469,10 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
               </ul>
             </div>
           </Reveal>
+
+          {chapter.cheatSheet && (
+            <CheatSheet cheatSheet={chapter.cheatSheet} chapterNumber={chapter.number} />
+          )}
 
           {/* Tandai bab selesai — diletakkan di akhir materi */}
           <Reveal>
@@ -681,7 +736,7 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
             {/* Kartu kecil: ke proyek akhir */}
             <button
               type="button"
-              onClick={() => onSelectChapter('bab-11')}
+              onClick={() => (onNavigateProject ? onNavigateProject() : onSelectChapter('bab-6'))}
               className="group flex w-full cursor-pointer items-center gap-3 rounded-3xl border border-slate-200/80 bg-white/80 p-3.5 text-left shadow-soft backdrop-blur transition hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-lift"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-400 text-white shadow-sm transition-transform group-hover:rotate-6">
@@ -692,7 +747,7 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
                   Siap merakit programnya?
                 </span>
                 <span className="block text-[11px] text-slate-500">
-                  Lihat kode utuh 3 file →
+                  Lihat kode utuh 4 file →
                 </span>
               </span>
             </button>

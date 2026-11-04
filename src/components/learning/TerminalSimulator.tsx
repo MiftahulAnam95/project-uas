@@ -1,40 +1,80 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Terminal as TermIcon, RefreshCw, Sparkles, Send } from 'lucide-react';
-import { InteractiveFinancialApp } from '../../utils/pythonRunner';
+import { Terminal as TermIcon, RefreshCw, Send, Sparkles } from 'lucide-react';
+
+type Step =
+  | 'menu'
+  | 'anggaran_nominal'
+  | 'anggaran_hari'
+  | 'catat_kat'
+  | 'catat_jml'
+  | 'pemasukan_sumber'
+  | 'pemasukan_jml';
+
+interface Transaksi {
+  hari: number;
+  jenis: 'masuk' | 'keluar';
+  kategori: string;
+  jumlah: number;
+}
+
+const KATEGORI = ['Makan', 'Transport', 'Kuota', 'Kuliah/Tugas', 'Hiburan', 'Lainnya'];
+
+const MENU = [
+  ['1', 'Catat pengeluaran'],
+  ['2', 'Catat pemasukan'],
+  ['3', 'Cek saldo dan peringatan'],
+  ['4', 'Riwayat transaksi'],
+  ['5', 'Laporan per kategori'],
+  ['6', 'Lanjut ke hari berikutnya'],
+  ['7', 'Atur ulang anggaran'],
+  ['0', 'Keluar'],
+];
+
+const rupiah = (n: number) => 'Rp' + Math.round(n).toLocaleString('id-ID');
+const bar = (nilai: number, maksimal: number, panjang = 20) => {
+  const rasio = maksimal > 0 ? Math.max(0, Math.min(1, nilai / maksimal)) : 0;
+  const terisi = Math.round(rasio * panjang);
+  return '█'.repeat(terisi) + '░'.repeat(panjang - terisi);
+};
+const statusHarian = (keluar: number, jatah: number) => {
+  if (jatah <= 0) return 'BELUM DIATUR';
+  if (keluar > jatah) return 'BOROS!';
+  if (keluar >= 0.8 * jatah) return 'HATI-HATI';
+  return 'AMAN';
+};
 
 export const TerminalSimulator: React.FC = () => {
-  const [app, setApp] = useState(() => new InteractiveFinancialApp());
   const [history, setHistory] = useState<string[]>([
     'Python 3.11.4 (interactive sandbox)',
     '$ python main.py',
     'Selamat datang di Program Pencatat Keuangan Mahasiswa!',
-    '========================================',
-    ' PENCATAT KEUANGAN MAHASISWA (PYTHON)',
-    '========================================',
-    ' [1] Atur Anggaran Awal',
-    ' [2] Catat Pengeluaran Baru',
-    ' [3] Lihat Ringkasan & Status Hari Ini',
-    ' [4] Lihat Laporan per Kategori',
-    ' [5] Ganti ke Hari Berikutnya',
-    ' [0] Keluar dari Program',
-    '========================================',
+    '',
+    '┌─ ATUR ANGGARAN ──────────────────────────────────────────────┐',
+    '│ Isi anggaran satu bulan (gaji, honor, atau kiriman).         │',
+    '│ Jatah harian akan dihitung otomatis.                         │',
+    '└──────────────────────────────────────────────────────────────┘',
+    '',
+    '  ► Anggaran sebulan (Rp)  : ',
   ]);
   const [inputVal, setInputVal] = useState('');
-  const [inputStep, setInputStep] = useState<
-    | 'menu'
-    | 'anggaran_nominal'
-    | 'anggaran_hari'
-    | 'catat_kat'
-    | 'catat_jml'
-    | 'catat_ket'
-  >('menu');
-
-  // Temp form buffers
-  const [tempAnggaran, setTempAnggaran] = useState<number>(0);
-  const [tempKat, setTempKat] = useState<string>('');
-  const [tempJml, setTempJml] = useState<number>(0);
-
+  const [step, setStep] = useState<Step>('anggaran_nominal');
+  const [anggaran, setAnggaran] = useState(0);
+  const [jumlahHari, setJumlahHari] = useState(30);
+  const [hariAktif, setHariAktif] = useState(1);
+  const [transaksi, setTransaksi] = useState<Transaksi[]>([]);
+  const [temp, setTemp] = useState<{ anggaran?: number; kat?: string; sumber?: string }>({});
+  const [running, setRunning] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const jatah = jumlahHari > 0 ? anggaran / jumlahHari : 0;
+  const saldo = transaksi.reduce((acc, t) => acc + (t.jenis === 'masuk' ? t.jumlah : -t.jumlah), 0);
+  const totalKeluar = transaksi
+    .filter((t) => t.jenis === 'keluar')
+    .reduce((acc, t) => acc + t.jumlah, 0);
+  const pengeluaranHariIni = transaksi
+    .filter((t) => t.hari === hariAktif && t.jenis === 'keluar')
+    .reduce((acc, t) => acc + t.jumlah, 0);
+  const status = statusHarian(pengeluaranHariIni, jatah);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -42,366 +82,358 @@ export const TerminalSimulator: React.FC = () => {
     }
   }, [history]);
 
-  const addLine = (line: string) => {
-    setHistory((prev) => [...prev, line]);
+  const add = (...lines: string[]) => setHistory((prev) => [...prev, ...lines]);
+  const addAndReset = (...lines: string[]) => {
+    add(...lines);
+    setInputVal('');
   };
 
-  const submitValue = (raw: string) => {
-    const val = raw.trim();
-    if (!val && inputStep === 'menu') return;
+  const tampilMenu = () => {
+    add(
+      '',
+      '╔══════════════════════════════════════════════════════════════╗',
+      '║                 PENCATAT KEUANGAN MAHASISWA                  ║',
+      '║           Catat, pantau, dan hemat uang bulananmu            ║',
+      '╚══════════════════════════════════════════════════════════════╝',
+      '',
+      `  Hari ke-${hariAktif} dari ${jumlahHari}   │   Saldo ${rupiah(saldo)}   │   Jatah ${rupiah(jatah)}`,
+      `  ${bar(hariAktif, jumlahHari, 40)}  perjalanan bulan`,
+      '',
+      '┌─ MENU ───────────────────────────────────────────────────────┐',
+      ...MENU.map(([nomor, nama]) => `│ [${nomor}]  ${nama.padEnd(56)}│`),
+      '└──────────────────────────────────────────────────────────────┘',
+      '',
+      '  ► Pilih menu : '
+    );
+    setStep('menu');
+  };
 
-    addLine(`> ${raw}`);
+  const ringkasan = () => {
+    add(
+      '',
+      `── STATUS HARI KE-${hariAktif} DARI ${jumlahHari} ────────────────────────────────`,
+      '┌─ RINGKASAN ──────────────────────────────────────────────────┐',
+      `│ Saldo sekarang        ${rupiah(saldo).padEnd(28)}│`,
+      `│   ${bar(saldo, anggaran, 34)} ${String(Math.round((saldo / (anggaran || 1)) * 100)).padStart(3)}% dari anggaran`,
+      '│                                                              │',
+      `│ Jatah harian          ${rupiah(jatah).padEnd(28)}│`,
+      `│ Pengeluaran hari ini  ${rupiah(pengeluaranHariIni).padEnd(28)}│`,
+      `│   ${bar(pengeluaranHariIni, jatah, 34)} ${String(Math.round((pengeluaranHariIni / (jatah || 1)) * 100)).padStart(3)}% dari jatah`,
+      '└──────────────────────────────────────────────────────────────┘',
+      `┌─ ${status} ${'─'.repeat(Math.max(0, 60 - status.length))}┐`,
+      `│ Status hari ini: ${status}`,
+      '└──────────────────────────────────────────────────────────────┘',
+      '',
+      '  Tekan Enter untuk kembali ke menu...'
+    );
+    setStep('menu');
+    setRunning(false);
+  };
+
+  const riwayat = () => {
+    add('', '── RIWAYAT TRANSAKSI ───────────────────────────────────────────');
+    if (transaksi.length === 0) {
+      add('  Belum ada transaksi.');
+    } else {
+      add('┌─────┬──────┬─────────────────┬───────────────┬───────────────┐');
+      add('│  No │ Hari │ Keterangan      │         Masuk │        Keluar │');
+      add('├─────┼──────┼─────────────────┼───────────────┼───────────────┤');
+      transaksi.forEach((t, i) => {
+        add(
+          `│ ${String(i + 1).padEnd(3)} │ ${String(t.hari).padEnd(4)} │ ${t.kategori
+            .slice(0, 15)
+            .padEnd(15)} │ ${(t.jenis === 'masuk' ? rupiah(t.jumlah) : '-').padStart(13)} │ ${(
+            t.jenis === 'keluar' ? rupiah(t.jumlah) : '-'
+          ).padStart(13)} │`
+        );
+      });
+      add('├─────┼──────┼─────────────────┼───────────────┼───────────────┤');
+      add(
+        `│     │      │ TOTAL           │ ${rupiah(
+          transaksi.filter((t) => t.jenis === 'masuk').reduce((a, t) => a + t.jumlah, 0)
+        ).padStart(13)} │ ${rupiah(totalKeluar).padStart(13)} │`
+      );
+      add('└─────┴──────┴─────────────────┴───────────────┴───────────────┘');
+    }
+    add('', '  Tekan Enter untuk kembali ke menu...');
+    setStep('menu');
+    setRunning(false);
+  };
+
+  const laporanKategori = () => {
+    add('', '── LAPORAN PENGELUARAN PER KATEGORI ─────────────────────────');
+    const total: Record<string, number> = {};
+    transaksi.forEach((t) => {
+      if (t.jenis === 'keluar') total[t.kategori] = (total[t.kategori] || 0) + t.jumlah;
+    });
+    const semua = Object.values(total).reduce((a, b) => a + b, 0);
+    if (semua === 0) {
+      add('  Belum ada pengeluaran.');
+    } else {
+      add('┌─ PER KATEGORI ───────────────────────────────────────────────┐');
+      Object.entries(total)
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([kat, jumlah]) => {
+          const persen = Math.round((jumlah / semua) * 100);
+          add(
+            `│ ${kat.padEnd(14)}${bar(jumlah, semua, 15)} ${String(persen).padStart(3)}% ${rupiah(
+              jumlah
+            ).padStart(12)} │`
+          );
+        });
+      add('└──────────────────────────────────────────────────────────────┘');
+      add('', `  Total pengeluaran ${rupiah(semua)}`);
+    }
+    add('', '  Tekan Enter untuk kembali ke menu...');
+    setStep('menu');
+    setRunning(false);
+  };
+
+  const submit = (raw: string) => {
+    const val = raw.trim();
+    add(`> ${raw}`);
     setInputVal('');
 
-    if (inputStep === 'menu') {
-      if (val === '1') {
-        addLine('--- Pengaturan Anggaran ---');
-        addLine('Masukkan anggaran bulanan (Rp):');
-        setInputStep('anggaran_nominal');
-      } else if (val === '2') {
-        if (app.anggaran === 0) {
-          addLine('[!] Harap atur anggaran terlebih dahulu di menu [1].');
-          printMenu();
-          return;
-        }
-        addLine(`--- Catat Pengeluaran (Hari ke-${app.hariAktif}) ---`);
-        addLine('Pilihan kategori: [Makan, Transport, Kos, Kuliah, Hiburan, Lainnya]');
-        addLine('Nama kategori pengeluaran:');
-        setInputStep('catat_kat');
-      } else if (val === '3') {
-        const total = app.hitungTotalPengeluaran();
-        const sisa = app.hitungSisaSaldo();
-        const hariIni = app.hitungPengeluaranHariIni();
-        const status = app.cekStatusHarian(hariIni, app.jatahHarian);
+    if (step === 'anggaran_nominal') {
+      const nominal = Number(val.replace(/\./g, ''));
+      if (!Number.isFinite(nominal) || nominal <= 0) {
+        add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
+        return;
+      }
+      setAnggaran(nominal);
+      setTemp((prev) => ({ ...prev, anggaran: nominal }));
+      add('  ► Jumlah hari sebulan    : ');
+      setStep('anggaran_hari');
+      return;
+    }
 
-        addLine('');
-        addLine('=============================================');
-        addLine('           RINGKASAN KEUANGAN MAHASISWA');
-        addLine('=============================================');
-        addLine(` Hari Aktif           : Hari ke-${app.hariAktif}`);
-        addLine(` Anggaran Awal        : ${app.formatRupiah(app.anggaran)}`);
-        addLine(` Jatah Harian         : ${app.formatRupiah(app.jatahHarian)}`);
-        addLine('---------------------------------------------');
-        addLine(` Pengeluaran Hari Ini : ${app.formatRupiah(hariIni)}`);
-        addLine(` Status Hari Ini      : ${status}`);
-        addLine('---------------------------------------------');
-        addLine(` Total Pengeluaran    : ${app.formatRupiah(total)}`);
-        addLine(` Sisa Saldo           : ${app.formatRupiah(sisa)}`);
-        addLine('=============================================');
-        addLine('');
-        printMenu();
-      } else if (val === '4') {
-        if (app.daftarTransaksi.length === 0) {
-          addLine('\n[!] Belum ada transaksi yang dicatat.\n');
+    if (step === 'anggaran_hari') {
+      const hari = Number(val.replace(/\./g, ''));
+      if (!Number.isFinite(hari) || hari <= 0) {
+        add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
+        return;
+      }
+      const nominal = temp.anggaran ?? 0;
+      setJumlahHari(hari);
+      setHariAktif(1);
+      setTransaksi([{ hari: 1, jenis: 'masuk', kategori: 'Anggaran', jumlah: nominal }]);
+      add('', '  [OK] Anggaran tersimpan.');
+      add(`  [i] Jatah harian kamu: ${rupiah(nominal / hari)}`);
+      add('', '  Tekan Enter untuk kembali ke menu...');
+      setStep('menu');
+      setRunning(false);
+      return;
+    }
+
+    if (step === 'menu') {
+      if (val === '') return;
+      if (val === '1') {
+        add('', '── CATAT PENGELUARAN ───────────────────────────────────────────');
+        add('┌─ PILIH KATEGORI ─────────────────────────────────────────────┐');
+        KATEGORI.forEach((k, i) => add(`│ [${i + 1}]  ${k.padEnd(56)}│`));
+        add('└──────────────────────────────────────────────────────────────┘');
+        add('  ► Nomor kategori          : ');
+        setStep('catat_kat');
+        return;
+      }
+      if (val === '2') {
+        add('', '── CATAT PEMASUKAN ─────────────────────────────────────────────');
+        add('  ► Sumber pemasukan (contoh: gaji, honor) : ');
+        setStep('pemasukan_sumber');
+        return;
+      }
+      if (val === '3') {
+        ringkasan();
+        return;
+      }
+      if (val === '4') {
+        riwayat();
+        return;
+      }
+      if (val === '5') {
+        laporanKategori();
+        return;
+      }
+      if (val === '6') {
+        if (hariAktif >= jumlahHari) {
+          add('', '  [i] Ini sudah hari terakhir. Cek laporan akhir di menu 5.');
         } else {
-          addLine('');
-          addLine('-----------------------------------');
-          addLine(' LAPORAN PENGELUARAN PER KATEGORI');
-          addLine('-----------------------------------');
-          const katMap: Record<string, number> = {};
-          app.daftarTransaksi.forEach((t) => {
-            katMap[t.kategori] = (katMap[t.kategori] || 0) + t.jumlah;
-          });
-          Object.entries(katMap).forEach(([k, total]) => {
-            addLine(` - ${k.padEnd(16)} : ${app.formatRupiah(total)}`);
-          });
-          addLine('-----------------------------------');
-          addLine('');
+          setHariAktif((h) => h + 1);
+          add('', `  [OK] Masuk ke hari ke-${hariAktif + 1}.`);
+          add(`  [i] Jatah hari ini: ${rupiah(jatah)}`);
         }
-        printMenu();
-      } else if (val === '5') {
-        const nextDay = app.gantiHari();
-        addLine(`\n[>>] Berpindah ke Hari ke-${nextDay}! Semangat berhemat hari ini.\n`);
-        printMenu();
-      } else if (val === '0') {
-        addLine('\nTerima kasih telah menggunakan program ini. Tetap bijak mengelola uang!');
-        addLine('Program terminated.');
-      } else {
-        addLine('[!] Pilihan tidak valid. Silakan ketik angka antara 0 sampai 5.');
-        printMenu();
-      }
-    } else if (inputStep === 'anggaran_nominal') {
-      const num = parseInt(val, 10);
-      if (isNaN(num) || num <= 0) {
-        addLine('[!] Masukkan hanya angka bulat positif!');
-        addLine('Masukkan anggaran bulanan (Rp):');
+        add('', '  Tekan Enter untuk kembali ke menu...');
+        setStep('menu');
+        setRunning(false);
         return;
       }
-      setTempAnggaran(num);
-      addLine('Masukkan jumlah hari (contoh: 30):');
-      setInputStep('anggaran_hari');
-    } else if (inputStep === 'anggaran_hari') {
-      const days = parseInt(val, 10);
-      if (isNaN(days) || days <= 0) {
-        addLine('[!] Hari harus lebih besar dari 0!');
-        addLine('Masukkan jumlah hari (contoh: 30):');
+      if (val === '7') {
+        add('', '┌─ ATUR ANGGARAN ──────────────────────────────────────────────┐');
+        add('│ Isi anggaran satu bulan (gaji, honor, atau kiriman).         │');
+        add('│ Perhatian: catatan lama akan dihapus.                        │');
+        add('└──────────────────────────────────────────────────────────────┘');
+        add('  ► Anggaran sebulan (Rp)  : ');
+        setStep('anggaran_nominal');
         return;
       }
-      app.aturAnggaran(tempAnggaran, days);
-      addLine(`[OK] Anggaran berhasil diatur! Jatah harian: ${app.formatRupiah(app.jatahHarian)}\n`);
-      setInputStep('menu');
-      printMenu();
-    } else if (inputStep === 'catat_kat') {
-      setTempKat(val ? val.charAt(0).toUpperCase() + val.slice(1) : 'Lainnya');
-      addLine('Jumlah pengeluaran (Rp):');
-      setInputStep('catat_jml');
-    } else if (inputStep === 'catat_jml') {
-      const nominal = parseInt(val, 10);
-      if (isNaN(nominal) || nominal <= 0) {
-        addLine('[!] Masukkan hanya angka bulat positif!');
-        addLine('Jumlah pengeluaran (Rp):');
+      if (val === '0') {
+        add(
+          '',
+          '┌─ SAMPAI JUMPA ───────────────────────────────────────────────┐',
+          '│ Terima kasih sudah memakai aplikasi ini.                     │',
+          '│ Semoga keuangannya aman sampai akhir bulan!                  │',
+          '└──────────────────────────────────────────────────────────────┘'
+        );
+        setRunning(false);
         return;
       }
-      setTempJml(nominal);
-      addLine('Catatan tambahan (tekan enter jika kosong):');
-      setInputStep('catat_ket');
-    } else if (inputStep === 'catat_ket') {
-      app.tambahTransaksi(tempKat, tempJml, val);
-      addLine('[OK] Pengeluaran berhasil dicatat!\n');
-      setInputStep('menu');
-      printMenu();
+      add('  [X] Menu tidak ada, pilih nomor yang tersedia ya.');
+      return;
+    }
+
+    if (step === 'catat_kat') {
+      const nomor = Number(val);
+      if (!Number.isFinite(nomor) || nomor < 1 || nomor > KATEGORI.length) {
+        add(`  [X] Pilihan tidak valid, masukkan nomor 1 sampai ${KATEGORI.length}.`);
+        return;
+      }
+      setTemp((prev) => ({ ...prev, kat: KATEGORI[nomor - 1] }));
+      add('  ► Jumlah pengeluaran (Rp) : ');
+      setStep('catat_jml');
+      return;
+    }
+
+    if (step === 'catat_jml') {
+      const jumlah = Number(val.replace(/\./g, ''));
+      if (!Number.isFinite(jumlah) || jumlah <= 0) {
+        add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
+        return;
+      }
+      const kat = temp.kat ?? 'Lainnya';
+      const baru: Transaksi = { hari: hariAktif, jenis: 'keluar', kategori: kat, jumlah };
+      setTransaksi((prev) => [...prev, baru]);
+      add('', `  [OK] Tercatat: ${kat} ${rupiah(jumlah)}`);
+      const pengeluaranBaru = pengeluaranHariIni + jumlah;
+      const statusBaru = statusHarian(pengeluaranBaru, jatah);
+      add(`┌─ ${statusBaru} ${'─'.repeat(Math.max(0, 60 - statusBaru.length))}┐`);
+      add(`│ Status hari ini: ${statusBaru}`);
+      add('└──────────────────────────────────────────────────────────────┘');
+      add('', '  Tekan Enter untuk kembali ke menu...');
+      setStep('menu');
+      setRunning(false);
+      return;
+    }
+
+    if (step === 'pemasukan_sumber') {
+      setTemp((prev) => ({ ...prev, sumber: val || 'Pemasukan lain' }));
+      add('  ► Jumlah pemasukan (Rp)                  : ');
+      setStep('pemasukan_jml');
+      return;
+    }
+
+    if (step === 'pemasukan_jml') {
+      const jumlah = Number(val.replace(/\./g, ''));
+      if (!Number.isFinite(jumlah) || jumlah <= 0) {
+        add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
+        return;
+      }
+      const sumber = temp.sumber ?? 'Pemasukan lain';
+      setTransaksi((prev) => [...prev, { hari: hariAktif, jenis: 'masuk', kategori: sumber, jumlah }]);
+      add('', `  [OK] Tercatat: ${sumber} ${rupiah(jumlah)}`);
+      add(`  [i] Saldo sekarang: ${rupiah(saldo + jumlah)}`);
+      add('', '  Tekan Enter untuk kembali ke menu...');
+      setStep('menu');
+      setRunning(false);
     }
   };
 
-  const handleCommand = (e: React.FormEvent) => {
-    e.preventDefault();
-    submitValue(inputVal);
-  };
-
-  const printMenu = () => {
-    addLine('========================================');
-    addLine(' PENCATAT KEUANGAN MAHASISWA (PYTHON)');
-    addLine('========================================');
-    addLine(' [1] Atur Anggaran Awal');
-    addLine(' [2] Catat Pengeluaran Baru');
-    addLine(' [3] Lihat Ringkasan & Status Hari Ini');
-    addLine(' [4] Lihat Laporan per Kategori');
-    addLine(' [5] Ganti ke Hari Berikutnya');
-    addLine(' [0] Keluar dari Program');
-    addLine('========================================');
-    addLine('Pilih menu (0-5):');
-  };
-
-  const handlePresetScenario = () => {
-    const newApp = new InteractiveFinancialApp();
-    newApp.aturAnggaran(3000000, 30);
-    newApp.tambahTransaksi('Makan', 85000, 'Makan siang & es teh');
-    newApp.tambahTransaksi('Transport', 40000, 'Ojek kampus');
-    setApp(newApp);
-
+  const reset = () => {
     setHistory([
-      'Python 3.11.4 (Simulasi Modul Dimuat)',
-      '$ python main.py',
-      '[!] Skenario modul berhasil dimuat:',
-      ' - Anggaran Awal: Rp 3.000.000 / 30 Hari',
-      ' - Jatah Harian: Rp 100.000',
-      ' - Pengeluaran Hari 1: Makan (Rp 85.000) + Transport (Rp 40.000) = Rp 125.000',
-      ' - Status: BOROS! (125% dari jatah harian)',
-      '========================================',
-      'Ketik [3] untuk melihat Ringkasan, [4] untuk Laporan Kategori, atau [5] untuk Ganti Hari!',
-      'Pilih menu (0-5):',
-    ]);
-    setInputStep('menu');
-  };
-
-  const handleReset = () => {
-    const fresh = new InteractiveFinancialApp();
-    setApp(fresh);
-    setHistory([
-      'Python 3.11.4 (Reset)',
+      'Python 3.11.4 (interactive sandbox)',
       '$ python main.py',
       'Selamat datang di Program Pencatat Keuangan Mahasiswa!',
-      '========================================',
-      ' PENCATAT KEUANGAN MAHASISWA (PYTHON)',
-      '========================================',
-      ' [1] Atur Anggaran Awal',
-      ' [2] Catat Pengeluaran Baru',
-      ' [3] Lihat Ringkasan & Status Hari Ini',
-      ' [4] Lihat Laporan per Kategori',
-      ' [5] Ganti ke Hari Berikutnya',
-      ' [0] Keluar dari Program',
-      '========================================',
-      'Pilih menu (0-5):',
+      '',
+      '┌─ ATUR ANGGARAN ──────────────────────────────────────────────┐',
+      '│ Isi anggaran satu bulan (gaji, honor, atau kiriman).         │',
+      '│ Jatah harian akan dihitung otomatis.                         │',
+      '└──────────────────────────────────────────────────────────────┘',
+      '',
+      '  ► Anggaran sebulan (Rp)  : ',
     ]);
-    setInputStep('menu');
+    setInputVal('');
+    setStep('anggaran_nominal');
+    setAnggaran(0);
+    setJumlahHari(30);
+    setHariAktif(1);
+    setTransaksi([]);
+    setTemp({});
+    setRunning(true);
   };
-
-  const QUICK_ACTIONS: Record<string, Array<{ label: string; value: string }>> = {
-    menu: [
-      { label: '1 · Anggaran', value: '1' },
-      { label: '2 · Catat', value: '2' },
-      { label: '3 · Ringkasan', value: '3' },
-      { label: '4 · Laporan', value: '4' },
-      { label: '5 · Ganti hari', value: '5' },
-      { label: '0 · Keluar', value: '0' },
-    ],
-    anggaran_nominal: [
-      { label: 'Rp 1.000.000', value: '1000000' },
-      { label: 'Rp 2.000.000', value: '2000000' },
-      { label: 'Rp 3.000.000', value: '3000000' },
-    ],
-    anggaran_hari: [
-      { label: '28 hari', value: '28' },
-      { label: '30 hari', value: '30' },
-      { label: '31 hari', value: '31' },
-    ],
-    catat_kat: [
-      { label: 'Makan', value: 'Makan' },
-      { label: 'Transport', value: 'Transport' },
-      { label: 'Kos', value: 'Kos' },
-      { label: 'Kuliah', value: 'Kuliah' },
-      { label: 'Hiburan', value: 'Hiburan' },
-      { label: 'Lainnya', value: 'Lainnya' },
-    ],
-    catat_jml: [
-      { label: 'Rp 25.000', value: '25000' },
-      { label: 'Rp 50.000', value: '50000' },
-      { label: 'Rp 125.000', value: '125000' },
-    ],
-    catat_ket: [
-      { label: 'Makan siang', value: 'Makan siang' },
-      { label: 'Ojek kampus', value: 'Ojek kampus' },
-      { label: '(kosong)', value: '' },
-    ],
-  };
-
-  const quick = QUICK_ACTIONS[inputStep] || QUICK_ACTIONS.menu;
 
   return (
-    <div className="group relative my-6 overflow-hidden rounded-4xl border border-slate-700/60 bg-slate-950 shadow-[0_40px_90px_-40px_rgba(2,6,23,0.95)]">
-      {/* Pita gradasi atas */}
-      <div
-        aria-hidden="true"
-        className="h-1 w-full bg-gradient-to-r from-brand-500 via-grape-500 to-aqua-400 anim-pan"
-        style={{ backgroundSize: '200% 100%' }}
-      />
-
-      {/* ---------- Bar judul ---------- */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-gradient-to-b from-slate-900 to-slate-900/60 px-4 py-3">
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center gap-1.5" aria-hidden="true">
-            <span className="h-2.5 w-2.5 rounded-full bg-rose-500/85" />
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-400/85" />
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/85" />
+    <div className="overflow-hidden rounded-3xl border border-slate-700/50 bg-slate-950 shadow-[0_28px_60px_-30px_rgba(2,6,23,0.85)]">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-slate-900/80 px-3 py-2.5 sm:px-4">
+        <div className="flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-400 text-slate-950">
+            <TermIcon className="h-4 w-4" strokeWidth={2.5} />
+          </span>
+          <div className="leading-tight">
+            <p className="text-xs font-extrabold text-white">Simulator Terminal</p>
+            <p className="text-[10px] text-slate-400">Simulasi main.py dengan menu 1-7 dan 0</p>
           </div>
-          <span className="ml-1 flex items-center gap-1.5 font-mono text-xs font-semibold text-slate-300">
-            <TermIcon className="h-3.5 w-3.5 text-aqua-400" />
-            mahasiswa@terminal: ~/keuangan_mahasiswa
-          </span>
-          <span className="hidden items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-300 sm:inline-flex">
-            <span className="relative flex h-1.5 w-1.5 text-emerald-400">
-              <span className="pulse-ring absolute inline-flex h-full w-full rounded-full" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            </span>
-            live
-          </span>
         </div>
-
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
+          <span className="hidden items-center gap-1 rounded-full border border-emerald-900/60 bg-emerald-950/40 px-2 py-0.5 text-[9px] font-bold text-emerald-300 sm:flex">
+            <Sparkles className="h-2.5 w-2.5" /> Python sandbox
+          </span>
           <button
             type="button"
-            onClick={handlePresetScenario}
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-brand-500/40 bg-brand-500/15 px-2.5 py-1 text-[11px] font-bold text-brand-200 transition hover:border-brand-400 hover:bg-brand-500/25 hover:text-white"
-            title="Muat contoh skenario anggaran Rp3 juta dari modul"
+            onClick={reset}
+            className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-[10px] font-bold text-slate-300 transition hover:bg-slate-700"
           >
-            <Sparkles className="h-3 w-3" />
-            <span className="hidden sm:inline">Muat Skenario Modul</span>
-            <span className="sm:hidden">Skenario</span>
-          </button>
-          <button
-            type="button"
-            onClick={handleReset}
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/70 px-2.5 py-1 text-[11px] font-bold text-slate-300 transition hover:border-slate-600 hover:bg-slate-800 hover:text-white"
-            title="Mulai ulang terminal"
-          >
-            <RefreshCw className="h-3 w-3" />
-            Reset
+            <RefreshCw className="h-3 w-3" /> Reset
           </button>
         </div>
       </div>
 
-      {/* ---------- Layar terminal ---------- */}
       <div
         ref={scrollRef}
-        className="code-scrollbar h-80 space-y-1 overflow-y-auto bg-[radial-gradient(120%_100%_at_50%_0%,rgba(106,90,232,0.12),transparent_60%),#05070f] p-4 font-mono text-xs leading-relaxed text-slate-200 selection:bg-brand-500 selection:text-white sm:h-96 sm:p-5 sm:text-[13px]"
+        className="code-scrollbar h-80 overflow-y-auto bg-[#05070f] px-3 py-3 font-mono text-[11px] leading-relaxed text-emerald-300/90 sm:h-96 sm:px-4 sm:text-xs"
+        aria-live="polite"
       >
-        {history.map((line, idx) => (
-          <div
-            key={idx}
-            className={`whitespace-pre-wrap break-words ${
-              line.startsWith('>')
-                ? 'rounded-md bg-amber-400/10 px-1.5 font-bold text-amber-300'
-                : line.includes('BOROS!')
-                ? 'font-bold text-rose-400'
-                : line.includes('WASPADA')
-                ? 'font-semibold text-amber-300'
-                : line.includes('AMAN')
-                ? 'font-semibold text-emerald-400'
-                : line.startsWith('[OK]')
-                ? 'text-emerald-400'
-                : line.startsWith('[!]')
-                ? 'text-rose-400'
-                : line.startsWith('[>>]')
-                ? 'text-sky-300'
-                : line.startsWith('=')
-                ? 'text-aqua-400/70'
-                : line.startsWith('Pilih menu')
-                ? 'font-bold text-white'
-                : 'text-slate-300'
-            }`}
-          >
-            {line}
+        {history.map((line, i) => (
+          <div key={i} className="whitespace-pre-wrap break-words">
+            {line || '\u00A0'}
           </div>
         ))}
       </div>
 
-      {/* ---------- Pintasan cepat ---------- */}
-      <div className="flex flex-wrap items-center gap-1.5 border-t border-slate-800 bg-slate-900/60 px-3 py-2.5">
-        <span className="mr-1 hidden text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500 sm:inline">
-          Pintasan
-        </span>
-        {quick.map((q) => (
-          <button
-            key={q.label}
-            type="button"
-            onClick={() => submitValue(q.value)}
-            className="cursor-pointer rounded-lg border border-slate-700/80 bg-slate-800/60 px-2.5 py-1 font-mono text-[11px] font-semibold text-slate-300 transition hover:-translate-y-px hover:border-aqua-400/50 hover:bg-aqua-400/10 hover:text-aqua-200 active:scale-95"
-          >
-            {q.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ---------- Baris input ---------- */}
       <form
-        onSubmit={handleCommand}
-        className="flex items-center gap-2 border-t border-slate-800 bg-slate-900/90 p-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (running) submit(inputVal);
+        }}
+        className="flex items-center gap-2 border-t border-slate-800 bg-slate-900/80 px-3 py-2.5"
       >
-        <span className="select-none pl-1 font-mono text-xs text-emerald-400 sm:text-sm">
-          ❯
-        </span>
+        <span className="font-mono text-xs text-emerald-400">►</span>
         <input
-          type="text"
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value)}
-          placeholder={
-            inputStep === 'menu'
-              ? 'Ketik angka menu (1-5, atau 0 untuk keluar) lalu Enter…'
-              : 'Ketik jawabanmu lalu tekan Enter…'
-          }
-          aria-label="Masukkan perintah terminal"
-          className="flex-1 border-0 bg-transparent font-mono text-xs text-white caret-aqua-400 outline-none placeholder:text-slate-600 focus:ring-0 sm:text-[13px]"
-          autoFocus
+          disabled={!running}
+          className="min-w-0 flex-1 bg-transparent font-mono text-xs text-slate-100 outline-none placeholder:text-slate-600 disabled:cursor-not-allowed"
+          placeholder={running ? 'Ketik jawaban, lalu Enter…' : 'Program selesai. Klik Reset untuk mengulang.'}
+          aria-label="Input simulator terminal"
         />
         <button
           type="submit"
-          className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-gradient-to-r from-brand-600 to-grape-500 px-3 py-2 text-[11px] font-extrabold text-white shadow-[0_10px_22px_-12px_rgba(106,90,232,0.95)] transition hover:brightness-110 active:scale-95"
-          aria-label="Kirim perintah"
+          disabled={!running}
+          className="inline-flex cursor-pointer items-center gap-1 rounded-lg bg-emerald-500 px-2.5 py-1 text-[10px] font-extrabold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <Send className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Enter</span>
+          <Send className="h-3 w-3" /> Kirim
         </button>
       </form>
     </div>
   );
 };
+
+export default TerminalSimulator;

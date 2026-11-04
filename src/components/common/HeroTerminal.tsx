@@ -27,7 +27,7 @@ const SCRIPT: ScriptLine[] = [
   { text: ' Status        : BOROS! ⚠', cls: 'text-rose-300 font-bold' },
   { text: ' Sisa saldo    : Rp 2.875.000', cls: 'text-emerald-300 font-semibold' },
   { text: '=========================================', cls: 'text-cyan-300/70' },
-  { text: '✓ 3 file terhubung: pencatat · laporan · main', cls: 'text-emerald-400/90 italic' },
+  { text: '✓ 4 file terhubung: pencatat · laporan · main · tampilan', cls: 'text-emerald-400/90 italic' },
 ];
 
 interface HeroTerminalProps {

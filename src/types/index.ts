@@ -1,15 +1,77 @@
-export type ChapterId = 
+export type ChapterId =
   | 'bab-1'
   | 'bab-2'
   | 'bab-3'
   | 'bab-4'
   | 'bab-5'
   | 'bab-6'
+  | 'bab-tampilan'
   | 'bab-7'
   | 'bab-8'
   | 'bab-9'
   | 'bab-10'
   | 'bab-11';
+
+/** Satu baris pada tabel jejak (trace table). */
+export interface TraceStep {
+  line: number;
+  code: string;
+  condition?: string;
+  result?: string;
+  variables: Record<string, string>;
+  note: string;
+}
+
+/** Data untuk visualisasi langkah demi langkah if/else atau loop. */
+export interface TraceTableData {
+  title: string;
+  description: string;
+  steps: TraceStep[];
+}
+
+/** Latihan "Coba sendiri" bertingkat dengan kunci jawaban. */
+export interface TryItExercise {
+  id: string;
+  level: 'Mudah' | 'Sedang' | 'Tantangan';
+  prompt: string;
+  starterCode?: string;
+  answerCode: string;
+  explanation: string;
+}
+
+/** Latihan memperbaiki kode yang rusak. */
+export interface FixTheBugExercise {
+  id: string;
+  title: string;
+  prompt: string;
+  buggyCode: string;
+  answerCode: string;
+  explanation: string;
+}
+
+/** Kesalahan paling umum di sebuah bab, lengkap dengan pesan error. */
+export interface CommonError {
+  name: string;
+  message: string;
+  cause: string;
+  fix: string;
+  badCode: string;
+  goodCode: string;
+}
+
+/** Cheat sheet satu halaman per bab. */
+export interface CheatSheet {
+  title: string;
+  items: string[];
+  code?: string;
+}
+
+/** Keterangan pemakaian kode di proyek akhir. */
+export interface ProjectConnection {
+  file: string;
+  note: string;
+  code?: string;
+}
 
 export interface LineExplanation {
   line: number;
@@ -129,6 +191,16 @@ export interface ChapterSection {
   stepTagline?: string;
   /** Uji pemahaman khusus langkah ini. */
   practice?: StepPractice;
+  /** Keterangan "ini dipakai di proyek kita di file ...". */
+  projectConnection?: ProjectConnection;
+  /** Tabel jejak untuk if/else atau loop. */
+  traceTable?: TraceTableData;
+  /** Latihan "Coba sendiri" khusus bagian ini. */
+  tryItYourself?: TryItExercise[];
+  /** Kesalahan umum khusus bagian ini. */
+  commonError?: CommonError;
+  /** Tampilkan pratinjau terminal interaktif (khusus bab tampilan.py). */
+  terminalPreview?: boolean;
 }
 
 export interface Chapter {
@@ -146,6 +218,18 @@ export interface Chapter {
   summaryPoints: string[];
   nextChapterId?: ChapterId;
   prevChapterId?: ChapterId;
+  /** Pembuka "Bayangkan begini" dengan analogi kehidupan sehari-hari. */
+  openingAnalogy?: string;
+  /** Cheat sheet satu halaman yang bisa dibuka/dicetak. */
+  cheatSheet?: CheatSheet;
+  /** Kesalahan paling umum di bab ini. */
+  commonError?: CommonError;
+  /** Latihan "Coba sendiri" bertingkat. */
+  tryItYourself?: TryItExercise[];
+  /** Latihan memperbaiki kode rusak. */
+  fixTheBug?: FixTheBugExercise;
+  /** Tabel jejak if/else atau loop. */
+  traceTable?: TraceTableData;
 }
 
 export interface GlossaryTerm {

@@ -40,7 +40,7 @@ const FILE_META: Record<
   'main.py': {
     icon: TermIcon,
     title: 'Resepsionis & Pengendali Menu',
-    desc: 'Menerima ketikan pengguna dari terminal, lalu memanggil fungsi di pencatat.py dan menyerahkan hasilnya ke laporan.py.',
+    desc: 'Menerima ketikan pengguna dari terminal, memanggil setup_awal(), menu_pengeluaran(), menu_pemasukan(), dan fungsi laporan. Menu 1-7 dan 0.',
     tile: 'from-amber-500 to-orange-400',
     wrap: 'border-amber-200/80 bg-gradient-to-br from-amber-50/90 via-white to-white',
     chip: 'bg-amber-100 text-amber-900 border-amber-300',
@@ -49,7 +49,7 @@ const FILE_META: Record<
   'pencatat.py': {
     icon: Database,
     title: 'Akuntan & Basis Data Memori',
-    desc: 'Menyimpan anggaran, list transaksi, menghitung jatah harian (//), sisa saldo (−), dan total pengeluaran.',
+    desc: 'Menyimpan KATEGORI, akun (dictionary), dan transaksi (list of tuple). Menghitung jatah harian (/), saldo, dan pengeluaran harian.',
     tile: 'from-brand-500 to-blue-500',
     wrap: 'border-brand-200/80 bg-gradient-to-br from-brand-50/90 via-white to-white',
     chip: 'bg-brand-100 text-brand-900 border-brand-300',
@@ -57,8 +57,8 @@ const FILE_META: Record<
   },
   'laporan.py': {
     icon: Eye,
-    title: 'Desainer Tampilan & Validasi',
-    desc: 'Mengubah angka jadi format "Rp 100.000", mengecek status AMAN vs BOROS, dan memvalidasi ketikan agar tidak crash.',
+    title: 'Peringatan, Laporan & Validasi',
+    desc: 'Membaca data dari pencatat.py, menentukan status AMAN/HATI-HATI/BOROS, menampilkan riwayat dan laporan kategori, serta memvalidasi input dengan try/except.',
     tile: 'from-emerald-500 to-teal-400',
     wrap: 'border-emerald-200/80 bg-gradient-to-br from-emerald-50/90 via-white to-white',
     chip: 'bg-emerald-100 text-emerald-900 border-emerald-300',
@@ -68,9 +68,9 @@ const FILE_META: Record<
 
 const FLOW_NODES = [
   { label: 'Mulai', style: 'bg-gradient-to-r from-brand-600 to-grape-500 text-white border-transparent font-extrabold' },
-  { label: 'Atur Anggaran [1]', style: 'bg-white text-slate-700 border-slate-300' },
-  { label: 'Tampilkan Menu', style: 'bg-white text-slate-700 border-slate-300' },
-  { label: 'Pengguna Pilih Opsi', style: 'bg-amber-50 text-amber-900 border-amber-300' },
+  { label: 'Setup Awal', style: 'bg-white text-slate-700 border-slate-300' },
+  { label: 'Tampilkan Menu 1-7', style: 'bg-white text-slate-700 border-slate-300' },
+  { label: 'Pengguna Pilih Menu', style: 'bg-amber-50 text-amber-900 border-amber-300' },
   { label: 'Jalankan Fungsi', style: 'bg-brand-50 text-brand-900 border-brand-300' },
   { label: 'Perbarui & Tampilkan', style: 'bg-emerald-50 text-emerald-900 border-emerald-300' },
   { label: 'Keluar [0]', style: 'bg-gradient-to-r from-rose-600 to-rose-500 text-white border-transparent font-extrabold' },
@@ -135,7 +135,7 @@ export const FlowVisualizerPage: React.FC = () => {
         icon={Activity}
         title="Visualisasi Alur Kerja Program & Perubahan Data"
         highlight="Perubahan Data"
-        description="Lihat bagaimana input pengguna mengalir melalui 3 file Python (main.py, pencatat.py, dan laporan.py), serta amati perubahan isi variabel di memori secara langsung di setiap langkah."
+        description="Lihat bagaimana input pengguna mengalir melalui 4 file Python (main.py, pencatat.py, laporan.py, dan tampilan.py), serta amati perubahan isi variabel di memori secara langsung di setiap langkah."
         stats={[
           { label: 'Langkah trace', value: String(SIMULATION_STEPS.length) },
           { label: 'File terlibat', value: '3' },
@@ -564,7 +564,7 @@ export const FlowVisualizerPage: React.FC = () => {
           <div className="flex flex-col items-center justify-between gap-3 rounded-3xl border border-slate-200/80 bg-white/80 p-4 shadow-soft backdrop-blur sm:flex-row">
             <p className="text-xs leading-relaxed text-slate-600">
               <strong className="font-extrabold text-slate-800">Sudah paham alurnya?</strong>{' '}
-              Langkah berikutnya adalah melihat kode utuh tiga file yang barusan kamu jalankan.
+              Langkah berikutnya adalah melihat kode utuh empat file yang barusan kamu jalankan.
             </p>
             <Button
               size="md"

@@ -8,6 +8,7 @@ import { HomePage } from './pages/HomePage';
 import { ChapterPage } from './pages/ChapterPage';
 import { FlowVisualizerPage } from './pages/FlowVisualizerPage';
 import { DebuggingPage } from './pages/DebuggingPage';
+import { StuckPage } from './pages/StuckPage';
 import { GlossaryPage } from './pages/GlossaryPage';
 import { ProjectPage } from './pages/ProjectPage';
 import { useProgress } from './hooks/useProgress';
@@ -44,6 +45,8 @@ export function App() {
         setActiveTab('flow');
       } else if (hash === 'debugging') {
         setActiveTab('debugging');
+      } else if (hash === 'stuck') {
+        setActiveTab('stuck');
       } else if (hash === 'glossary') {
         setActiveTab('glossary');
       } else if (hash === 'project') {
@@ -190,6 +193,7 @@ export function App() {
                 savedQuizScore={progress.quizScores[currentChapterId]}
                 onSaveQuizScore={saveQuizScore}
                 onMarkExerciseDone={markExerciseCompleted}
+                onNavigateProject={() => handleNavigateTab('project')}
               />
             </main>
           </div>
@@ -210,6 +214,7 @@ export function App() {
             )}
             {activeTab === 'flow' && <FlowVisualizerPage />}
             {activeTab === 'debugging' && <DebuggingPage />}
+            {activeTab === 'stuck' && <StuckPage onNavigateTab={handleNavigateTab} />}
             {activeTab === 'glossary' && (
               <GlossaryPage onNavigateTab={handleNavigateTab} />
             )}

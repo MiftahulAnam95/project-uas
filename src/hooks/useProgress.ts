@@ -13,6 +13,7 @@ const DEFAULT_PROGRESS: UserProgress = {
     'bab-4': 0,
     'bab-5': 0,
     'bab-6': 0,
+    'bab-tampilan': 0,
     'bab-7': 0,
     'bab-8': 0,
     'bab-9': 0,
@@ -126,7 +127,7 @@ export function useProgress() {
     }
   }, []);
 
-  const totalChapters = 11;
+  const totalChapters = 12;
   const completedCount = progress.completedChapters.length;
   const percentage = Math.round((completedCount / totalChapters) * 100);
 

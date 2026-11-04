@@ -200,16 +200,14 @@ import pencatat`,
     import pencatat
 ModuleNotFoundError: No module named 'pencatat'`,
     commonCauses: [
-      'File pencatat.py belum disimpan di folder yang sama dengan main.py',
+      'File pencatat.py, laporan.py, atau tampilan.py belum disimpan di folder yang sama dengan main.py',
       'Salah ketik nama file saat import (misalnya `import pencatatt`)',
       'Menulis akhiran .py di dalam perintah import (salah: `import pencatat.py`)',
       'Menjalankan terminal dari folder yang berbeda dengan lokasi file proyek disimpan',
     ],
     howToFix:
-      'Pastikan ketiga file (pencatat.py, laporan.py, dan main.py) tersimpan di folder yang sama (misalnya folder `keuangan_mahasiswa`). Saat import, jangan gunakan ekstensi .py, cukup tulis nama dasarnya: `import pencatat`.',
-    sampleFixedCode: `# Pastikan main.py dan pencatat.py ada di folder yang sama!
-import pencatat
-import laporan`,
+      'Pastikan keempat file (pencatat.py, laporan.py, main.py, dan tampilan.py) tersimpan di folder yang sama (misalnya folder `keuangan_mahasiswa`). Saat import, jangan gunakan ekstensi .py, cukup tulis nama dasarnya: `import pencatat`.',
+    sampleFixedCode: `# Pastikan 4 file ada di folder yang sama!\nimport pencatat\nimport laporan\nimport tampilan`,
     practiceSnippet: {
       question: 'Bagaimana penulisan perintah import yang benar untuk menyambungkan file `laporan.py` ke file `main.py`?',
       buggyCode: `# Mau pakai fungsi di laporan.py`,
@@ -222,6 +220,86 @@ import laporan`,
       correctIndex: 1,
       explanation:
         'Di Python, modul diimpor cukup dengan menulis nama dasarnya tanpa tanda kutip dan tanpa ekstensi `.py`: `import laporan`.',
+    },
+  },
+
+  {
+    id: 'value-error',
+    errorName: 'ValueError',
+    title: "ValueError: invalid literal for int() with base 10: 'abc'",
+    simpleMeaning:
+      'Python tidak bisa mengubah teks menjadi angka. Biasanya terjadi karena pengguna mengetik huruf saat diminta angka, atau memakai titik/koma yang tidak dikenal int().',
+    sampleBrokenCode: `angka = int(input("Jumlah: "))
+print(angka + 1)`,
+    terminalOutput: `  File "main.py", line 1, in <module>
+    angka = int(input("Jumlah: "))
+ValueError: invalid literal for int() with base 10: 'abc'`,
+    commonCauses: [
+      'Pengguna mengetik huruf saat diminta angka',
+      'Input kosong lalu diubah dengan int()',
+      'Input memakai titik atau koma, misalnya "15.000"',
+      'Validasi gagal lalu raise ValueError(...) sengaja',
+    ],
+    howToFix:
+      'Tangkap ValueError dengan try/except, lalu ulangi pertanyaan sampai input valid. Jika input boleh memakai pemisah ribuan, bersihkan titik/koma lebih dulu: input("...").replace(".", "").replace(",", "").',
+    sampleFixedCode: `while True:
+    try:
+        teks = input("Jumlah: ").replace(".", "").replace(",", "")
+        angka = int(teks)
+        if angka > 0:
+            break
+    except ValueError:
+        print("Input salah, masukkan angka bulat lebih dari 0.")`,
+    practiceSnippet: {
+      question: 'Kode mana yang menangani input huruf tanpa membuat program crash?',
+      buggyCode: `angka = int(input("Jumlah: "))`,
+      options: [
+        'angka = int(input("Jumlah: "))',
+        'while True:\n    try:\n        angka = int(input("Jumlah: "))\n        break\n    except ValueError:\n        print("Input salah")',
+        'angka = input("Jumlah: ")',
+        'angka = float(input("Jumlah: "))',
+      ],
+      correctIndex: 1,
+      explanation:
+        'try/except ValueError menangkap input yang tidak bisa diubah menjadi angka, lalu while True mengulang pertanyaan.',
+    },
+  },
+  {
+    id: 'zero-division-error',
+    errorName: 'ZeroDivisionError',
+    title: 'ZeroDivisionError: division by zero',
+    simpleMeaning:
+      'Program mencoba membagi angka dengan nol. Di matematika, pembagian dengan nol tidak terdefinisi, jadi Python menghentikan program.',
+    sampleBrokenCode: `anggaran = 3000000
+hari = 0
+jatah = anggaran / hari`,
+    terminalOutput: `  File "pencatat.py", line 3, in <module>
+    jatah = anggaran / hari
+ZeroDivisionError: division by zero`,
+    commonCauses: [
+      'Jumlah hari diisi 0',
+      'Jatah harian bernilai 0 lalu dipakai sebagai pembagi',
+      'Pembagi berasal dari input pengguna tanpa validasi',
+      'Variabel pembagi belum diisi sehingga tetap 0',
+    ],
+    howToFix:
+      'Periksa pembagi lebih besar dari nol sebelum membagi. Jika tidak, gunakan nilai cadangan 0 atau minta input ulang. Validasi di laporan.py sudah mencegah jumlah_hari 0.',
+    sampleFixedCode: `if jumlah_hari > 0:
+    jatah = anggaran / jumlah_hari
+else:
+    jatah = 0`,
+    practiceSnippet: {
+      question: 'Bagaimana cara mencegah ZeroDivisionError saat menghitung jatah harian?',
+      buggyCode: `jatah = anggaran / jumlah_hari`,
+      options: [
+        'jatah = anggaran / jumlah_hari',
+        'if jumlah_hari > 0:\n    jatah = anggaran / jumlah_hari\nelse:\n    jatah = 0',
+        'jatah = anggaran // 0',
+        'jatah = 0',
+      ],
+      correctIndex: 1,
+      explanation:
+        'Periksa pembagi lebih dulu. Jika jumlah_hari > 0, baru bagi. Jika tidak, gunakan 0.',
     },
   },
 ];
