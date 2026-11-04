@@ -12,6 +12,7 @@ import {
   ClipboardCheck,
   List,
   ChevronRight,
+  LifeBuoy,
 } from 'lucide-react';
 import { ChapterId } from '../../types';
 import { CHAPTERS } from '../../data/lessons';
@@ -24,6 +25,7 @@ export type ActiveTab =
   | 'chapter'
   | 'flow'
   | 'debugging'
+  | 'stuck'
   | 'glossary'
   | 'project';
 
@@ -65,8 +67,8 @@ const NAV_ITEMS: NavItem[] = [
   {
     id: 'chapter',
     label: 'Materi',
-    shortDesc: 'Kurikulum 11 bab berurutan',
-    badge: '11',
+    shortDesc: 'Kurikulum 12 bab berurutan',
+    badge: '12',
     icon: BookOpen,
     tile: 'from-sky-500 to-cyan-400',
     activeText: 'text-sky-700',
@@ -84,11 +86,20 @@ const NAV_ITEMS: NavItem[] = [
   {
     id: 'debugging',
     label: 'Bantuan Error',
-    shortDesc: 'Solusi 6 error umum Python',
+    shortDesc: 'Solusi 8 error umum Python',
     icon: Bug,
     tile: 'from-rose-500 to-orange-400',
     activeText: 'text-rose-700',
     activeRing: 'ring-rose-200',
+  },
+  {
+    id: 'stuck',
+    label: 'Kalau Macet',
+    shortDesc: 'Diagram keputusan: error → arti → solusi',
+    icon: LifeBuoy,
+    tile: 'from-amber-500 to-yellow-400',
+    activeText: 'text-amber-700',
+    activeRing: 'ring-amber-200',
   },
   {
     id: 'glossary',
@@ -102,7 +113,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     id: 'project',
     label: 'Proyek Akhir',
-    shortDesc: 'Kode utuh 3 file & evaluasi',
+    shortDesc: 'Kode utuh 4 file & evaluasi',
     icon: CheckSquare,
     tile: 'from-amber-500 to-orange-400',
     activeText: 'text-amber-700',

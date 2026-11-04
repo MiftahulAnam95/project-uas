@@ -19,18 +19,19 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
 
 ## 🌟 Fitur Utama Platform
 
-1. **Kurikulum Lengkap 11 Bab Sesuai Modul**:
-   - **Bab 1 — Kenalan Dulu**: Memahami masalah keuangan mahasiswa dan alasan modularitas 3 file (`pencatat.py`, `laporan.py`, `main.py`).
+1. **Kurikulum Lengkap 12 Bab Sesuai Modul**:
+   - **Bab 1 — Kenalan Dulu**: Memahami masalah keuangan mahasiswa dan alasan modularitas 4 file (`pencatat.py`, `laporan.py`, `main.py`, `tampilan.py`).
    - **Bab 2 — Persiapan**: Memasang Python 3, teks editor (VS Code), dan menjalankan file lewat terminal.
    - **Bab 3 — Sembilan Langkah Dasar**: 9 pondasi koding (`print`, variabel, `input`, operator, `if/else`, `list`, `dict`, perulangan `for/while`, fungsi `def`, dan `import`). Setiap langkah dilengkapi penjelasan ulang untuk pemula, contoh kode, kesalahan umum, dan **3 soal uji pemahaman** yang harus benar semua sebelum langkah dianggap dikuasai.
-   - **Bab 4 — Bedah pencatat.py**: Logika penyimpanan data keuangan dan perhitungan matematika.
-   - **Bab 5 — Bedah laporan.py**: Format Rupiah rapi, status peringatan (Aman/Waspada/Boros), dan validasi input.
-   - **Bab 6 — Bedah main.py**: Menu interaktif terminal (CLI) dan penghubung antar-file.
-   - **Bab 7 — Mengikuti Jalannya Program**: Visualisasi alur program dan pelacakan isi memori sebelum vs sesudah aksi.
-   - **Bab 8 — Error yang Sering Muncul**: Panduan debugging 6 error umum (*IndentationError*, *SyntaxError*, *NameError*, *TypeError*, *IndexError*, *ModuleNotFoundError*).
-   - **Bab 9 — Latihan Mandiri**: 3 tantangan modifikasi kode mandiri disertai petunjuk bertahap.
-   - **Bab 10 — Kamus Istilah**: Pencarian istilah pemrograman dalam bahasa sehari-hari dengan perumpamaan nyata.
-   - **Bab 11 — Tips Presentasi**: Strategi live demo di hadapan dosen penguji dan bocoran jawaban pertanyaan ujian.
+   - **Bab 4 — Bedah pencatat.py**: Data KATEGORI, akun, transaksi, format Rupiah, dan perhitungan saldo.
+   - **Bab 5 — Bedah laporan.py**: Status AMAN/HATI-HATI/BOROS, validasi input dengan try/except, riwayat, dan laporan kategori.
+   - **Bab 6 — Bedah main.py**: Menu interaktif 1-7 dan 0, setup awal, serta penghubung antar-modul.
+   - **Bab 7 — Mempercantik Tampilan Program (tampilan.py)**: Warna ANSI, karakter kotak, panjang_tampil(), batang kemajuan, kotak, tabel, membersihkan layar, dan pratinjau terminal interaktif.
+   - **Bab 8 — Mengikuti Jalannya Program**: Visualisasi alur program dan pelacakan isi memori sebelum vs sesudah aksi.
+   - **Bab 9 — Error yang Sering Muncul**: Panduan debugging 8 error umum (*IndentationError*, *SyntaxError*, *NameError*, *TypeError*, *IndexError*, *KeyError*, *ValueError*, *ZeroDivisionError*, *ModuleNotFoundError*).
+   - **Bab 10 — Latihan Mandiri**: 3 tantangan modifikasi kode terbaru (kategori, ambang batas, fungsi baru).
+   - **Bab 11 — Kamus Istilah**: Pencarian 31 istilah pemrograman dalam bahasa sehari-hari dengan perumpamaan nyata.
+   - **Bab 12 — Tips Presentasi**: Strategi live demo di hadapan dosen penguji dan bocoran jawaban pertanyaan ujian.
 
 2. **Sistem Penjelasan Kode 3 Bagian**:
    - Kode Python dengan *syntax highlighting*.
@@ -40,6 +41,12 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
 
 3. **Latihan Interaktif Beragam**:
    - **Uji Pemahaman per Langkah (Bab 3)**: peta 9 langkah dengan status penguasaan, lalu 3 soal per langkah (konsep, membaca kode, dan isian singkat) beserta petunjuk dan pembahasan.
+   - **Coba sendiri bertingkat**: 3 latihan mudah/sedang/tantangan dengan kunci jawaban yang bisa dibuka di setiap bab.
+   - **Awas, ini sering salah**: kotak error umum dengan pesan error asli dan cara memperbaiki.
+   - **Cheat sheet satu halaman**: bisa dibuka dan dicetak per bab.
+   - **Tabel jejak**: animasi langkah demi langkah untuk if/else dan loop.
+   - **Perbaiki kode yang rusak**: editor untuk memperbaiki bug.
+   - **Kalau Macet**: diagram keputusan gejala → arti → solusi.
    - Prediksi hasil kode (*Predict Output*).
    - Lengkapi kode (*Fill in the Blank*) dengan sistem petunjuk bertahap (Petunjuk 1 & Petunjuk 2).
    - Susun urutan langkah program (*Code Sequence Ordering*).

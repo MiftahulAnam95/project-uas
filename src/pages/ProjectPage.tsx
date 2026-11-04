@@ -41,9 +41,10 @@ const CHECKLIST_CRITERIA = [
   { id: 'crit-4', text: 'Saya memahami perhitungan total pengeluaran dan sisa saldo.' },
   { id: 'crit-5', text: 'Saya memahami logika peringatan status harian: AMAN, WASPADA, dan BOROS!.' },
   { id: 'crit-6', text: 'Saya memahami cara kerja laporan pengeluaran per kategori.' },
-  { id: 'crit-7', text: 'Saya memahami hubungan dan tanggung jawab tiga file (pencatat.py, laporan.py, main.py).' },
+  { id: 'crit-7', text: 'Saya memahami hubungan dan tanggung jawab empat file (pencatat.py, laporan.py, main.py, tampilan.py) beserta pemiliknya.' },
   { id: 'crit-8', text: 'Saya dapat menjalankan program dari terminal (python main.py).' },
   { id: 'crit-9', text: 'Saya dapat menjelaskan alur program dan menjawab pertanyaan dosen dengan percaya diri.' },
+  { id: 'crit-10', text: 'Saya memahami peran tampilan.py (warna, kotak, tabel, batang) dan cara memakainya dengan from tampilan import ... .' },
 ];
 
 const FILE_STYLE: Record<string, { tile: string; chip: string; ring: string; text: string }> = {
@@ -65,6 +66,12 @@ const FILE_STYLE: Record<string, { tile: string; chip: string; ring: string; tex
     ring: 'ring-amber-300',
     text: 'text-amber-700',
   },
+  'tampilan.py': {
+    tile: 'from-cyan-500 to-teal-400',
+    chip: 'bg-cyan-50 text-cyan-800 border-cyan-200',
+    ring: 'ring-cyan-300',
+    text: 'text-cyan-700',
+  },
 };
 
 const RUN_STEPS = [
@@ -76,7 +83,7 @@ const RUN_STEPS = [
     di komputer kamu.
   </>,
   <>
-    Buat 3 file teks kosong di dalamnya:{' '}
+    Buat 4 file teks kosong di dalamnya:{' '}
     <code className="rounded-md bg-slate-950/70 px-1.5 py-0.5 font-mono text-brand-300">
       pencatat.py
     </code>
@@ -84,9 +91,13 @@ const RUN_STEPS = [
     <code className="rounded-md bg-slate-950/70 px-1.5 py-0.5 font-mono text-emerald-300">
       laporan.py
     </code>
-    , dan{' '}
+    ,{' '}
     <code className="rounded-md bg-slate-950/70 px-1.5 py-0.5 font-mono text-amber-300">
       main.py
+    </code>
+    , dan{' '}
+    <code className="rounded-md bg-slate-950/70 px-1.5 py-0.5 font-mono text-cyan-300">
+      tampilan.py
     </code>
     .
   </>,
@@ -151,7 +162,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
         highlight="(Utuh)"
         description={
           <>
-            Struktur berkas utuh yang siap kamu salin ke komputer, simpan di folder{' '}
+            Struktur berkas utuh 4 file yang siap kamu salin ke komputer, simpan di folder{' '}
             <code className="rounded-md bg-white/10 px-1.5 py-0.5 font-mono text-[12px] text-emerald-200">
               keuangan_mahasiswa/
             </code>
@@ -159,7 +170,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
           </>
         }
         stats={[
-          { label: 'File', value: '3' },
+          { label: 'File', value: '4' },
           {
             label: 'Fungsi',
             value: String(
@@ -198,7 +209,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
             icon={FolderTree}
             title={
               <>
-                Tiga file, satu folder:{' '}
+                Empat file, satu folder:{' '}
                 <span className="font-mono text-brand-700">keuangan_mahasiswa/</span>
               </>
             }
@@ -216,7 +227,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
           />
 
           {/* Tab file */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {Object.values(PROJECT_FILES).map((file) => {
               const isSelected = file.name === selectedFileName;
               const s = FILE_STYLE[file.name] || FILE_STYLE['pencatat.py'];
@@ -260,7 +271,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
                         s.chip
                       )}
                     >
-                      File #{file.order}
+                      File #{file.order} · {file.owner}
                     </span>
                   </span>
                   <span className="line-clamp-2 text-xs leading-relaxed text-slate-600">
@@ -296,6 +307,9 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
                 Tanggung jawab file
               </div>
               <div className="text-sm font-extrabold text-slate-900">{activeFile.role}</div>
+              <div className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+                Pemilik: {activeFile.owner}
+              </div>
               <p className="mt-1 text-xs leading-relaxed text-slate-700 sm:text-[13px]">
                 {activeFile.description}
               </p>
@@ -503,7 +517,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
                   Selamat! Perjalanan belajarmu tuntas 🎉
                 </h3>
                 <p className="max-w-2xl text-xs leading-relaxed text-emerald-50 sm:text-sm">
-                  Kamu sudah menguasai seluruh konsep: dari variabel sampai arsitektur 3 file
+                  Kamu sudah menguasai seluruh konsep: dari variabel sampai arsitektur 4 file
                   program pencatat keuangan mahasiswa. Saatnya mempresentasikan karyamu dengan
                   percaya diri.
                 </p>

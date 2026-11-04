@@ -24,13 +24,15 @@ interface FooterProps {
 const LEARNING_LINKS: Array<{ label: string; tab: ActiveTab; chapter?: ChapterId }> = [
   { label: 'Bab 1 — Kenalan Dulu', tab: 'chapter', chapter: 'bab-1' },
   { label: 'Bab 3 — Sembilan Langkah Dasar', tab: 'chapter', chapter: 'bab-3' },
-  { label: 'Bab 7 — Simulasi Alur', tab: 'flow' },
-  { label: 'Bab 8 — Panduan Error', tab: 'debugging' },
-  { label: 'Bab 11 — Tips Presentasi', tab: 'chapter', chapter: 'bab-11' },
+  { label: 'Bab 7 — Tampilan Program', tab: 'chapter', chapter: 'bab-tampilan' },
+  { label: 'Bab 8 — Simulasi Alur', tab: 'flow' },
+  { label: 'Bab 9 — Panduan Error', tab: 'debugging' },
+  { label: 'Bab 12 — Tips Presentasi', tab: 'chapter', chapter: 'bab-11' },
 ];
 
 const FEATURE_LINKS: Array<{ label: string; tab: ActiveTab; chapter?: ChapterId }> = [
-  { label: 'Kode Sumber 3 File', tab: 'project' },
+  { label: 'Kode Sumber 4 File', tab: 'project' },
+  { label: 'Kalau Macet', tab: 'stuck' },
   { label: 'Kamus Istilah Pemrograman', tab: 'glossary' },
   { label: 'Simulasi Alur Program', tab: 'flow' },
   { label: 'Kuis & Latihan Interaktif', tab: 'chapter', chapter: 'bab-4' },

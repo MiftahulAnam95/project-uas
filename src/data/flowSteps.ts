@@ -32,348 +32,311 @@ export interface SimulationStep {
   terminalOutput: string;
 }
 
+const EMPTY = {
+  anggaran: 0,
+  jumlahHari: 30,
+  jatahHarian: 0,
+  hariAktif: 1,
+  totalKeluar: 0,
+  sisaSaldo: 0,
+  pengeluaranHariIni: 0,
+  status: 'BELUM DIATUR',
+  transaksiCount: 0,
+};
+
+const SETUP = {
+  anggaran: 3000000,
+  jumlahHari: 30,
+  jatahHarian: 100000,
+  hariAktif: 1,
+  totalKeluar: 0,
+  sisaSaldo: 3000000,
+  pengeluaranHariIni: 0,
+  status: 'AMAN',
+  transaksiCount: 1,
+};
+
+const MAKAN = {
+  anggaran: 3000000,
+  jumlahHari: 30,
+  jatahHarian: 100000,
+  hariAktif: 1,
+  totalKeluar: 85000,
+  sisaSaldo: 2915000,
+  pengeluaranHariIni: 85000,
+  status: 'HATI-HATI',
+  transaksiCount: 2,
+};
+
+const TRANSPORT = {
+  anggaran: 3000000,
+  jumlahHari: 30,
+  jatahHarian: 100000,
+  hariAktif: 1,
+  totalKeluar: 125000,
+  sisaSaldo: 2875000,
+  pengeluaranHariIni: 125000,
+  status: 'BOROS!',
+  transaksiCount: 3,
+};
+
+const HARI_2 = {
+  anggaran: 3000000,
+  jumlahHari: 30,
+  jatahHarian: 100000,
+  hariAktif: 2,
+  totalKeluar: 125000,
+  sisaSaldo: 2875000,
+  pengeluaranHariIni: 0,
+  status: 'AMAN',
+  transaksiCount: 3,
+};
+
 export const SIMULATION_STEPS: SimulationStep[] = [
   {
     stepNumber: 1,
-    title: 'Langkah 1: Menjalankan Program & Buka Menu',
-    actionDescription: 'Mahasiswa mengetik "python main.py" di terminal untuk memulai aplikasi.',
+    title: 'Langkah 1: Menjalankan Program & Setup Awal',
+    actionDescription:
+      'Mahasiswa mengetik "python main.py", lalu setup_awal() meminta anggaran Rp3.000.000 dan 30 hari.',
     activeFile: 'main.py',
-    fileRoleInStep: 'main.py memuat fungsi tampilkan_menu() dan menunggu input pengguna.',
-    userInput: 'python main.py',
-    calledFunctions: ['main.py -> main()', 'main.py -> tampilkan_menu()'],
-    stateBefore: {
-      anggaran: 0,
-      jumlahHari: 30,
-      jatahHarian: 0,
-      hariAktif: 1,
-      totalKeluar: 0,
-      sisaSaldo: 0,
-      pengeluaranHariIni: 0,
-      status: 'BELUM DIATUR',
-      transaksiCount: 0,
-    },
-    stateAfter: {
-      anggaran: 0,
-      jumlahHari: 30,
-      jatahHarian: 0,
-      hariAktif: 1,
-      totalKeluar: 0,
-      sisaSaldo: 0,
-      pengeluaranHariIni: 0,
-      status: 'BELUM DIATUR',
-      transaksiCount: 0,
-    },
+    fileRoleInStep:
+      'main.py memanggil setup_awal(), lalu setup_awal() memanggil atur_uang_saku() dari pencatat.py. tampilan.py menggambar judul dan kotak.',
+    userInput: 'python main.py -> 3000000 -> 30',
+    calledFunctions: [
+      'main.py -> main()',
+      'main.py -> setup_awal()',
+      'laporan.baca_angka(...)',
+      'pencatat.atur_uang_saku(3000000, 30)',
+      'tampilan.judul_besar(...)',
+    ],
+    stateBefore: { ...EMPTY },
+    stateAfter: { ...SETUP },
     whatHappened:
-      'Program Python mulai membaca file main.py. Import modul pencatat dan laporan berhasil. Menu pilihan 0-5 dicetak ke layar konsol.',
-    terminalOutput: `Selamat datang di Program Pencatat Keuangan Mahasiswa!
-========================================
- PENCATAT KEUANGAN MAHASISWA (PYTHON)
-========================================
- [1] Atur Anggaran Awal
- [2] Catat Pengeluaran Baru
- [3] Lihat Ringkasan & Status Hari Ini
- [4] Lihat Laporan per Kategori
- [5] Ganti ke Hari Berikutnya
- [0] Keluar dari Program
-========================================
-Pilih menu (0-5): `,
+      'Program mencatat pemasukan awal "Anggaran" Rp3.000.000. Jatah harian dihitung 3.000.000 / 30 = 100.000. Saldo awal 3.000.000. Menu 1-7 dan 0 ditampilkan.',
+    terminalOutput: `╔══════════════════════════════════════════════════════════════╗
+║                 PENCATAT KEUANGAN MAHASISWA                  ║
+║                       Selamat datang!                        ║
+╚══════════════════════════════════════════════════════════════╝
+
+┌─ ATUR ANGGARAN ──────────────────────────────────────────────┐
+│ Isi anggaran satu bulan (gaji, honor, atau kiriman).         │
+│ Jatah harian akan dihitung otomatis.                         │
+└──────────────────────────────────────────────────────────────┘
+
+  ► Anggaran sebulan (Rp)  : 3000000
+  ► Jumlah hari sebulan    : 30
+  [OK] Anggaran tersimpan.
+  [i] Jatah harian kamu: Rp100.000`,
   },
   {
     stepNumber: 2,
-    title: 'Langkah 2: Menetapkan Anggaran Bulanan Rp3.000.000',
-    actionDescription: 'Mahasiswa memilih menu [1], lalu memasukkan anggaran Rp3.000.000 untuk jangka waktu 30 hari.',
+    title: 'Langkah 2: Menu 1 — Catat Makan Rp85.000',
+    actionDescription:
+      'Pengguna memilih menu 1, memilih kategori Makan, lalu memasukkan Rp85.000.',
     activeFile: 'pencatat.py',
-    fileRoleInStep: 'main.py menerima input, lalu meneruskan data ke fungsi pencatat.atur_anggaran(3000000, 30).',
-    userInput: '1 -> 3000000 -> 30',
+    fileRoleInStep:
+      'main.py memanggil menu_pengeluaran(), lalu pencatat.tambah_pengeluaran(85000, "Makan") menambah tuple ke list transaksi.',
+    userInput: '1 -> 1 (Makan) -> 85000',
     calledFunctions: [
-      'laporan.validasi_angka_positif(...)',
-      'pencatat.atur_anggaran(3000000, 30)',
-      'pencatat.hitung_jatah_harian()',
+      'main.py -> menu_pengeluaran()',
+      'laporan.baca_pilihan(...)',
+      'laporan.baca_angka(...)',
+      'pencatat.tambah_pengeluaran(85000, "Makan")',
     ],
-    stateBefore: {
-      anggaran: 0,
-      jumlahHari: 30,
-      jatahHarian: 0,
-      hariAktif: 1,
-      totalKeluar: 0,
-      sisaSaldo: 0,
-      pengeluaranHariIni: 0,
-      status: 'BELUM DIATUR',
-      transaksiCount: 0,
-    },
-    stateAfter: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 1,
-      totalKeluar: 0,
-      sisaSaldo: 3000000,
-      pengeluaranHariIni: 0,
-      status: 'AMAN (Pengeluaran terjaga dengan baik)',
-      transaksiCount: 0,
-    },
+    stateBefore: { ...SETUP },
+    stateAfter: { ...MAKAN },
     whatHappened:
-      'Di dalam pencatat.py, variabel anggaran_bulanan diisi 3000000 dan jatah_harian dihitung menggunakan pembagian bulat: 3000000 // 30 = 100000. Mahasiswa kini punya patokan jatah harian Rp100.000.',
-    terminalOutput: `--- Pengaturan Anggaran ---
-Masukkan anggaran bulanan (Rp): 3000000
-Masukkan jumlah hari (contoh: 30): 30
-[OK] Anggaran berhasil diatur! Jatah harian: Rp 100.000`,
+      'Satu tuple (1, "keluar", "Makan", 85000) ditambahkan. Total pengeluaran hari ini 85.000. Status menjadi HATI-HATI karena >= 80% jatah.',
+    terminalOutput: `── CATAT PENGELUARAN ───────────────────────────────────────────
+┌─ PILIH KATEGORI ─────────────────────────────────────────────┐
+│ [1]  Makan                                                   │
+│ [2]  Transport                                               │
+│ [3]  Kuota                                                   │
+│ [4]  Kuliah/Tugas                                            │
+│ [5]  Hiburan                                                 │
+│ [6]  Lainnya                                                 │
+└──────────────────────────────────────────────────────────────┘
+
+  ► Nomor kategori          : 1
+  ► Jumlah pengeluaran (Rp) : 85000
+  [OK] Tercatat: Makan Rp85.000
+
+┌─ HATI-HATI ──────────────────────────────────────────────────┐
+│ Pengeluaran hari ini hampir habis jatah.                     │
+└──────────────────────────────────────────────────────────────┘`,
   },
   {
     stepNumber: 3,
-    title: 'Langkah 3: Catat Pengeluaran Pertama — Makan Rp85.000',
-    actionDescription: 'Mahasiswa memilih menu [2] pada Hari ke-1 untuk mencatat makan siang dan makan malam seharga Rp85.000.',
-    activeFile: 'pencatat.py',
-    fileRoleInStep: 'pencatat.tambah_transaksi("Makan", 85000, "Makan hari 1") membuat dictionary transaksi baru dan menambahkannya ke list.',
-    userInput: '2 -> "Makan" -> 85000 -> "Makan siang & malam"',
+    title: 'Langkah 3: Menu 3 — Cek Saldo dan Peringatan',
+    actionDescription:
+      'Pengguna memilih menu 3 untuk melihat ringkasan saldo, jatah, dan status hari ini.',
+    activeFile: 'laporan.py',
+    fileRoleInStep:
+      'main.py memanggil laporan.cek_peringatan(). laporan.py membaca hitung_saldo() dan pengeluaran_hari() dari pencatat.py, lalu menampilkan kotak dari tampilan.py.',
+    userInput: '3',
     calledFunctions: [
-      'laporan.validasi_angka_positif("85000")',
-      'pencatat.tambah_transaksi("Makan", 85000, "Makan siang & malam")',
+      'main.py -> cek_peringatan()',
+      'pencatat.hitung_saldo()',
+      'pencatat.pengeluaran_hari(1)',
+      'tampilan.kotak(...)',
+      'tampilan.bar(...)',
     ],
-    stateBefore: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 1,
-      totalKeluar: 0,
-      sisaSaldo: 3000000,
-      pengeluaranHariIni: 0,
-      status: 'AMAN (Pengeluaran terjaga dengan baik)',
-      transaksiCount: 0,
-    },
-    stateAfter: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 1,
-      totalKeluar: 85000,
-      sisaSaldo: 2915000,
-      pengeluaranHariIni: 85000,
-      status: 'WASPADA (Mendekati batas jatah harian!)',
-      transaksiCount: 1,
-    },
+    stateBefore: { ...MAKAN },
+    stateAfter: { ...MAKAN },
     whatHappened:
-      'List daftar_transaksi kini berisi 1 transaksi. Total pengeluaran hari ini menjadi Rp85.000 (85% dari jatah Rp100.000). Status berubah menjadi WASPADA karena sudah berada di kisaran 70%-100% jatah harian.',
-    terminalOutput: `--- Catat Pengeluaran (Hari ke-1) ---
-Nama kategori pengeluaran: Makan
-Jumlah pengeluaran (Rp): 85000
-Catatan tambahan (opsional): Makan siang & malam
-[OK] Pengeluaran berhasil dicatat!`,
+      'Saldo 2.915.000. Pengeluaran hari ini 85.000. Status HATI-HATI. Batang kemajuan menunjukkan 85% dari jatah.',
+    terminalOutput: `── STATUS HARI KE-1 DARI 30 ────────────────────────────────────
+┌─ RINGKASAN ──────────────────────────────────────────────────┐
+│ Saldo sekarang        Rp2.915.000                            │
+│   ██████████████████████████████████ 97% dari anggaran         │
+│                                                              │
+│ Jatah harian          Rp100.000                              │
+│ Pengeluaran hari ini  Rp85.000                               │
+│   ███████████████████████████░░░ 85% dari jatah               │
+└──────────────────────────────────────────────────────────────┘
+┌─ HATI-HATI ──────────────────────────────────────────────────┐
+│ Pengeluaran hari ini hampir habis jatah.                     │
+└──────────────────────────────────────────────────────────────┘`,
   },
   {
     stepNumber: 4,
-    title: 'Langkah 4: Melihat Ringkasan & Cek Status',
-    actionDescription: 'Mahasiswa memilih menu [3] untuk memeriksa sisa saldo dompet dan status keuangan hari ini.',
-    activeFile: 'laporan.py',
-    fileRoleInStep: 'laporan.py mengambil data saldo dan pengeluaran dari pencatat.py, lalu mencetak tabel ringkasan dengan format rupiah rapi.',
-    userInput: '3',
+    title: 'Langkah 4: Menu 1 — Catat Transport Rp40.000',
+    actionDescription:
+      'Pengguna memilih menu 1 lagi, memilih Transport, lalu memasukkan Rp40.000.',
+    activeFile: 'pencatat.py',
+    fileRoleInStep:
+      'main.py memanggil menu_pengeluaran(), lalu pencatat.tambah_pengeluaran(40000, "Transport") menambah tuple kedua.',
+    userInput: '1 -> 2 (Transport) -> 40000',
     calledFunctions: [
-      'pencatat.hitung_total_pengeluaran()',
-      'pencatat.hitung_sisa_saldo()',
-      'pencatat.hitung_pengeluaran_hari_ini()',
-      'laporan.cek_status_harian(85000, 100000)',
-      'laporan.tampilkan_ringkasan(...)',
+      'main.py -> menu_pengeluaran()',
+      'laporan.baca_pilihan(...)',
+      'laporan.baca_angka(...)',
+      'pencatat.tambah_pengeluaran(40000, "Transport")',
     ],
-    stateBefore: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 1,
-      totalKeluar: 85000,
-      sisaSaldo: 2915000,
-      pengeluaranHariIni: 85000,
-      status: 'WASPADA (Mendekati batas jatah harian!)',
-      transaksiCount: 1,
-    },
-    stateAfter: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 1,
-      totalKeluar: 85000,
-      sisaSaldo: 2915000,
-      pengeluaranHariIni: 85000,
-      status: 'WASPADA (Mendekati batas jatah harian!)',
-      transaksiCount: 1,
-    },
+    stateBefore: { ...MAKAN },
+    stateAfter: { ...TRANSPORT },
     whatHappened:
-      'Fungsi laporan.py membaca sisa saldo = Rp2.915.000. Pengeluaran hari ke-1 adalah Rp85.000 dari patokan Rp100.000. Layar menampilkan peringatan waspada secara visual.',
-    terminalOutput: `=============================================
-           RINGKASAN KEUANGAN MAHASISWA
-=============================================
- Hari Aktif           : Hari ke-1
- Anggaran Awal        : Rp 3.000.000
- Jatah Harian         : Rp 100.000
----------------------------------------------
- Pengeluaran Hari Ini : Rp 85.000
- Status Hari Ini      : WASPADA (Mendekati batas jatah harian!)
----------------------------------------------
- Total Pengeluaran    : Rp 85.000
- Sisa Saldo           : Rp 2.915.000
-=============================================`,
+      'Total pengeluaran hari ini menjadi 125.000, melebihi jatah 100.000. Status berubah menjadi BOROS! Saldo menjadi 2.875.000.',
+    terminalOutput: `── CATAT PENGELUARAN ───────────────────────────────────────────
+  ► Nomor kategori          : 2
+  ► Jumlah pengeluaran (Rp) : 40000
+  [OK] Tercatat: Transport Rp40.000
+
+┌─ BOROS! ─────────────────────────────────────────────────────┐
+│ Kamu sudah lebih Rp25.000 dari jatah hari ini.               │
+└──────────────────────────────────────────────────────────────┘`,
   },
   {
     stepNumber: 5,
-    title: 'Langkah 5: Catat Pengeluaran Kedua — Transport Rp40.000',
-    actionDescription: 'Masih di Hari ke-1, mahasiswa naik ojek online seharga Rp40.000 dan mencatatnya ke program.',
-    activeFile: 'pencatat.py',
-    fileRoleInStep: 'pencatat.tambah_transaksi("Transport", 40000) menambahkan elemen kedua ke list transaksi.',
-    userInput: '2 -> "Transport" -> 40000 -> "Ojek kampus bolak-balik"',
+    title: 'Langkah 5: Menu 3 — Status Berubah Menjadi BOROS!',
+    actionDescription:
+      'Pengguna memilih menu 3 lagi. Status hari ini sekarang BOROS karena total 125.000 > jatah 100.000.',
+    activeFile: 'laporan.py',
+    fileRoleInStep:
+      'laporan.cek_peringatan() menghitung ulang pengeluaran_hari(1) dan memilih cabang if pertama: keluar_hari_ini > jatah.',
+    userInput: '3',
     calledFunctions: [
-      'laporan.validasi_angka_positif("40000")',
-      'pencatat.tambah_transaksi("Transport", 40000, "Ojek kampus")',
+      'main.py -> cek_peringatan()',
+      'pencatat.pengeluaran_hari(1)',
+      'tampilan.kotak(...)',
+      'tampilan.bar(...)',
     ],
-    stateBefore: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 1,
-      totalKeluar: 85000,
-      sisaSaldo: 2915000,
-      pengeluaranHariIni: 85000,
-      status: 'WASPADA (Mendekati batas jatah harian!)',
-      transaksiCount: 1,
-    },
-    stateAfter: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 1,
-      totalKeluar: 125000,
-      sisaSaldo: 2875000,
-      pengeluaranHariIni: 125000,
-      status: 'BOROS! (Melebihi jatah harian hari ini!)',
-      transaksiCount: 2,
-    },
+    stateBefore: { ...TRANSPORT },
+    stateAfter: { ...TRANSPORT },
     whatHappened:
-      'Total pengeluaran Hari ke-1 kini menjadi Rp85.000 + Rp40.000 = Rp125.000. Karena Rp125.000 > jatah Rp100.000 (125%), status otomatis berubah menjadi BOROS!',
-    terminalOutput: `--- Catat Pengeluaran (Hari ke-1) ---
-Nama kategori pengeluaran: Transport
-Jumlah pengeluaran (Rp): 40000
-Catatan tambahan (opsional): Ojek kampus bolak-balik
-[OK] Pengeluaran berhasil dicatat!`,
+      'Status BOROS! ditampilkan dengan warna merah. Batang pengeluaran penuh. Ini momen utama saat demo ke dosen.',
+    terminalOutput: `── STATUS HARI KE-1 DARI 30 ────────────────────────────────────
+┌─ RINGKASAN ──────────────────────────────────────────────────┐
+│ Saldo sekarang        Rp2.875.000                            │
+│   ██████████████████████████████████ 96% dari anggaran         │
+│                                                              │
+│ Jatah harian          Rp100.000                              │
+│ Pengeluaran hari ini  Rp125.000                              │
+│   ██████████████████████████████████ 125% dari jatah          │
+└──────────────────────────────────────────────────────────────┘
+┌─ BOROS! ─────────────────────────────────────────────────────┐
+│ Kamu sudah lebih Rp25.000 dari jatah hari ini.               │
+└──────────────────────────────────────────────────────────────┘`,
   },
   {
     stepNumber: 6,
-    title: 'Langkah 6: Memeriksa Status yang Berubah Jadi BOROS!',
-    actionDescription: 'Mahasiswa kembali membuka menu [3] untuk melihat dampak dari pengeluaran transport tadi.',
+    title: 'Langkah 6: Menu 4 — Melihat Riwayat Transaksi',
+    actionDescription:
+      'Pengguna memilih menu 4. laporan.tampil_riwayat() menampilkan semua transaksi dalam tabel.',
     activeFile: 'laporan.py',
-    fileRoleInStep: 'laporan.cek_status_harian mendeteksi persentase > 100% dan mengembalikan label peringatan BOROS!.',
-    userInput: '3',
+    fileRoleInStep:
+      'laporan.py memakai garis_tabel() dan baris_tabel() dari tampilan.py. Setiap transaksi adalah tuple (hari, jenis, kategori, jumlah).',
+    userInput: '4',
     calledFunctions: [
-      'pencatat.hitung_pengeluaran_hari_ini()',
-      'laporan.cek_status_harian(125000, 100000)',
-      'laporan.tampilkan_ringkasan(...)',
+      'main.py -> tampil_riwayat()',
+      'tampilan.garis_tabel(...)',
+      'tampilan.baris_tabel(...)',
+      'tampilan.panjang_tampil(...)',
     ],
-    stateBefore: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 1,
-      totalKeluar: 125000,
-      sisaSaldo: 2875000,
-      pengeluaranHariIni: 125000,
-      status: 'BOROS! (Melebihi jatah harian hari ini!)',
-      transaksiCount: 2,
-    },
-    stateAfter: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 1,
-      totalKeluar: 125000,
-      sisaSaldo: 2875000,
-      pengeluaranHariIni: 125000,
-      status: 'BOROS! (Melebihi jatah harian hari ini!)',
-      transaksiCount: 2,
-    },
+    stateBefore: { ...TRANSPORT },
+    stateAfter: { ...TRANSPORT },
     whatHappened:
-      'Program memperingatkan mahasiswa bahwa ia telah "nombok" atau melebihi jatah harian sebesar Rp25.000. Ini membuktikan logika if/else di laporan.py bekerja akurat.',
-    terminalOutput: `=============================================
-           RINGKASAN KEUANGAN MAHASISWA
-=============================================
- Hari Aktif           : Hari ke-1
- Anggaran Awal        : Rp 3.000.000
- Jatah Harian         : Rp 100.000
----------------------------------------------
- Pengeluaran Hari Ini : Rp 125.000
- Status Hari Ini      : BOROS! (Melebihi jatah harian hari ini!)
----------------------------------------------
- Total Pengeluaran    : Rp 125.000
- Sisa Saldo           : Rp 2.875.000
-=============================================`,
+      'Tabel menampilkan 3 transaksi: pemasukan Anggaran, pengeluaran Makan, dan pengeluaran Transport. Total pemasukan dan pengeluaran dihitung.',
+    terminalOutput: `── RIWAYAT TRANSAKSI ───────────────────────────────────────────
+┌─────┬──────┬─────────────────┬───────────────┬───────────────┐
+│  No │ Hari │ Keterangan      │         Masuk │        Keluar │
+├─────┼──────┼─────────────────┼───────────────┼───────────────┤
+│   1 │    1 │ Anggaran        │   Rp3.000.000 │             - │
+│   2 │    1 │ Makan           │             - │      Rp85.000 │
+│   3 │    1 │ Transport       │             - │      Rp40.000 │
+├─────┼──────┼─────────────────┼───────────────┼───────────────┤
+│     │      │ TOTAL           │   Rp3.000.000 │     Rp125.000 │
+└─────┴──────┴─────────────────┴───────────────┴───────────────┘`,
   },
   {
     stepNumber: 7,
-    title: 'Langkah 7: Ganti ke Hari ke-2',
-    actionDescription: 'Hari telah berganti. Mahasiswa memilih menu [5] untuk berganti ke hari berikutnya.',
-    activeFile: 'pencatat.py',
-    fileRoleInStep: 'pencatat.ganti_hari() menaikkan nilai variabel hari_aktif dari 1 menjadi 2.',
+    title: 'Langkah 7: Menu 5 — Laporan per Kategori',
+    actionDescription:
+      'Pengguna memilih menu 5. laporan.laporan_kategori() mengelompokkan pengeluaran per kategori dan mengurutkan dari terbesar.',
+    activeFile: 'laporan.py',
+    fileRoleInStep:
+      'laporan.py membuat dictionary total per kategori, menghitung sum(total.values()), lalu menampilkan bar() untuk setiap kategori.',
     userInput: '5',
-    calledFunctions: ['pencatat.ganti_hari()'],
-    stateBefore: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 1,
-      totalKeluar: 125000,
-      sisaSaldo: 2875000,
-      pengeluaranHariIni: 125000,
-      status: 'BOROS! (Melebihi jatah harian hari ini!)',
-      transaksiCount: 2,
-    },
-    stateAfter: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 2,
-      totalKeluar: 125000,
-      sisaSaldo: 2875000,
-      pengeluaranHariIni: 0,
-      status: 'AMAN (Pengeluaran terjaga dengan baik)',
-      transaksiCount: 2,
-    },
+    calledFunctions: [
+      'main.py -> laporan_kategori()',
+      'tampilan.bar(...)',
+      'tampilan.persen(...)',
+      'tampilan.kotak(...)',
+    ],
+    stateBefore: { ...TRANSPORT },
+    stateAfter: { ...TRANSPORT },
     whatHappened:
-      'Variabel hari_aktif bertambah menjadi 2. Pengeluaran khusus hari ini dihitung ulang berdasarkan transaksi yang memiliki "hari": 2, sehingga nilainya kembali menjadi Rp0. Namun seluruh histori transaksi hari ke-1 tetap tersimpan aman di memori!',
-    terminalOutput: `[>>] Berpindah ke Hari ke-2! Semangat berhemat hari ini.`,
+      'Kategori Transport (40.000) lebih besar dari Makan (85.000)? Tidak: Makan 85.000 lebih besar. Laporan menampilkan Makan sebagai yang paling boros.',
+    terminalOutput: `── LAPORAN PENGELUARAN PER KATEGORI ─────────────────────────
+┌─ PER KATEGORI ───────────────────────────────────────────────┐
+│ Makan        ███████████████████ 68,0%        Rp85.000       │
+│ Transport    ████████ 32,0%                   Rp40.000       │
+└──────────────────────────────────────────────────────────────┘
+
+  Total pengeluaran Rp125.000
+  Kategori paling boros Makan`,
   },
   {
     stepNumber: 8,
-    title: 'Langkah 8: Cek Laporan per Kategori Keseluruhan',
-    actionDescription: 'Mahasiswa memilih menu [4] untuk melihat ringkasan pengelompokan biaya selama kuliah.',
-    activeFile: 'laporan.py',
-    fileRoleInStep: 'laporan.tampilkan_laporan_kategori(daftar_transaksi) melakukan looping dictionary untuk menjumlahkan per jenis belanja.',
-    userInput: '4',
-    calledFunctions: ['laporan.tampilkan_laporan_kategori(pencatat.daftar_transaksi)'],
-    stateBefore: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 2,
-      totalKeluar: 125000,
-      sisaSaldo: 2875000,
-      pengeluaranHariIni: 0,
-      status: 'AMAN (Pengeluaran terjaga dengan baik)',
-      transaksiCount: 2,
-    },
-    stateAfter: {
-      anggaran: 3000000,
-      jumlahHari: 30,
-      jatahHarian: 100000,
-      hariAktif: 2,
-      totalKeluar: 125000,
-      sisaSaldo: 2875000,
-      pengeluaranHariIni: 0,
-      status: 'AMAN (Pengeluaran terjaga dengan baik)',
-      transaksiCount: 2,
-    },
+    title: 'Langkah 8: Menu 6 — Pindah ke Hari ke-2',
+    actionDescription:
+      'Pengguna memilih menu 6. hari_berikutnya() menaikkan akun["hari"] menjadi 2. Pengeluaran harian reset, tetapi riwayat tetap tersimpan.',
+    activeFile: 'pencatat.py',
+    fileRoleInStep:
+      'main.py memanggil hari_berikutnya(), lalu pencatat.hari_berikutnya() menaikkan akun["hari"]. List transaksi tidak diubah.',
+    userInput: '6',
+    calledFunctions: [
+      'main.py -> hari_berikutnya()',
+      'pencatat.hari_berikutnya()',
+      'tampilan.pesan_ok(...)',
+    ],
+    stateBefore: { ...TRANSPORT },
+    stateAfter: { ...HARI_2 },
     whatHappened:
-      'Fungsi mengelompokkan kategori "Makan" (Rp85.000) dan "Transport" (Rp40.000). Total akumulasi pas Rp125.000. Alur lengkap program telah berhasil dijalankan!',
-    terminalOutput: `-----------------------------------
- LAPORAN PENGELUARAN PER KATEGORI
------------------------------------
- - Makan           : Rp 85.000
- - Transport       : Rp 40.000
------------------------------------`,
+      'Hari aktif menjadi 2. Pengeluaran hari ini 0. Status kembali AMAN. Saldo tetap 2.875.000 dan 3 transaksi lama tetap tersimpan.',
+    terminalOutput: `  [OK] Masuk ke hari ke-2.
+  [i] Jatah hari ini: Rp100.000
+
+  Tekan Enter untuk kembali ke menu...`,
   },
 ];

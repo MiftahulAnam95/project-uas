@@ -191,4 +191,137 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     relatedChapterId: 'bab-2',
     relatedChapterTitle: 'Bab 2 — Persiapan',
   },
+
+  {
+    id: 'tuple',
+    term: 'Tuple',
+    category: 'Tipe Data',
+    simpleDefinition:
+      'Kumpulan nilai berurutan yang tidak bisa diubah setelah dibuat. Ditulis dengan kurung biasa, contoh (1, "masuk", "Makan", 15000).',
+    analogy: 'Seperti map plastik yang sudah disegel: isinya tidak bisa ditambah atau diubah, tetapi bisa dibaca.',
+    codeExample: 'KATEGORI = ("Makan", "Transport", "Kuota")',
+    relatedChapterId: 'bab-4',
+    relatedChapterTitle: 'Bab 4 — Bedah pencatat.py',
+  },
+  {
+    id: 'try-except',
+    term: 'try / except',
+    category: 'Struktur Kontrol',
+    simpleDefinition:
+      'Cara menangani error agar program tidak berhenti mendadak. Kode berisiko diletakkan di try, lalu error ditangkap di except.',
+    analogy: 'Seperti payung saat hujan: kamu tetap jalan, tetapi tidak basah kuyup.',
+    codeExample: 'try:\n    angka = int(input("Jumlah: "))\nexcept ValueError:\n    print("Input salah")',
+    relatedChapterId: 'bab-8',
+    relatedChapterTitle: 'Bab 9 — Error yang Sering Muncul',
+  },
+  {
+    id: 'value-error',
+    term: 'ValueError',
+    category: 'Alat & Konsep',
+    simpleDefinition:
+      'Error yang muncul saat sebuah nilai tidak bisa diubah menjadi tipe yang diminta, misalnya int("abc").',
+    analogy: 'Seperti mesin pembaca barcode yang menolak label tulisan tangan karena bukan barcode.',
+    codeExample: 'int("abc")  # ValueError',
+    relatedChapterId: 'bab-8',
+    relatedChapterTitle: 'Bab 9 — Error yang Sering Muncul',
+  },
+  {
+    id: 'zero-division-error',
+    term: 'ZeroDivisionError',
+    category: 'Alat & Konsep',
+    simpleDefinition:
+      'Error yang muncul saat program membagi angka dengan nol. Pembagi harus diperiksa lebih dulu.',
+    analogy: 'Seperti mencoba membagi kue menjadi nol bagian: tidak ada hasil yang masuk akal.',
+    codeExample: 'jatah = anggaran / 0  # ZeroDivisionError',
+    relatedChapterId: 'bab-8',
+    relatedChapterTitle: 'Bab 9 — Error yang Sering Muncul',
+  },
+  {
+    id: 'traceback',
+    term: 'Traceback',
+    category: 'Alat & Konsep',
+    simpleDefinition:
+      'Pesan panjang dari Python saat terjadi error. Isinya menunjukkan urutan pemanggilan fungsi, nama file, nomor baris, dan nama error.',
+    analogy: 'Seperti rekaman CCTV: menunjukkan kejadian sebelum error terjadi.',
+    codeExample: 'Traceback (most recent call last):\n  File "main.py", line 10, in <module>',
+    relatedChapterId: 'bab-8',
+    relatedChapterTitle: 'Bab 9 — Error yang Sering Muncul',
+  },
+  {
+    id: 'ansi',
+    term: 'ANSI escape code',
+    category: 'Alat & Konsep',
+    simpleDefinition:
+      'Kode karakter khusus untuk mengatur warna dan gaya teks di terminal. Bentuknya seperti \\033[92m untuk hijau dan \\033[0m untuk reset.',
+    analogy: 'Seperti kode warna cat: angka tertentu mewakili warna tertentu.',
+    codeExample: 'print("\\033[92mHijau\\033[0m")',
+    relatedChapterId: 'bab-tampilan',
+    relatedChapterTitle: 'Bab 7 — Mempercantik Tampilan Program',
+  },
+  {
+    id: 'isatty',
+    term: 'isatty()',
+    category: 'Fungsi & Modularitas',
+    simpleDefinition:
+      'Fungsi yang mengembalikan True jika output terhubung ke terminal sungguhan, dan False jika diarahkan ke file atau lingkungan seperti IDLE.',
+    analogy: 'Seperti memeriksa apakah lampu indikator benar-benar terhubung ke mesin, bukan hanya hiasan.',
+    codeExample: 'if sys.stdout.isatty():\n    os.system("clear")',
+    relatedChapterId: 'bab-tampilan',
+    relatedChapterTitle: 'Bab 7 — Mempercantik Tampilan Program',
+  },
+  {
+    id: 'utf-8',
+    term: 'UTF-8',
+    category: 'Alat & Konsep',
+    simpleDefinition:
+      'Cara menyimpan karakter di komputer yang mendukung huruf, angka, simbol, dan karakter kotak Unicode. Tanpa UTF-8, karakter kotak bisa rusak.',
+    analogy: 'Seperti kamus yang mencakup semua aksara, bukan hanya huruf Latin.',
+    codeExample: 'sys.stdout.reconfigure(encoding="utf-8")',
+    relatedChapterId: 'bab-tampilan',
+    relatedChapterTitle: 'Bab 7 — Mempercantik Tampilan Program',
+  },
+  {
+    id: 'raise',
+    term: 'raise',
+    category: 'Struktur Kontrol',
+    simpleDefinition:
+      'Kata kunci untuk memicu error sendiri, biasanya untuk validasi. Contoh: raise ValueError("harus positif").',
+    analogy: 'Seperti membunyikan bel alarm sendiri saat ada yang tidak beres.',
+    codeExample: 'if angka <= 0:\n    raise ValueError("harus lebih dari 0")',
+    relatedChapterId: 'bab-5',
+    relatedChapterTitle: 'Bab 5 — Bedah laporan.py',
+  },
+  {
+    id: 'panjang-tampil',
+    term: 'panjang_tampil()',
+    category: 'Fungsi & Modularitas',
+    simpleDefinition:
+      'Fungsi di tampilan.py yang menghitung panjang teks yang terlihat dengan melewati kode ANSI. Dipakai agar tabel dan kotak tetap rapi.',
+    analogy: 'Seperti menghitung isi paket tanpa menghitung label di luarnya.',
+    codeExample: 'panjang_tampil(warna("Halo", "hijau"))  # 4',
+    relatedChapterId: 'bab-tampilan',
+    relatedChapterTitle: 'Bab 7 — Mempercantik Tampilan Program',
+  },
+  {
+    id: 'state',
+    term: 'State',
+    category: 'Alat & Konsep',
+    simpleDefinition:
+      'Isi memori program pada satu waktu. Di proyek ini, state utama ada di dictionary akun dan list transaksi.',
+    analogy: 'Seperti isi tas kamu saat ini: dompet, struk, dan catatan.',
+    codeExample: 'akun = {"uang_saku": 3000000, "hari": 1}',
+    relatedChapterId: 'bab-7',
+    relatedChapterTitle: 'Bab 8 — Mengikuti Jalannya Program',
+  },
+  {
+    id: 'trace-table',
+    term: 'Tabel jejak (trace table)',
+    category: 'Alat & Konsep',
+    simpleDefinition:
+      'Tabel yang menunjukkan nilai variabel di setiap langkah program. Membantu melihat bagaimana if/else atau loop mengubah data.',
+    analogy: 'Seperti catatan perjalanan uang: setiap langkah dicatat, jadi tahu kapan saldo berubah.',
+    codeExample: 'total = 0\nfor harga in [15000, 40000]:\n    total += harga',
+    relatedChapterId: 'bab-7',
+    relatedChapterTitle: 'Bab 8 — Mengikuti Jalannya Program',
+  },
 ];

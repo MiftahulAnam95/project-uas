@@ -41,10 +41,10 @@ interface HomePageProps {
 }
 
 const HERO_STATS = [
-  { icon: BookOpen, value: '11', label: 'Bab terstruktur', tile: 'from-brand-500 to-grape-500' },
-  { icon: Zap, value: '30+', label: 'Latihan & kuis', tile: 'from-amber-500 to-orange-400' },
-  { icon: Bug, value: '6', label: 'Panduan error', tile: 'from-rose-500 to-pink-500' },
-  { icon: BookMarked, value: '30+', label: 'Istilah dikamus', tile: 'from-teal-500 to-emerald-400' },
+  { icon: BookOpen, value: '12', label: 'Bab terstruktur', tile: 'from-brand-500 to-grape-500' },
+  { icon: Zap, value: '100+', label: 'Latihan & kuis', tile: 'from-amber-500 to-orange-400' },
+  { icon: Bug, value: '8', label: 'Panduan error', tile: 'from-rose-500 to-pink-500' },
+  { icon: BookMarked, value: '31', label: 'Istilah dikamus', tile: 'from-teal-500 to-emerald-400' },
 ];
 
 const LEARNING_STEPS = [
@@ -69,7 +69,7 @@ const LEARNING_STEPS = [
   {
     icon: Rocket,
     title: 'Rakit proyek akhirnya',
-    desc: 'Gabungkan semuanya jadi program pencatat keuangan 3 file yang siap kamu presentasikan.',
+    desc: 'Gabungkan semuanya jadi program pencatat keuangan 4 file yang siap kamu presentasikan.',
     tile: 'from-emerald-500 to-teal-400',
   },
 ];
@@ -100,7 +100,7 @@ const AUDIENCE = [
 
 const OUTCOMES = [
   '9 pondasi dasar Python (print, variabel, input, rumus, if/else, list, dict, fungsi, import)',
-  'Prinsip modularitas: mengapa membagi kode ke 3 file membuat hidupmu jauh lebih mudah',
+  'Prinsip modularitas: mengapa membagi kode ke 4 file membuat hidupmu jauh lebih mudah',
   'Cara memvalidasi input agar program tidak crash saat pengguna salah ketik',
   'Melacak perubahan data di memori dari Hari 1 hingga Hari 30',
   'Membaca pesan error Python tanpa panik dan memperbaikinya',
@@ -119,7 +119,7 @@ const FILES = [
   {
     name: 'laporan.py',
     order: 2,
-    desc: 'Memformat mata uang Rupiah, memeriksa status aman/boros, dan memvalidasi input.',
+    desc: 'Membaca data dari pencatat.py, menentukan status AMAN/HATI-HATI/BOROS, dan memvalidasi input dengan try/except.',
     tile: 'from-emerald-500 to-teal-400',
     text: 'text-emerald-700',
     ring: 'ring-emerald-100',
@@ -131,6 +131,14 @@ const FILES = [
     tile: 'from-amber-500 to-orange-400',
     text: 'text-amber-700',
     ring: 'ring-amber-100',
+  },
+  {
+    name: 'tampilan.py',
+    order: 4,
+    desc: 'Membuat warna ANSI, kotak, tabel, dan batang kemajuan. Dipakai bersama oleh laporan.py dan main.py.',
+    tile: 'from-cyan-500 to-teal-400',
+    text: 'text-cyan-700',
+    ring: 'ring-cyan-100',
   },
 ];
 
@@ -470,7 +478,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </ul>
               </div>
 
-              {/* Kartu arsitektur 3 file */}
+              {/* Kartu arsitektur 4 file */}
               <Reveal delay={120}>
                 <Card solid className="p-6 sm:p-7">
                   <div className="flex items-center gap-2.5">
@@ -482,7 +490,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                         Arsitektur proyek akhir
                       </div>
                       <div className="text-sm font-extrabold text-slate-900">
-                        Tiga file, satu program utuh
+                        Empat file, satu program utuh
                       </div>
                     </div>
                   </div>
@@ -538,7 +546,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       </section>
 
       {/* ================================================================== */}
-      {/* PETA 11 BAB                                                        */}
+      {/* PETA 12 BAB                                                        */}
       {/* ================================================================== */}
       <section className="max-w-6xl mx-auto px-0 sm:px-4">
         <Reveal>
@@ -548,7 +556,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             icon={BookOpen}
             title={
               <>
-                Peta Perjalanan Belajar <span className="text-gradient">11 Bab</span>
+                Peta Perjalanan Belajar <span className="text-gradient">12 Bab</span>
               </>
             }
             description="Disusun berurutan sesuai modul resmi: dari perkenalan santai sampai tips presentasi di depan dosen."
