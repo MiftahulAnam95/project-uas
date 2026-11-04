@@ -44,6 +44,7 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
    - **Coba sendiri bertingkat**: 3 latihan mudah/sedang/tantangan dengan kunci jawaban yang bisa dibuka di setiap bab.
    - **Awas, ini sering salah**: kotak error umum dengan pesan error asli dan cara memperbaiki.
    - **Cheat sheet satu halaman**: bisa dibuka dan dicetak per bab.
+   - **Panduan paper laporan**: kerangka laporan UAS + pembagian tugas kelompok 3 orang (tampilan.py dipakai bersama).
    - **Tabel jejak**: animasi langkah demi langkah untuk if/else dan loop.
    - **Perbaiki kode yang rusak**: editor untuk memperbaiki bug.
    - **Kalau Macet**: diagram keputusan gejala → arti → solusi.

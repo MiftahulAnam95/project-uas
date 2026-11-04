@@ -14,6 +14,9 @@ import {
   Trophy,
   Braces,
   RotateCcw,
+  FileText,
+  Users,
+  ClipboardCheck,
 } from 'lucide-react';
 import { PROJECT_FILES } from '../data/codeFiles';
 import { CodeBlock } from '../components/code-block/CodeBlock';
@@ -33,6 +36,49 @@ interface ProjectPageProps {
   onToggleChecklist: (id: string) => void;
   onNavigateTab: (tab: ActiveTab, chapterId?: ChapterId) => void;
 }
+
+const PAPER_OUTLINE = [
+  {
+    title: 'A. Pendahuluan',
+    desc: 'Latar belakang masalah keuangan mahasiswa, rumusan masalah, tujuan, dan manfaat program.',
+  },
+  {
+    title: 'B. Dasar Teori',
+    desc: 'Tipe data & variabel, string/number/operator, seleksi kondisi, perulangan, list & tuple, fungsi, modul & eksepsi.',
+  },
+  {
+    title: 'C. Implementasi',
+    desc: 'Arsitektur 4 file, flowchart/alur logika, penjelasan fungsi, dan tampilan program (warna, kotak, tabel, batang).',
+  },
+  {
+    title: 'D. Pengujian',
+    desc: 'Skenario uji, hasil run, status AMAN/HATI-HATI/BOROS, dan penanganan ValueError.',
+  },
+  {
+    title: 'E. Penutup',
+    desc: 'Kesimpulan, saran, daftar pustaka, dan lampiran kode lengkap.',
+  },
+];
+
+const PAPER_CHECKLIST = [
+  'Judul, nama kelompok, dan pembimbing',
+  'Latar belakang + rumusan masalah',
+  'Tujuan dan manfaat',
+  'Dasar teori 7 materi wajib',
+  'Flowchart / alur logika program',
+  'Penjelasan 4 file dan fungsi',
+  'Tangkapan layar / hasil run',
+  'Pembahasan error dan solusinya',
+  'Kesimpulan dan daftar pustaka',
+  'Lampiran kode lengkap',
+];
+
+const ROLES_3 = [
+  { role: 'Orang 1', file: 'pencatat.py', task: 'Data, tuple, list, fungsi hitung' },
+  { role: 'Orang 2', file: 'laporan.py', task: 'Seleksi status, validasi, laporan' },
+  { role: 'Orang 3', file: 'main.py', task: 'Menu, perulangan, penghubung modul' },
+  { role: 'Bersama', file: 'tampilan.py', task: 'Warna, kotak, tabel, batang' },
+];
 
 const CHECKLIST_CRITERIA = [
   { id: 'crit-1', text: 'Saya memahami tujuan program dan mengapa jatah harian penting bagi mahasiswa.' },
@@ -119,6 +165,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
 }) => {
   const [selectedFileName, setSelectedFileName] = useState<string>('pencatat.py');
   const [copiedAll, setCopiedAll] = useState(false);
+  const [copiedPaper, setCopiedPaper] = useState(false);
 
   const activeFile = PROJECT_FILES[selectedFileName] || PROJECT_FILES['pencatat.py'];
   const activeStyle = FILE_STYLE[activeFile.name] || FILE_STYLE['pencatat.py'];
@@ -128,6 +175,50 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
       await navigator.clipboard.writeText(activeFile.code);
       setCopiedAll(true);
       setTimeout(() => setCopiedAll(false), 2000);
+    } catch {
+      // clipboard tidak tersedia
+    }
+  };
+
+  const handleCopyPaper = async () => {
+    const outline = [
+      'KERANGKA PAPER LAPORAN — PROGRAM PENCATAT KEUANGAN MAHASISWA',
+      '',
+      'A. Pendahuluan',
+      '1. Latar belakang masalah keuangan mahasiswa',
+      '2. Rumusan masalah',
+      '3. Tujuan dan manfaat program',
+      '',
+      'B. Dasar Teori',
+      '1. Tipe data dan variabel',
+      '2. String, bilangan, dan operator',
+      '3. Seleksi kondisi (if/elif/else)',
+      '4. Perulangan (for/while)',
+      '5. List dan tuple',
+      '6. Fungsi (def, parameter, return)',
+      '7. Modul dan eksepsi (import, try/except ValueError)',
+      '',
+      'C. Implementasi',
+      '1. Arsitektur 4 file: pencatat.py, laporan.py, main.py, tampilan.py',
+      '2. Flowchart / alur logika program',
+      '3. Penjelasan fungsi dan parameter',
+      '4. Tampilan program: warna ANSI, kotak, tabel, batang kemajuan',
+      '',
+      'D. Pengujian',
+      '1. Skenario uji: atur anggaran, catat pengeluaran, cek status, riwayat, laporan kategori',
+      '2. Hasil run dan status AMAN/HATI-HATI/BOROS',
+      '3. Penanganan input salah (ValueError)',
+      '',
+      'E. Penutup',
+      '1. Kesimpulan',
+      '2. Saran',
+      '3. Daftar pustaka',
+      '4. Lampiran kode lengkap',
+    ].join('\n');
+    try {
+      await navigator.clipboard.writeText(outline);
+      setCopiedPaper(true);
+      setTimeout(() => setCopiedPaper(false), 2000);
     } catch {
       // clipboard tidak tersedia
     }
@@ -527,7 +618,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
                     variant="white"
                     onClick={() => onNavigateTab('chapter', 'bab-11')}
                   >
-                    Baca Tips Presentasi (Bab 11)
+                    Baca Tips Presentasi (Bab 12)
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                   <Button
@@ -554,6 +645,113 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
               </p>
             </div>
           )}
+        </Card>
+      </Reveal>
+
+      {/* ======================= PANDUAN PAPER & PRESENTASI ======================= */}
+      <Reveal>
+        <Card className="space-y-6 p-5 sm:p-7">
+          <SectionHeading
+            eyebrow="Ketentuan UAS · Pertemuan 11–15"
+            icon={FileText}
+            title="Panduan Paper Laporan"
+            description="Modul UAS mewajibkan paper laporan, presentasi alur logika + running program, dan penilaian dosen. Kerangka di bawah bisa langsung kamu salin ke dokumen kelompok."
+            aside={
+              <Button size="sm" variant="white" onClick={handleCopyPaper}>
+                {copiedPaper ? (
+                  <>
+                    <Check className="h-3.5 w-3.5" strokeWidth={3} /> Kerangka tersalin!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3.5 w-3.5" /> Salin kerangka paper
+                  </>
+                )}
+              </Button>
+            }
+          />
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {PAPER_OUTLINE.map((item, idx) => (
+              <div
+                key={item.title}
+                className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-3.5"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-grape-500 text-[10px] font-extrabold text-white">
+                    {idx + 1}
+                  </span>
+                  <p className="text-xs font-extrabold text-slate-900">{item.title}</p>
+                </div>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-slate-600">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/60 p-4">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-emerald-600" />
+              <p className="text-xs font-extrabold text-emerald-900">
+                Kelompok 3 orang sudah pas
+              </p>
+            </div>
+            <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
+              Modul menyebut kelompok 5 orang bersifat opsional. Untuk kelompok 3 orang,
+              pembagian tugas berikut sudah mencakup semua file:
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {ROLES_3.map((role) => (
+                <div
+                  key={role.role}
+                  className="flex items-start gap-2 rounded-xl border border-white bg-white/80 p-2.5"
+                >
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-emerald-100 text-[9px] font-extrabold text-emerald-700">
+                    {role.role === 'Bersama' ? '🤝' : role.role.replace('Orang ', '')}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-mono text-[11px] font-bold text-slate-900">{role.file}</p>
+                    <p className="text-[10px] leading-snug text-slate-500">
+                      {role.role} · {role.task}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4">
+            <div className="flex items-center gap-2">
+              <ClipboardCheck className="h-4 w-4 text-brand-600" />
+              <p className="text-xs font-extrabold text-slate-900">Checklist isi paper</p>
+            </div>
+            <ul className="mt-2 grid gap-1.5 sm:grid-cols-2">
+              {PAPER_CHECKLIST.map((item) => (
+                <li key={item} className="flex items-start gap-1.5 text-[11px] text-slate-600">
+                  <Check className="mt-0.5 h-3 w-3 shrink-0 text-emerald-500" strokeWidth={3} />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-amber-200/80 bg-amber-50/60 p-4">
+            <p className="text-[11px] font-extrabold uppercase tracking-wider text-amber-800">
+              Media presentasi yang disarankan
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
+              Gunakan <strong>Simulasi Alur</strong> untuk menunjukkan alur logika dan
+              <strong> Simulator Terminal</strong> untuk menunjukkan running program. Keduanya
+              bisa dipakai langsung saat presentasi tanpa perlu instalasi.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button size="sm" variant="white" onClick={() => onNavigateTab('flow')}>
+                <Terminal className="h-3.5 w-3.5" /> Buka Simulasi Alur
+              </Button>
+              <Button size="sm" variant="white" onClick={() => onNavigateTab('chapter', 'bab-11')}>
+                <Layers className="h-3.5 w-3.5" /> Baca Tips Presentasi (Bab 12)
+              </Button>
+            </div>
+          </div>
         </Card>
       </Reveal>
     </div>
