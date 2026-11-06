@@ -76,6 +76,7 @@ export function App() {
         : 'Materi',
       flow: 'Simulasi Alur Program',
       debugging: 'Bantuan Error Python',
+      stuck: 'Kalau Macet',
       glossary: 'Kamus Istilah',
       project: 'Proyek Akhir',
     };

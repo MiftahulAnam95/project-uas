@@ -82,10 +82,10 @@ const ROLES_3 = [
 
 const CHECKLIST_CRITERIA = [
   { id: 'crit-1', text: 'Saya memahami tujuan program dan mengapa jatah harian penting bagi mahasiswa.' },
-  { id: 'crit-2', text: 'Saya memahami pengaturan anggaran dan rumus pembagian jatah harian (anggaran // hari).' },
+  { id: 'crit-2', text: 'Saya memahami pengaturan anggaran dan rumus pembagian jatah harian (anggaran / hari).' },
   { id: 'crit-3', text: 'Saya memahami pencatatan transaksi menggunakan Dictionary di dalam List.' },
   { id: 'crit-4', text: 'Saya memahami perhitungan total pengeluaran dan sisa saldo.' },
-  { id: 'crit-5', text: 'Saya memahami logika peringatan status harian: AMAN, WASPADA, dan BOROS!.' },
+  { id: 'crit-5', text: 'Saya memahami logika peringatan status harian: AMAN, HATI-HATI, dan BOROS!.' },
   { id: 'crit-6', text: 'Saya memahami cara kerja laporan pengeluaran per kategori.' },
   { id: 'crit-7', text: 'Saya memahami hubungan dan tanggung jawab empat file (pencatat.py, laporan.py, main.py, tampilan.py) beserta pemiliknya.' },
   { id: 'crit-8', text: 'Saya dapat menjalankan program dari terminal (python main.py).' },
@@ -740,8 +740,9 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({
             </p>
             <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
               Gunakan <strong>Simulasi Alur</strong> untuk menunjukkan alur logika dan
-              <strong> Simulator Terminal</strong> untuk menunjukkan running program. Keduanya
-              bisa dipakai langsung saat presentasi tanpa perlu instalasi.
+              <strong> Simulator Terminal</strong> sebagai simulasi, bukan eksekusi Python asli.
+              Untuk membuktikan program berjalan, jalankan keempat file Python di komputer.
+              Eksekusi Python di browser membutuhkan koneksi saat memuat Pyodide; siapkan cadangan lokal.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button size="sm" variant="white" onClick={() => onNavigateTab('flow')}>

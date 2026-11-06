@@ -8,7 +8,7 @@ export const CHAPTERS: Chapter[] = [
     id: 'bab-1',
     number: 1,
     title: 'Kenalan Dulu',
-    subtitle: 'Memahami Masalah, Program yang Akan Dibuat, dan Alasan Membagi Tiga File',
+    subtitle: 'Memahami Masalah, Program yang Akan Dibuat, dan Alasan Membagi Empat File',
     description:
       'Selamat datang di dunia pemrograman Python! Di bab pembuka ini, kita akan berkenalan dengan masalah keuangan mahasiswa, program yang akan kita bangun bersama, dan mengapa kita memecah program menjadi empat file terpisah.',
     learningGoals: [
@@ -41,7 +41,7 @@ Cara kerja program ini sangat sederhana namun ampuh:
 1. Kamu memasukkan total anggaran bulanan (misal: Rp3.000.000) dan jumlah hari (misal: 30 hari).
 2. Program menghitung otomatis jatah harianmu: Rp3.000.000 ÷ 30 = **Rp100.000 per hari**.
 3. Setiap kali kamu jajan atau bayar sesuatu, kamu mencatatnya ke program.
-4. Program langsung memberi tahu statusmu: apakah masih **AMAN**, sudah **WASPADA**, atau sudah **BOROS** karena melebihi jatah hari itu.
+4. Program langsung memberi tahu statusmu: apakah masih **AMAN**, sudah **HATI-HATI**, atau sudah **BOROS** karena melebihi jatah hari itu.
 5. Saat hari berganti, kamu bisa memindahkan hari aktif dan program tetap menyimpan seluruh catatan transaksi pengeluaranmu.`,
         codeSnippets: [
           {
@@ -55,7 +55,7 @@ Cara kerja program ini sangat sederhana namun ampuh:
  Jatah Harian         : Rp 100.000
 ---------------------------------------------
  Pengeluaran Hari Ini : Rp 85.000
- Status Hari Ini      : WASPADA (Mendekati batas jatah harian!)
+ Status Hari Ini      : HATI-HATI (Mendekati batas jatah harian!)
 ---------------------------------------------
  Total Pengeluaran    : Rp 85.000
  Sisa Saldo           : Rp 2.915.000
@@ -68,7 +68,7 @@ Cara kerja program ini sangat sederhana namun ampuh:
       },
       {
         id: 'mengapa-tiga-file',
-        title: '3. Mengapa Program Kita Dibagi Menjadi Tiga File?',
+        title: '3. Mengapa Program Kita Dibagi Menjadi Empat File?',
         content: `Banyak pemula tergoda untuk menulis semua kode dari baris 1 sampai baris 300 di dalam satu file saja. Kelihatannya praktis, tetapi begitu program semakin panjang dan ada error, mencari kesalahan di file 300 baris rasanya seperti mencari jarum di tumpukan jerami!
 
 Dalam dunia kerja profesional, prinsip ini disebut **Separation of Concerns** (Pemisahan Tanggung Jawab) atau **Modularitas**. Kita membagi program kita menjadi empat file dengan tugas yang berbeda:
@@ -92,8 +92,9 @@ Dalam dunia kerja profesional, prinsip ini disebut **Separation of Concerns** (P
         title: 'Tebak Tanggung Jawab File',
         prompt: 'Jika kita ingin mengubah rumus perhitungan sisa saldo dari (anggaran - pengeluaran), file manakah yang seharusnya kita buka dan edit?',
         code: `# Di mana rumus ini seharusnya berada?
-def hitung_sisa_saldo():
-    return anggaran_bulanan - total_pengeluaran`,
+def hitung_saldo():
+    # Jumlahkan pemasukan dan kurangi pengeluaran
+    ...`,
         options: ['main.py', 'laporan.py', 'pencatat.py', 'terminal.exe'],
         correctAnswer: 'pencatat.py',
         explanation:
@@ -138,7 +139,7 @@ def hitung_sisa_saldo():
     ],
     summaryPoints: [
       'Masalah keuangan mahasiswa sering terjadi karena tidak ada pembagian jatah harian yang disiplin.',
-      'Program kita menghitung jatah harian dan memberi peringatan status: AMAN, WASPADA, atau BOROS.',
+      'Program kita menghitung jatah harian dan memberi peringatan status: AMAN, HATI-HATI, atau BOROS.',
       'Modularitas 4 file: pencatat.py (data & hitungan), laporan.py (status & validasi), main.py (menu utama), tampilan.py (warna, kotak, tabel, batang).',
     ],
     nextChapterId: 'bab-2',
@@ -192,7 +193,7 @@ Langkah pemasangan:
       },
       {
         id: 'membuat-folder-proyek',
-        title: '3. Membuat Folder Proyek dan Tiga File Kosong',
+        title: '3. Membuat Folder Proyek dan Empat File Kosong',
         content: `Buatlah sebuah folder baru di komputermu, misalnya di Desktop atau Documents, dengan nama:
 \`keuangan_mahasiswa/\`
 
@@ -304,7 +305,7 @@ C:\\keuangan_mahasiswa> _____ main.py`,
       'Bab ini adalah pondasi seluruh proyek. Sembilan langkah di bawah disusun untuk mahasiswa yang baru pertama kali menulis kode: setiap langkah berisi penjelasan sederhana, contoh kode yang bisa dijalankan, kesalahan umum, lalu 3 soal uji pemahaman. Jangan lanjut sebelum kamu benar-benar paham langkah sebelumnya.',
     learningGoals: [
       'Menulis dan membaca kode untuk sembilan pondasi Python: print(), variabel, input(), operator, percabangan, list/dict, perulangan, fungsi, dan import.',
-      'Menjelaskan dengan kata sendiri mengapa input() perlu int() dan mengapa jatah harian memakai //.',
+      'Menjelaskan dengan kata sendiri mengapa input() perlu int() dan mengapa proyek menghitung jatah harian memakai /.',
       'Memprediksi keluaran sebuah potongan kode sebelum menjalankannya, lalu memeriksa dugaanmu.',
       'Menyelesaikan 3 soal uji pemahaman pada setiap langkah sebagai tanda langkah itu benar-benar dikuasai.',
     ],
@@ -697,13 +698,13 @@ print(umur_angka + 1)`,
             title: 'Pola int(input()) untuk anggaran',
             code: `anggaran = int(input("Masukkan anggaran bulanan: "))
 hari = int(input("Jumlah hari: "))
-jatah = anggaran // hari
+jatah = anggaran / hari
 print(f"Jatah harianmu: Rp {jatah}")`,
             explanation:
               'Dua input dikonversi menjadi int lebih dulu, baru dibagi. Contoh isian: 3000000 lalu 30.',
             output: `Masukkan anggaran bulanan: 3000000
 Jumlah hari: 30
-Jatah harianmu: Rp 100000`,
+Jatah harianmu: Rp 100000.0`,
             isSimulated: true,
             lineExplanations: [
               {
@@ -714,8 +715,8 @@ Jatah harianmu: Rp 100000`,
               },
               {
                 line: 3,
-                code: 'jatah = anggaran // hari',
-                explanation: 'Pembagian bulat agar jatah harian tidak memiliki angka desimal.',
+                code: 'jatah = anggaran / hari',
+                explanation: 'Pembagian biasa menghasilkan float, seperti dalam proyek.',
               },
               {
                 line: 4,
@@ -792,12 +793,12 @@ Jatah harianmu: Rp 100000`,
 
 - \`+\` penjumlahan, \`-\` pengurangan, \`*\` perkalian
 - \`/\` pembagian biasa → hasilnya **selalu float**, misalnya \`3000000 / 30\` menghasilkan \`100000.0\`
-- \`//\` pembagian bulat (floor division) → membuang bagian desimal, misalnya \`3000000 // 30\` menghasilkan \`100000\`
+- \`//\` pembagian lantai (floor division) → membulatkan ke bawah, misalnya \`3000000 // 30\` menghasilkan \`100000\`
 - \`%\` sisa bagi (modulo) → \`7 % 2\` menghasilkan \`1\`, dan \`10 % 5\` menghasilkan \`0\`
 - \`**\` pangkat → \`2 ** 3\` menghasilkan \`8\`
 
-**Mengapa kita memakai \`//\` untuk jatah harian?**
-Uang rupiah tidak perlu pecahan dalam program kita. Dengan \`//\`, jatah harian selalu berupa bilangan bulat yang rapi. Bandingkan \`3000000 / 30\` yang menghasilkan \`100000.0\` dengan \`3000000 // 30\` yang menghasilkan \`100000\`.
+**Operator mana yang dipakai proyek?**
+Proyek menghitung jatah harian dengan \`/\` agar hasil pembagiannya tetap tersimpan sebagai float; \`format_rupiah()\` merapikannya saat ditampilkan. Sebagai perbandingan, \`3000000 / 30\` menghasilkan \`100000.0\`, sedangkan \`3000000 // 30\` menghasilkan \`100000\`. Untuk pembagian yang tidak habis, \`//\` membulatkan ke bawah dan hasilnya bisa berbeda.
 
 **Urutan hitung:** kurung dulu, lalu pangkat, lalu \`*\` dan \`/\`, terakhir \`+\` dan \`-\`. Contoh: \`(3000000 - 500000) // 25\` menghasilkan \`100000\`.
 
@@ -805,7 +806,7 @@ Uang rupiah tidak perlu pecahan dalam program kita. Dengan \`//\`, jatah harian 
 - \`total += harga\` sama dengan \`total = total + harga\`
 - \`saldo -= 50000\` sama dengan \`saldo = saldo - 50000\``,
         analogy:
-          'Seperti kalkulator di ponsel: + dan - sudah biasa, tetapi // adalah mode "buang receh" yang selalu membulatkan ke bawah agar catatan uangmu tidak penuh angka desimal.',
+          'Seperti kalkulator di ponsel: + dan - sudah biasa, tetapi // membulatkan hasil pembagian ke bawah. Contohnya, -5 // 2 menghasilkan -3.',
         codeSnippets: [
           {
             id: 'contoh-operator-lima',
@@ -835,7 +836,7 @@ print(anggaran - 85000)   # 2915000`,
               {
                 line: 5,
                 code: 'print(anggaran // hari)',
-                explanation: 'Pembagian bulat. Bagian desimal dibuang sehingga hasilnya 100000.',
+                explanation: 'Pembagian lantai membulatkan ke bawah sehingga hasilnya 100000. Dengan operand float, hasilnya tetap float.',
               },
               {
                 line: 6,
@@ -859,7 +860,7 @@ print(anggaran - 85000)   # 2915000`,
             title: 'Menghitung jatah, sisa, dan persentase',
             code: `anggaran = 3000000
 pengeluaran = 85000
-jatah_harian = anggaran // 30
+jatah_harian = anggaran / 30
 sisa = anggaran - pengeluaran
 persen = (pengeluaran / jatah_harian) * 100
 
@@ -867,16 +868,16 @@ print(f"Jatah harian: Rp {jatah_harian}")
 print(f"Sisa saldo: Rp {sisa}")
 print(f"Terpakai: {persen}% dari jatah harian")`,
             explanation:
-              'Tiga hitungan berbeda dalam satu program: pembagian bulat, pengurangan, dan persentase dengan pembagian biasa.',
-            output: `Jatah harian: Rp 100000
+              'Tiga hitungan berbeda dalam satu program: pembagian biasa, pengurangan, dan persentase.',
+            output: `Jatah harian: Rp 100000.0
 Sisa saldo: Rp 2915000
 Terpakai: 85.0% dari jatah harian`,
             isSimulated: true,
             lineExplanations: [
               {
                 line: 3,
-                code: 'jatah_harian = anggaran // 30',
-                explanation: 'Pembagian bulat menghasilkan 100000 tanpa desimal.',
+                code: 'jatah_harian = anggaran / 30',
+                explanation: 'Pembagian biasa menghasilkan float 100000.0, seperti dalam proyek.',
               },
               {
                 line: 4,
@@ -903,7 +904,7 @@ Terpakai: 85.0% dari jatah harian`,
           'Gunakan tanda kurung agar maksud hitunganmu jelas dan tidak salah urutan.',
         ],
         commonMistakes: [
-          'Menulis `jatah = anggaran / 30` lalu mencetak `Rp 100000.0`. Gunakan `//` jika ingin bilangan bulat.',
+          'Hasil `/` bisa memiliki desimal. Dalam proyek, gunakan `format_rupiah()` untuk merapikan tampilan tanpa mengubah rumus menjadi `//`.',
           'Lupa tanda kurung: `(a + b) * 2` berbeda hasilnya dengan `a + b * 2`.',
           'Menulis `total = + 5000` (tanda plus di depan) alih-alih `total += 5000`.',
         ],
@@ -911,7 +912,7 @@ Terpakai: 85.0% dari jatah harian`,
           id: 'bab3-uji-langkah-4',
           stepNumber: 4,
           keyTakeaway:
-            '`/` menghasilkan float, `//` menghasilkan bilangan bulat, dan `%` memberi sisa bagi.',
+            '`/` menghasilkan float, `//` membulatkan ke bawah (hasil float jika ada operand float), dan `%` memberi sisa bagi.',
           questions: [
             {
               id: 'bab3-s4-q1',
@@ -974,7 +975,7 @@ print(10 // 4)`,
 
 **Ingat:** \`=\` untuk mengisi variabel, \`==\` untuk membandingkan. Ini kesalahan pemula nomor satu.
 
-**Rantai \`elif\`** dipakai saat ada lebih dari dua kemungkinan. Python memeriksa dari atas ke bawah dan **berhenti di kondisi pertama yang benar**. Kalau \`persen = 85\`, kondisi \`persen <= 70\` salah dan \`persen <= 100\` benar, sehingga status menjadi \`WASPADA\` dan \`else\` tidak dijalankan.
+**Rantai \`elif\`** dipakai saat ada lebih dari dua kemungkinan. Python memeriksa dari atas ke bawah dan **berhenti di kondisi pertama yang benar**. Kalau \`persen = 85\`, kondisi \`persen < 80\` salah dan \`persen <= 100\` benar, sehingga status menjadi \`HATI-HATI\` dan \`else\` tidak dijalankan.
 
 Artinya, urutan penulisan kondisi itu penting. Kondisi yang lebih sempit harus diperiksa lebih dulu.`,
         analogy:
@@ -1023,21 +1024,21 @@ else:
             title: 'Rantai elif untuk tiga status',
             code: `persen = 85
 
-if persen <= 70:
+if persen < 80:
     print("Status: AMAN")
 elif persen <= 100:
-    print("Status: WASPADA")
+    print("Status: HATI-HATI")
 else:
     print("Status: BOROS")`,
             explanation:
-              'Python memeriksa dari atas. 85 tidak memenuhi <= 70, tetapi memenuhi <= 100, sehingga WASPADA dicetak dan else dilewati.',
-            output: `Status: WASPADA`,
+              'Python memeriksa dari atas. 85 tidak memenuhi < 80, tetapi memenuhi <= 100, sehingga HATI-HATI dicetak dan else dilewati.',
+            output: `Status: HATI-HATI`,
             isSimulated: true,
             lineExplanations: [
               {
                 line: 3,
-                code: 'if persen <= 70:',
-                explanation: 'Kondisi pertama diperiksa lebih dulu. 85 <= 70 salah.',
+                code: 'if persen < 80:',
+                explanation: 'Kondisi pertama diperiksa lebih dulu. 85 < 80 salah.',
               },
               {
                 line: 5,
@@ -1530,8 +1531,8 @@ Setelah belanja lagi: Rp 2815000`,
             code: `def status_harian(pengeluaran, jatah):
     if pengeluaran > jatah:
         return "BOROS"
-    elif pengeluaran > jatah * 0.7:
-        return "WASPADA"
+    elif pengeluaran >= jatah * 0.8:
+        return "HATI-HATI"
     else:
         return "AMAN"
 
@@ -1540,7 +1541,7 @@ print(status_harian(125000, 100000))
 print(status_harian(50000, 100000))`,
             explanation:
               'Fungsi mengembalikan teks status yang berbeda sesuai kondisi. return langsung menghentikan fungsi, jadi hanya satu status yang dikembalikan.',
-            output: `WASPADA
+            output: `HATI-HATI
 BOROS
 AMAN`,
             isSimulated: true,
@@ -1557,15 +1558,15 @@ AMAN`,
               },
               {
                 line: 4,
-                code: '    elif pengeluaran > jatah * 0.7:',
+                code: '    elif pengeluaran >= jatah * 0.8:',
                 explanation:
-                  'Jika tidak melebihi jatah tetapi sudah di atas 70%, statusnya WASPADA.',
+                  'Jika tidak melebihi jatah tetapi sudah mencapai 80%, statusnya HATI-HATI.',
               },
               {
                 line: 9,
                 code: 'print(status_harian(85000, 100000))',
                 explanation:
-                  '85% dari jatah berarti WASPADA. Nilai return langsung dicetak oleh print.',
+                  '85% dari jatah berarti HATI-HATI. Nilai return langsung dicetak oleh print.',
               },
             ],
           },
@@ -2100,11 +2101,11 @@ def hitung_pengeluaran_hari_ini(hari=None):
       {
         id: 'prediksi-bab4-sisa-saldo',
         title: 'Prediksi Sisa Saldo',
-        prompt: 'Jika anggaran awal diatur 2.000.000 dan daftar_transaksi berisi dua pengeluaran: 50.000 dan 30.000, berapa nilai yang dikembalikan oleh hitung_sisa_saldo()?',
+        prompt: 'Jika anggaran awal 2.000.000 dan transaksi berisi dua pengeluaran: 50.000 dan 30.000, berapa nilai yang dikembalikan oleh hitung_saldo()?',
         code: `# Anggaran: 2000000
 # Transaksi 1: 50000
 # Transaksi 2: 30000
-sisa = hitung_sisa_saldo()
+sisa = hitung_saldo()
 print(sisa)`,
         options: ['1920000', '1950000', '2080000', '1970000'],
         correctAnswer: '1920000',
@@ -2164,7 +2165,7 @@ print(sisa)`,
       'Memahami cara kerja baca_angka() dan baca_pilihan() dengan try/except ValueError.',
       'Memahami logika ambang batas status harian: AMAN, HATI-HATI, dan BOROS (cek_peringatan).',
       'Mempelajari cara menyajikan riwayat transaksi dan laporan per kategori pengeluaran.',
-      'Memahami teknik validasi input (baca_angka, baca_pilihan) agar program tidak pernah crash.',
+      'Memahami teknik validasi input (baca_angka, baca_pilihan) untuk menangani ValueError akibat input angka yang tidak valid.',
     ],
     sections: [
       {
@@ -2261,13 +2262,19 @@ Untuk mencegah hal itu, kita buat fungsi validasi dengan loop \`while True\` yan
       {
         id: 'prediksi-bab5-status',
         title: 'Prediksi Status Harian',
-        prompt: 'Jika jatah harian adalah Rp100.000 dan pengeluaran hari ini Rp60.000, status manakah yang dikembalikan oleh cek_status_harian()?',
-        code: `status = cek_status_harian(60000, 100000)
-print(status)`,
-        options: ['BOROS!', 'WASPADA', 'AMAN (Pengeluaran terjaga dengan baik)', 'BELUM DIATUR'],
-        correctAnswer: 'AMAN (Pengeluaran terjaga dengan baik)',
+        prompt: 'Jika jatah harian Rp100.000 dan pengeluaran hari ini Rp60.000, status apa yang ditampilkan logika cek_peringatan()?',
+        code: `keluar_hari_ini = 60000
+jatah = 100000
+if keluar_hari_ini > jatah:
+    print("BOROS!")
+elif keluar_hari_ini >= 0.8 * jatah:
+    print("HATI-HATI")
+else:
+    print("AMAN")`,
+        options: ['BOROS!', 'HATI-HATI', 'AMAN', 'BELUM DIATUR'],
+        correctAnswer: 'AMAN',
         explanation:
-          'Persentase pengeluaran adalah (60.000 / 100.000) * 100 = 60%. Karena 60% <= 70%, maka status yang dikembalikan adalah AMAN.',
+          'Pengeluaran sebesar 60% jatah, kurang dari ambang HATI-HATI 80%, sehingga statusnya AMAN.',
       },
     ],
     quiz: [
@@ -2558,10 +2565,10 @@ Dengan memahami apa yang terjadi di setiap langkah, kamu tidak lagi hanya "mengh
     title: 'Error yang Sering Muncul',
     subtitle: 'Mengenali Pesan Error Python, Memahami Artinya, dan Cara Memperbaikinya dengan Tenang',
     description:
-      'Jangan panik saat melihat tulisan merah di terminal! Error adalah sahabat terbaik programmer. Di bab ini, kita bedah 8 error yang paling sering dialami mahasiswa pemula beserta solusinya.',
+      'Jangan panik saat melihat tulisan merah di terminal! Error adalah sahabat terbaik programmer. Di bab ini, kita bedah 9 error yang paling sering dialami mahasiswa pemula beserta solusinya.',
     learningGoals: [
       'Mengubah cara pandang: error bukanlah kegagalan, melainkan petunjuk akurat dari Python.',
-      'Mengenali 8 error klasik pemula: IndentationError, SyntaxError, NameError, TypeError, IndexError, KeyError, ValueError, ZeroDivisionError, ModuleNotFoundError.',
+      'Mengenali 9 error klasik pemula: IndentationError, SyntaxError, NameError, TypeError, IndexError, KeyError, ValueError, ZeroDivisionError, ModuleNotFoundError.',
       'Membaca pesan traceback terminal untuk menemukan nomor baris kode yang perlu diperbaiki.',
     ],
     sections: [

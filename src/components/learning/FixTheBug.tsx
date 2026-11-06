@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Bug, CheckCircle2, XCircle, RotateCcw, Eye, EyeOff, Wrench } from 'lucide-react';
 import { FixTheBugExercise } from '../../types';
 import { MiniCode } from '../code-block/MiniCode';
-import { cn } from '../../utils/cn';
 
 interface FixTheBugProps {
   exercise: FixTheBugExercise;

@@ -86,7 +86,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     id: 'debugging',
     label: 'Bantuan Error',
-    shortDesc: 'Solusi 8 error umum Python',
+    shortDesc: 'Solusi 9 error umum Python',
     icon: Bug,
     tile: 'from-rose-500 to-orange-400',
     activeText: 'text-rose-700',

@@ -27,7 +27,7 @@ export const GlossaryText: React.FC<GlossaryTextProps> = ({ text, className = ''
   }, [terms]);
 
   const applyGlossary = (plain: string) => {
-    if (!pattern) return plain;
+    if (!pattern) return [plain];
     const pieces = plain.split(pattern);
     return pieces.map((piece, index) => {
       const found = terms.find((t) => t.term === piece);

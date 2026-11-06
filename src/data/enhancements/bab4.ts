@@ -18,7 +18,7 @@ Karena data dan hitungan dipisah, file \`laporan.py\` dan \`main.py\` cukup mema
       importantNotes: [
         'File ini tidak memakai input() dan tidak memakai print() untuk menu.',
         'Semua data disimpan di memori selama program berjalan. Jika program ditutup, data hilang.',
-        'Perubahan data dilakukan lewat fungsi, bukan dengan mengubah variabel dari luar.',
+        'Transaksi dan pengaturan anggaran diubah lewat fungsi pencatat.py; hari aktif dinaikkan langsung oleh hari_berikutnya() di main.py.',
       ],
       projectConnection: {
         file: 'pencatat.py',
@@ -67,7 +67,7 @@ transaksi = []`,
       ],
       importantNotes: [
         'Tuple memakai kurung biasa (), list memakai kurung siku [], dictionary memakai kurung kurawal {}.',
-        'Jangan menulis transaksi[0] = ... karena tuple tidak bisa diubah. Buat tuple baru atau pakai list.',
+        'transaksi adalah list, jadi transaksi[0] boleh diganti dengan tuple baru jika elemen itu ada. Namun, isi tuple tidak dapat diubah langsung dengan transaksi[0][3] = ....',
         'Key dictionary harus sama persis: "uang_saku", bukan "uang_saka".',
       ],
       commonMistakes: [
@@ -142,7 +142,7 @@ print(format_rupiah(85000))`,
         'Jika jumlah_hari 0, program akan error ZeroDivisionError. Validasi di laporan.py mencegah input 0.',
       ],
       commonMistakes: [
-        'Menggunakan // lalu mengira hasilnya selalu bulat; sekarang kodenya memakai /.',
+        'Mengira / dan // selalu menghasilkan nilai yang sama; pembagian yang tidak habis dapat menghasilkan nilai berbeda.',
         'Lupa transaksi.clear() sehingga data lama tercampur data baru.',
       ],
       projectConnection: {

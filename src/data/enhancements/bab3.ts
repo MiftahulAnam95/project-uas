@@ -1,4 +1,4 @@
-import { Chapter, ChapterSection } from '../../types';
+import { Chapter, ChapterSection, TraceTableData } from '../../types';
 import { CHAPTERS as BASE } from '../lessonsBase';
 
 const baseBab3 = BASE.find((c) => c.id === 'bab-3')!;
@@ -107,7 +107,7 @@ const TRACE_IF = {
   ],
 };
 
-const TRACE_LOOP = {
+const TRACE_LOOP: TraceTableData = {
   title: 'Tabel jejak: loop menjumlahkan saldo',
   description:
     'Variabel saldo bertambah atau berkurang setiap kali satu transaksi dibaca. Perhatikan nilai saldo di setiap putaran.',
@@ -173,7 +173,7 @@ export const bab3: Partial<Chapter> = {
       'Variabel: nama = nilai. Nama tanpa spasi, tidak diawali angka, huruf besar/kecil berbeda.',
       'input() selalu menghasilkan str. Bungkus dengan int() atau float() sebelum berhitung.',
       'Tipe data: str (teks), int (bulat), float (desimal), bool (True/False), list [], dict {}.',
-      'Operator: + - * / // % **. / hasil float, // hasil bulat, % sisa bagi.',
+      'Operator: + - * / // % **. / hasil float; // membulatkan ke bawah; % sisa bagi.',
       'if / elif / else: wajib titik dua, badan menjorok 4 spasi, hanya satu jalur dijalankan.',
       'list: index mulai 0, append() menambah di akhir, len() menghitung isi.',
       'dict: akses dengan key, contoh transaksi["jumlah"].',
@@ -181,17 +181,17 @@ export const bab3: Partial<Chapter> = {
       'def: membuat fungsi. return: mengembalikan nilai. Tanpa return, hasilnya None.',
       'import modul: menyambung file. Panggil dengan awalan modul.fungsi().',
     ],
-    code: `akun = {"uang_saku": 3000000, "jumlah_hari": 30}\nprint(akun["uang_saku"] // akun["jumlah_hari"])`,
+    code: `akun = {"uang_saku": 3000000, "jumlah_hari": 30}\nprint(akun["uang_saku"] / akun["jumlah_hari"])`,
   },
   commonError: {
     name: 'TypeError: can only concatenate str (not "int") to str',
     message: `TypeError: can only concatenate str (not "int") to str`,
     cause:
-      'input() menghasilkan teks. Kamu menulis "Halo " + nama, lalu nama diisi angka dari input. Python tidak bisa menyambung teks dengan angka.',
+      'Python tidak bisa menyambung teks dengan angka menggunakan +. Contohnya, umur dari input() sudah diubah menjadi int sebelum disambung ke teks.',
     fix:
-      'Bungkus input() dengan int() atau float(), atau ubah angka menjadi teks dengan str() sebelum disambung.',
-    badCode: `nama = input("Nama: ")\nprint("Halo " + nama)`,
-    goodCode: `nama = input("Nama: ")\nprint("Halo " + str(nama))`,
+      'Ubah angka menjadi teks dengan str() sebelum disambung, atau gunakan f-string.',
+    badCode: `umur = int(input("Umur: "))\nprint("Umur: " + umur)`,
+    goodCode: `umur = int(input("Umur: "))\nprint("Umur: " + str(umur))`,
   },
   tryItYourself: [
     {
@@ -206,11 +206,11 @@ export const bab3: Partial<Chapter> = {
       id: 'bab3-coba-2',
       level: 'Sedang',
       prompt:
-        'Minta anggaran dan jumlah hari lewat input(), ubah ke int, hitung jatah harian dengan //, lalu cetak.',
+        'Minta anggaran dan jumlah hari lewat input(), ubah ke int, hitung jatah harian dengan / seperti di proyek, lalu cetak.',
       starterCode: `anggaran = int(input("Anggaran: "))\nhari = int(input("Hari: "))\n# hitung dan cetak`,
-      answerCode: `anggaran = int(input("Anggaran: "))\nhari = int(input("Hari: "))\njatah = anggaran // hari\nprint(f"Jatah harian: Rp {jatah}")`,
+      answerCode: `anggaran = int(input("Anggaran: "))\nhari = int(input("Hari: "))\njatah = anggaran / hari\nprint(f"Jatah harian: Rp {jatah}")`,
       explanation:
-        'input() dibungkus int() lebih dulu. // menghasilkan bilangan bulat. Contoh: 3000000 // 30 = 100000.',
+        'input() dibungkus int() lebih dulu. / menghasilkan float. Contoh: 3000000 / 30 = 100000.0; proyek merapikannya dengan format_rupiah().',
     },
     {
       id: 'bab3-coba-3',

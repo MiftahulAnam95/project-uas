@@ -72,7 +72,7 @@ Di proyek 4 file, alur program melibatkan:
         ],
         projectConnection: {
           file: 'pencatat.py',
-          note: 'Data transaksi dan akun diubah oleh fungsi di pencatat.py.',
+          note: 'Transaksi dan anggaran diubah oleh fungsi di pencatat.py; hari aktif dinaikkan di main.py.',
           code: `akun["hari"] += 1\ntransaksi.append((akun["hari"], "keluar", kategori, jumlah))`,
         },
       },

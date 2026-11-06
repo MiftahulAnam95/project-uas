@@ -59,6 +59,7 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
   savedQuizScore = 0,
   onSaveQuizScore,
   onMarkExerciseDone,
+  onNavigateProject,
 }) => {
   const chapter = CHAPTERS.find((c) => c.id === chapterId) || CHAPTERS[0];
   const isCompleted = completedChapters.includes(chapter.id);

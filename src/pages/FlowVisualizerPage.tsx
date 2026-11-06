@@ -64,6 +64,15 @@ const FILE_META: Record<
     chip: 'bg-emerald-100 text-emerald-900 border-emerald-300',
     hex: '#10b981',
   },
+  'tampilan.py': {
+    icon: FileCode2,
+    title: 'Tampilan Terminal Bersama',
+    desc: 'Menyediakan warna, kotak, tabel, dan batang untuk main.py dan laporan.py; tidak menghitung data keuangan.',
+    tile: 'from-purple-500 to-fuchsia-400',
+    wrap: 'border-purple-200/80 bg-gradient-to-br from-purple-50/90 via-white to-white',
+    chip: 'bg-purple-100 text-purple-900 border-purple-300',
+    hex: '#a855f7',
+  },
 };
 
 const FLOW_NODES = [
@@ -131,14 +140,14 @@ export const FlowVisualizerPage: React.FC = () => {
     <div className="max-w-6xl mx-auto space-y-10 py-6 sm:py-10">
       {/* ============================ HEADER ============================ */}
       <PageHeader
-        eyebrow="Bab 7 · Simulasi visual alur program"
+        eyebrow="Bab 8 · Simulasi visual alur program"
         icon={Activity}
         title="Visualisasi Alur Kerja Program & Perubahan Data"
         highlight="Perubahan Data"
         description="Lihat bagaimana input pengguna mengalir melalui 4 file Python (main.py, pencatat.py, laporan.py, dan tampilan.py), serta amati perubahan isi variabel di memori secara langsung di setiap langkah."
         stats={[
           { label: 'Langkah trace', value: String(SIMULATION_STEPS.length) },
-          { label: 'File terlibat', value: '3' },
+          { label: 'File terlibat', value: '4' },
           { label: 'Variabel dilacak', value: String(STATE_FIELDS.length) },
         ]}
         actions={
@@ -149,17 +158,17 @@ export const FlowVisualizerPage: React.FC = () => {
         }
       />
 
-      {/* ==================== DIAGRAM 3 FILE ==================== */}
+      {/* ==================== DIAGRAM 4 FILE ==================== */}
       <Reveal>
         <Card className="space-y-6 p-5 sm:p-8">
           <SectionHeading
             eyebrow="Separation of concerns"
             icon={Layers}
-            title="Diagram Hubungan Tiga File"
-            description="Setiap file punya satu pekerjaan utama. Inilah alasan kodemu rapi dan mudah diperbaiki."
+            title="Diagram Hubungan Empat File"
+            description="main.py menghubungkan pencatat.py dan laporan.py; main.py dan laporan.py memakai tampilan.py. Penyorotan langkah berfokus pada tiga file logika."
           />
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             {Object.entries(FILE_META).map(([name, meta], idx) => {
               const Icon = meta.icon;
               const isActiveNow = step.activeFile === name;
