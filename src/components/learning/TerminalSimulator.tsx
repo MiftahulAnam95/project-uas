@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Terminal as TermIcon, RefreshCw, Send, Sparkles } from 'lucide-react';
+import { parseSimulatorInteger } from '../../utils/simulatorInput';
 
 type Step =
   | 'menu'
+  | 'tunggu'
   | 'anggaran_nominal'
   | 'anggaran_hari'
   | 'catat_kat'
@@ -45,7 +47,7 @@ const statusHarian = (keluar: number, jatah: number) => {
 
 export const TerminalSimulator: React.FC = () => {
   const [history, setHistory] = useState<string[]>([
-    'Python 3.11.4 (interactive sandbox)',
+    'Simulasi menu Python (bukan interpreter Python)',
     '$ python main.py',
     'Selamat datang di Program Pencatat Keuangan Mahasiswa!',
     '',
@@ -83,11 +85,6 @@ export const TerminalSimulator: React.FC = () => {
   }, [history]);
 
   const add = (...lines: string[]) => setHistory((prev) => [...prev, ...lines]);
-  const addAndReset = (...lines: string[]) => {
-    add(...lines);
-    setInputVal('');
-  };
-
   const tampilMenu = () => {
     add(
       '',
@@ -126,8 +123,7 @@ export const TerminalSimulator: React.FC = () => {
       '',
       '  Tekan Enter untuk kembali ke menu...'
     );
-    setStep('menu');
-    setRunning(false);
+    setStep('tunggu');
   };
 
   const riwayat = () => {
@@ -156,8 +152,7 @@ export const TerminalSimulator: React.FC = () => {
       add('└─────┴──────┴─────────────────┴───────────────┴───────────────┘');
     }
     add('', '  Tekan Enter untuk kembali ke menu...');
-    setStep('menu');
-    setRunning(false);
+    setStep('tunggu');
   };
 
   const laporanKategori = () => {
@@ -185,8 +180,7 @@ export const TerminalSimulator: React.FC = () => {
       add('', `  Total pengeluaran ${rupiah(semua)}`);
     }
     add('', '  Tekan Enter untuk kembali ke menu...');
-    setStep('menu');
-    setRunning(false);
+    setStep('tunggu');
   };
 
   const submit = (raw: string) => {
@@ -194,9 +188,14 @@ export const TerminalSimulator: React.FC = () => {
     add(`> ${raw}`);
     setInputVal('');
 
+    if (step === 'tunggu') {
+      tampilMenu();
+      return;
+    }
+
     if (step === 'anggaran_nominal') {
-      const nominal = Number(val.replace(/\./g, ''));
-      if (!Number.isFinite(nominal) || nominal <= 0) {
+      const nominal = parseSimulatorInteger(val, true);
+      if (nominal === null || nominal <= 0) {
         add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
         return;
       }
@@ -208,8 +207,8 @@ export const TerminalSimulator: React.FC = () => {
     }
 
     if (step === 'anggaran_hari') {
-      const hari = Number(val.replace(/\./g, ''));
-      if (!Number.isFinite(hari) || hari <= 0) {
+      const hari = parseSimulatorInteger(val, true);
+      if (hari === null || hari <= 0) {
         add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
         return;
       }
@@ -220,8 +219,7 @@ export const TerminalSimulator: React.FC = () => {
       add('', '  [OK] Anggaran tersimpan.');
       add(`  [i] Jatah harian kamu: ${rupiah(nominal / hari)}`);
       add('', '  Tekan Enter untuk kembali ke menu...');
-      setStep('menu');
-      setRunning(false);
+      setStep('tunggu');
       return;
     }
 
@@ -263,8 +261,7 @@ export const TerminalSimulator: React.FC = () => {
           add(`  [i] Jatah hari ini: ${rupiah(jatah)}`);
         }
         add('', '  Tekan Enter untuk kembali ke menu...');
-        setStep('menu');
-        setRunning(false);
+        setStep('tunggu');
         return;
       }
       if (val === '7') {
@@ -292,8 +289,8 @@ export const TerminalSimulator: React.FC = () => {
     }
 
     if (step === 'catat_kat') {
-      const nomor = Number(val);
-      if (!Number.isFinite(nomor) || nomor < 1 || nomor > KATEGORI.length) {
+      const nomor = parseSimulatorInteger(val);
+      if (nomor === null || nomor < 1 || nomor > KATEGORI.length) {
         add(`  [X] Pilihan tidak valid, masukkan nomor 1 sampai ${KATEGORI.length}.`);
         return;
       }
@@ -304,8 +301,8 @@ export const TerminalSimulator: React.FC = () => {
     }
 
     if (step === 'catat_jml') {
-      const jumlah = Number(val.replace(/\./g, ''));
-      if (!Number.isFinite(jumlah) || jumlah <= 0) {
+      const jumlah = parseSimulatorInteger(val, true);
+      if (jumlah === null || jumlah <= 0) {
         add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
         return;
       }
@@ -319,8 +316,7 @@ export const TerminalSimulator: React.FC = () => {
       add(`│ Status hari ini: ${statusBaru}`);
       add('└──────────────────────────────────────────────────────────────┘');
       add('', '  Tekan Enter untuk kembali ke menu...');
-      setStep('menu');
-      setRunning(false);
+      setStep('tunggu');
       return;
     }
 
@@ -332,8 +328,8 @@ export const TerminalSimulator: React.FC = () => {
     }
 
     if (step === 'pemasukan_jml') {
-      const jumlah = Number(val.replace(/\./g, ''));
-      if (!Number.isFinite(jumlah) || jumlah <= 0) {
+      const jumlah = parseSimulatorInteger(val, true);
+      if (jumlah === null || jumlah <= 0) {
         add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
         return;
       }
@@ -342,14 +338,13 @@ export const TerminalSimulator: React.FC = () => {
       add('', `  [OK] Tercatat: ${sumber} ${rupiah(jumlah)}`);
       add(`  [i] Saldo sekarang: ${rupiah(saldo + jumlah)}`);
       add('', '  Tekan Enter untuk kembali ke menu...');
-      setStep('menu');
-      setRunning(false);
+      setStep('tunggu');
     }
   };
 
   const reset = () => {
     setHistory([
-      'Python 3.11.4 (interactive sandbox)',
+      'Simulasi menu Python (bukan interpreter Python)',
       '$ python main.py',
       'Selamat datang di Program Pencatat Keuangan Mahasiswa!',
       '',
@@ -379,12 +374,12 @@ export const TerminalSimulator: React.FC = () => {
           </span>
           <div className="leading-tight">
             <p className="text-xs font-extrabold text-white">Simulator Terminal</p>
-            <p className="text-[10px] text-slate-400">Simulasi main.py dengan menu 1-7 dan 0</p>
+            <p className="text-[10px] text-slate-400">Simulasi menu 1-7 dan 0, bukan Python asli</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="hidden items-center gap-1 rounded-full border border-emerald-900/60 bg-emerald-950/40 px-2 py-0.5 text-[9px] font-bold text-emerald-300 sm:flex">
-            <Sparkles className="h-2.5 w-2.5" /> Python sandbox
+            <Sparkles className="h-2.5 w-2.5" /> Simulasi menu
           </span>
           <button
             type="button"

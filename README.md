@@ -28,7 +28,7 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
    - **Bab 6 — Bedah main.py**: Menu interaktif 1-7 dan 0, setup awal, serta penghubung antar-modul.
    - **Bab 7 — Mempercantik Tampilan Program (tampilan.py)**: Warna ANSI, karakter kotak, panjang_tampil(), batang kemajuan, kotak, tabel, membersihkan layar, dan pratinjau terminal interaktif.
    - **Bab 8 — Mengikuti Jalannya Program**: Visualisasi alur program dan pelacakan isi memori sebelum vs sesudah aksi.
-   - **Bab 9 — Error yang Sering Muncul**: Panduan debugging 8 error umum (*IndentationError*, *SyntaxError*, *NameError*, *TypeError*, *IndexError*, *KeyError*, *ValueError*, *ZeroDivisionError*, *ModuleNotFoundError*).
+   - **Bab 9 — Error yang Sering Muncul**: Panduan debugging 9 error umum (*IndentationError*, *SyntaxError*, *NameError*, *TypeError*, *IndexError*, *KeyError*, *ValueError*, *ZeroDivisionError*, *ModuleNotFoundError*).
    - **Bab 10 — Latihan Mandiri**: 3 tantangan modifikasi kode terbaru (kategori, ambang batas, fungsi baru).
    - **Bab 11 — Kamus Istilah**: Pencarian 31 istilah pemrograman dalam bahasa sehari-hari dengan perumpamaan nyata.
    - **Bab 12 — Tips Presentasi**: Strategi live demo di hadapan dosen penguji dan bocoran jawaban pertanyaan ujian.
@@ -54,12 +54,12 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
    - Kuis evaluasi bab berpenilaian langsung dengan efek perayaan *confetti*.
 
 4. **Simulasi Terminal Interaktif (Interactive CLI Simulator)**:
-   - Mahasiswa dapat mencoba program pencatat keuangan secara langsung di browser tanpa perlu menginstal apapun.
-   - Mendukung Menu [1] Atur Anggaran, [2] Catat Pengeluaran, [3] Ringkasan & Status, [4] Laporan Kategori, [5] Ganti Hari, dan [0] Keluar.
+   - Mahasiswa dapat mencoba simulasi menu pencatat keuangan di browser tanpa perlu menginstal Python. Simulasi memiliki batas presisi angka JavaScript dan tidak selalu identik dengan program asli.
+   - Menirukan setup awal, menu [1] Catat Pengeluaran, [2] Catat Pemasukan, [3] Ringkasan & Status, [4] Riwayat, [5] Laporan Kategori, [6] Ganti Hari, [7] Atur Ulang Anggaran, dan [0] Keluar. Ini simulasi, bukan eksekusi Python asli.
 
 5. **Visualisasi Alur & Pelacak Data (State Inspector)**:
    - Skenario realistis anggaran Rp3.000.000 selama 30 hari.
-   - Perubahan status dari Aman -> Waspada -> Boros saat pengeluaran melebihi jatah harian.
+   - Perubahan status dari AMAN -> HATI-HATI -> BOROS saat pengeluaran melebihi jatah harian.
    - Menampilkan isi memori sebelum dan sesudah aksi.
 
 6. **Penyimpanan Progres Lokal (LocalStorage)**:
@@ -98,12 +98,14 @@ Tipografi memakai **Plus Jakarta Sans** (teks) dan **JetBrains Mono** (kode).
 - **Canvas Confetti** (Animasi selebrasi capaian kuis & proyek)
 - **LocalStorage API** (Penyimpanan progres tanpa server)
 
+Eksekusi Python sungguhan di blok kode memakai Pyodide yang dimuat dari CDN, sehingga membutuhkan koneksi saat pertama dimuat. Jika gagal, aplikasi menampilkan hasil contoh atau memakai simulator ringan dan memberi keterangan. Untuk demo tanpa internet, jalankan file Python proyek secara lokal.
+
 ---
 
 ## 💻 Cara Instalasi & Menjalankan di Komputer Lokal
 
 ### Prasyarat
-- Pastikan [Node.js](https://nodejs.org/) (versi 20 ke atas) telah terpasang di komputermu.
+- Pastikan [Node.js](https://nodejs.org/) versi 20.19+ atau 22.12+ telah terpasang (sesuai kebutuhan Vite 7). Untuk menjalankan pengujian Python, pasang juga Python 3.
 
 ### Langkah-langkah:
 1. Unduh atau clone repository ini:
@@ -147,6 +149,14 @@ Untuk menyegarkan `index.html` di root repositori secara manual (misalnya sebelu
 ```bash
 npm run build
 cp dist/index.html index.html
+```
+
+Untuk memeriksa tipe dan menjalankan pengujian simulator:
+
+```bash
+npm run typecheck
+npm test
+PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -p 'test_*.py'
 ```
 
 Untuk menguji hasil build secara lokal:
