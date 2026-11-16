@@ -49,7 +49,8 @@ Di proyek 4 file, alur program melibatkan:
             id: 'kode-menu-baru',
             title: 'Menu baru di main.py',
             filename: 'main.py',
-            code: `MENU = [
+            code: `# Daftar menu: list berisi tuple (nomor, tulisan)
+MENU = [
     ("1", "Catat pengeluaran"),
     ("2", "Catat pemasukan"),
     ("3", "Cek saldo dan peringatan"),
@@ -101,7 +102,6 @@ Dari state ini, \`hitung_saldo()\` menghasilkan 2.915.000 dan \`pengeluaran_hari
           {
             id: 'kode-state',
             title: 'State setelah mencatat Makan',
-            filename: 'pencatat.py',
             code: `akun = {"uang_saku": 3000000, "jumlah_hari": 30, "jatah_harian": 100000.0, "hari": 1}
 transaksi = [
     (1, "masuk", "Anggaran", 3000000),
@@ -350,14 +350,16 @@ Di proyek 4 file, error sering muncul karena:
 Contoh di \`baca_angka()\`:
 
 \`\`\`python
-while True:
-    try:
-        angka = int(input("Jumlah: "))
-        if angka <= 0:
-            raise ValueError("harus lebih dari 0")
-        return angka
-    except ValueError:
-        print("Input salah, coba lagi.")
+def baca_angka(pesan):
+    while True:
+        try:
+            teks = input(pesan).replace(".", "").replace(",", "").strip()
+            angka = int(teks)
+            if angka <= 0:
+                raise ValueError("harus lebih dari 0")
+            return angka
+        except ValueError:
+            pesan_error("Input salah, masukkan angka bulat lebih dari 0 ya (contoh: 15000).")
 \`\`\`
 
 - \`try\`: kode yang mungkin error.
@@ -373,23 +375,27 @@ while True:
             id: 'kode-try-except',
             title: 'try/except ValueError',
             filename: 'laporan.py',
-            code: `while True:
-    try:
-        angka = int(input("Jumlah: "))
-        if angka <= 0:
-            raise ValueError("harus lebih dari 0")
-        return angka
-    except ValueError:
-        print("Input salah, coba lagi.")`,
+            code: `def baca_angka(pesan):
+    """Minta input angka positif. Kalau salah, ulangi terus (pakai try-except)."""
+    while True:
+        try:
+            teks = input(pesan).replace(".", "").replace(",", "").strip()
+            angka = int(teks)
+            if angka <= 0:
+                raise ValueError("harus lebih dari 0")
+            return angka
+        except ValueError:
+            pesan_error("Input salah, masukkan angka bulat lebih dari 0 ya (contoh: 15000).")`,
             explanation:
               'Jika input huruf atau <= 0, ValueError ditangkap dan program mengulang. Jika valid, return mengakhiri fungsi.',
-            output: `(Contoh: pengguna mengetik "abc", lalu "15000")\nInput salah, coba lagi.\n15000`,
+            output: `(Contoh: pengguna mengetik "abc", lalu "15000")\n  [X] Input salah, masukkan angka bulat lebih dari 0 ya (contoh: 15000).\n15000`,
             isSimulated: true,
             lineExplanations: [
-              { line: 2, code: 'try:', explanation: 'Mulai blok yang berisiko error.' },
-              { line: 3, code: 'angka = int(input(...))', explanation: 'Mengubah input menjadi int; bisa ValueError.' },
-              { line: 5, code: 'raise ValueError(...)', explanation: 'Memicu error sendiri jika angka tidak valid.' },
-              { line: 7, code: 'except ValueError:', explanation: 'Menangkap ValueError dan mengulang.' },
+              { line: 4, code: 'try:', explanation: 'Mulai blok yang berisiko error.' },
+              { line: 5, code: 'teks = input(pesan).replace(".", "").replace(",", "").strip()', explanation: 'Membaca input dan membersihkan pemisah ribuan.' },
+              { line: 6, code: 'angka = int(teks)', explanation: 'Mengubah teks menjadi int; di sini ValueError bisa muncul.' },
+              { line: 8, code: 'raise ValueError("harus lebih dari 0")', explanation: 'Memicu error sendiri jika angka tidak valid.' },
+              { line: 10, code: 'except ValueError:', explanation: 'Menangkap ValueError dan mengulang tanpa crash.' },
             ],
           },
         ],
@@ -544,7 +550,6 @@ while True:
           {
             id: 'hint-kategori-baru',
             title: 'Menambah kategori di pencatat.py',
-            filename: 'pencatat.py',
             code: `KATEGORI = ("Makan", "Transport", "Kuota", "Kuliah/Tugas", "Hiburan", "Pulsa", "Lainnya")`,
             explanation:
               'Menambah "Pulsa" ke tuple. main.py akan menampilkan 7 pilihan kategori secara otomatis.',
@@ -589,7 +594,6 @@ Logika lain tetap sama.`,
           {
             id: 'hint-ambang-baru',
             title: 'Mengubah ambang di laporan.py',
-            filename: 'laporan.py',
             code: `keluar_hari_ini = 75000
 jatah = 100000
 if keluar_hari_ini > jatah:
@@ -640,7 +644,6 @@ Fungsi ini bisa dipanggil dari \`laporan.py\` atau \`main.py\`.`,
           {
             id: 'hint-total-masuk',
             title: 'Fungsi baru di pencatat.py',
-            filename: 'pencatat.py',
             code: `def total_masuk():
     total = 0
     for hari, jenis, kategori, jumlah in transaksi:
@@ -726,7 +729,7 @@ Fungsi ini bisa dipanggil dari \`laporan.py\` atau \`main.py\`.`,
       'Menambah kategori: ubah tuple KATEGORI di pencatat.py; main.py otomatis menampilkan.',
       'Mengubah ambang status: ubah angka 0.8 di cek_peringatan() menjadi 0.7.',
       'Menambah fungsi baru: total_masuk() di pencatat.py menjumlahkan transaksi jenis "masuk".',
-      'Uji setiap perubahan dengan menjalankan program dari menu 1 sampai 5.',
+      'Uji setiap perubahan dengan menjalankan program dari menu 1 sampai 7.',
     ],
     cheatSheet: {
       title: 'Cheat Sheet Bab 10 — Latihan Mandiri',
@@ -843,15 +846,52 @@ Di proyek 4 file, istilah yang sering muncul:
             id: 'kode-istilah',
             title: 'Contoh istilah dalam kode',
             filename: 'tampilan.py',
-            code: `import sys
-from tampilan import warna, kotak, bar, panjang_tampil
+            code: `# tampilan.py
+# Modul tampilan: warna, kotak, batang kemajuan, dan tabel
+# supaya program terlihat menarik. Hanya memakai library bawaan Python.
 
-print(sys.stdout.isatty())
-print(warna("Halo", "hijau"))
-print(panjang_tampil(warna("Halo", "hijau")))`,
-            explanation:
-              'isatty() memeriksa terminal. warna() membungkus teks dengan ANSI. panjang_tampil() menghitung 4, bukan 11.',
-            output: `True\nHalo\n4`,
+import os
+import sys
+
+# Supaya warna tampil di Command Prompt Windows 10 ke atas
+if os.name == "nt":
+    os.system("")
+
+# Pakai UTF-8 supaya karakter kotak dan batang tampil dengan benar
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
+LEBAR = 64  # lebar tampilan (jumlah karakter)
+
+# Kode warna disimpan di dictionary: nama warna -> kode
+WARNA = {
+    "reset": "\\033[0m",
+    "tebal": "\\033[1m",
+    "merah": "\\033[91m",
+    "hijau": "\\033[92m",
+    "kuning": "\\033[93m",
+    "biru": "\\033[94m",
+    "cyan": "\\033[96m",
+    "abu": "\\033[90m",
+    "putih": "\\033[97m",
+}
+
+# Warna hanya dipakai kalau layarnya terminal sungguhan
+# (di IDLE atau saat output disimpan ke file, teks tampil polos)
+PAKAI_WARNA = sys.stdout.isatty() or os.environ.get("FORCE_COLOR") == "1"
+
+
+def warna(teks, nama, tebal=False):
+    """Beri warna pada teks. Contoh: warna("Halo", "hijau", True)"""
+    if not PAKAI_WARNA:
+        return teks
+    kode = WARNA[nama]
+    if tebal:
+        kode = WARNA["tebal"] + kode
+    return kode + teks + WARNA["reset"]`,
+            explanation: 'Semua istilah di modul ini muncul di bagian atas tampilan.py: os.name, sys.stdout.reconfigure(encoding="utf-8"), dictionary WARNA berisi kode ANSI, PAKAI_WARNA dari isatty(), dan warna() yang membungkus teks.',
             isSimulated: true,
           },
         ],
@@ -1019,7 +1059,7 @@ print(panjang_tampil(warna("Halo", "hijau")))`,
 3. **Pastikan 4 file ada di folder yang sama**: \`pencatat.py\`, \`laporan.py\`, \`main.py\`, \`tampilan.py\`.
 4. **Tutup aplikasi lain** agar laptop tidak lambat.
 5. **Siapkan data demo**: anggaran Rp3.000.000 untuk 30 hari, pengeluaran Makan Rp85.000, Transport Rp40.000.
-6. **Uji alur demo** dari menu 1 sampai 5 sebelum presentasi.`,
+6. **Uji alur demo** dari menu 1 sampai 7 sebelum presentasi.`,
         analogy:
           'Seperti koki yang menyiapkan pisau dan celemek bersih sebelum juri datang.',
         importantNotes: [

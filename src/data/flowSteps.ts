@@ -135,7 +135,7 @@ export const SIMULATION_STEPS: SimulationStep[] = [
       'Pengguna memilih menu 1, memilih kategori Makan, lalu memasukkan Rp85.000.',
     activeFile: 'pencatat.py',
     fileRoleInStep:
-      'main.py memanggil menu_pengeluaran(), lalu pencatat.tambah_pengeluaran(85000, "Makan") menambah tuple ke list transaksi.',
+      'main.py memanggil menu_pengeluaran(), lalu tambah_pengeluaran(85000, "Makan") dari pencatat.py menambah tuple ke list transaksi.',
     userInput: '1 -> 1 (Makan) -> 85000',
     calledFunctions: [
       'main.py -> menu_pengeluaran()',
@@ -159,11 +159,23 @@ export const SIMULATION_STEPS: SimulationStep[] = [
 
   ► Nomor kategori          : 1
   ► Jumlah pengeluaran (Rp) : 85000
+
   [OK] Tercatat: Makan Rp85.000
 
+── STATUS HARI KE-1 DARI 30 ────────────────────────────────────
+┌─ RINGKASAN ──────────────────────────────────────────────────┐
+│ Saldo sekarang        Rp2.915.000                            │
+│   █████████████████████████████████░ 97% dari anggaran       │
+│                                                              │
+│ Jatah harian          Rp100.000                              │
+│ Pengeluaran hari ini  Rp85.000                               │
+│   █████████████████████████████░░░░░ 85% dari jatah          │
+└──────────────────────────────────────────────────────────────┘
 ┌─ HATI-HATI ──────────────────────────────────────────────────┐
 │ Pengeluaran hari ini hampir habis jatah.                     │
-└──────────────────────────────────────────────────────────────┘`,
+└──────────────────────────────────────────────────────────────┘
+
+  [i] Biar cukup sampai akhir bulan, maksimal pengeluaran Rp97.167 per hari.`,
   },
   {
     stepNumber: 3,
@@ -188,15 +200,17 @@ export const SIMULATION_STEPS: SimulationStep[] = [
     terminalOutput: `── STATUS HARI KE-1 DARI 30 ────────────────────────────────────
 ┌─ RINGKASAN ──────────────────────────────────────────────────┐
 │ Saldo sekarang        Rp2.915.000                            │
-│   ██████████████████████████████████ 97% dari anggaran         │
+│   █████████████████████████████████░ 97% dari anggaran       │
 │                                                              │
 │ Jatah harian          Rp100.000                              │
 │ Pengeluaran hari ini  Rp85.000                               │
-│   ███████████████████████████░░░ 85% dari jatah               │
+│   █████████████████████████████░░░░░ 85% dari jatah          │
 └──────────────────────────────────────────────────────────────┘
 ┌─ HATI-HATI ──────────────────────────────────────────────────┐
 │ Pengeluaran hari ini hampir habis jatah.                     │
-└──────────────────────────────────────────────────────────────┘`,
+└──────────────────────────────────────────────────────────────┘
+
+  [i] Biar cukup sampai akhir bulan, maksimal pengeluaran Rp97.167 per hari.`,
   },
   {
     stepNumber: 4,
@@ -205,7 +219,7 @@ export const SIMULATION_STEPS: SimulationStep[] = [
       'Pengguna memilih menu 1 lagi, memilih Transport, lalu memasukkan Rp40.000.',
     activeFile: 'pencatat.py',
     fileRoleInStep:
-      'main.py memanggil menu_pengeluaran(), lalu pencatat.tambah_pengeluaran(40000, "Transport") menambah tuple kedua.',
+      'main.py memanggil menu_pengeluaran(), lalu tambah_pengeluaran(40000, "Transport") dari pencatat.py menambah tuple kedua.',
     userInput: '1 -> 2 (Transport) -> 40000',
     calledFunctions: [
       'main.py -> menu_pengeluaran()',
@@ -218,13 +232,34 @@ export const SIMULATION_STEPS: SimulationStep[] = [
     whatHappened:
       'Total pengeluaran hari ini menjadi 125.000, melebihi jatah 100.000. Status berubah menjadi BOROS! Saldo menjadi 2.875.000.',
     terminalOutput: `── CATAT PENGELUARAN ───────────────────────────────────────────
+┌─ PILIH KATEGORI ─────────────────────────────────────────────┐
+│ [1]  Makan                                                   │
+│ [2]  Transport                                               │
+│ [3]  Kuota                                                   │
+│ [4]  Kuliah/Tugas                                            │
+│ [5]  Hiburan                                                 │
+│ [6]  Lainnya                                                 │
+└──────────────────────────────────────────────────────────────┘
+
   ► Nomor kategori          : 2
   ► Jumlah pengeluaran (Rp) : 40000
+
   [OK] Tercatat: Transport Rp40.000
 
+── STATUS HARI KE-1 DARI 30 ────────────────────────────────────
+┌─ RINGKASAN ──────────────────────────────────────────────────┐
+│ Saldo sekarang        Rp2.875.000                            │
+│   █████████████████████████████████░ 96% dari anggaran       │
+│                                                              │
+│ Jatah harian          Rp100.000                              │
+│ Pengeluaran hari ini  Rp125.000                              │
+│   ██████████████████████████████████ 125% dari jatah         │
+└──────────────────────────────────────────────────────────────┘
 ┌─ BOROS! ─────────────────────────────────────────────────────┐
 │ Kamu sudah lebih Rp25.000 dari jatah hari ini.               │
-└──────────────────────────────────────────────────────────────┘`,
+└──────────────────────────────────────────────────────────────┘
+
+  [i] Biar cukup sampai akhir bulan, maksimal pengeluaran Rp95.833 per hari.`,
   },
   {
     stepNumber: 5,
@@ -248,15 +283,17 @@ export const SIMULATION_STEPS: SimulationStep[] = [
     terminalOutput: `── STATUS HARI KE-1 DARI 30 ────────────────────────────────────
 ┌─ RINGKASAN ──────────────────────────────────────────────────┐
 │ Saldo sekarang        Rp2.875.000                            │
-│   ██████████████████████████████████ 96% dari anggaran         │
+│   █████████████████████████████████░ 96% dari anggaran       │
 │                                                              │
 │ Jatah harian          Rp100.000                              │
 │ Pengeluaran hari ini  Rp125.000                              │
-│   ██████████████████████████████████ 125% dari jatah          │
+│   ██████████████████████████████████ 125% dari jatah         │
 └──────────────────────────────────────────────────────────────┘
 ┌─ BOROS! ─────────────────────────────────────────────────────┐
 │ Kamu sudah lebih Rp25.000 dari jatah hari ini.               │
-└──────────────────────────────────────────────────────────────┘`,
+└──────────────────────────────────────────────────────────────┘
+
+  [i] Biar cukup sampai akhir bulan, maksimal pengeluaran Rp95.833 per hari.`,
   },
   {
     stepNumber: 6,
@@ -307,13 +344,13 @@ export const SIMULATION_STEPS: SimulationStep[] = [
     stateAfter: { ...TRANSPORT },
     whatHappened:
       'Kategori Transport (40.000) lebih besar dari Makan (85.000)? Tidak: Makan 85.000 lebih besar. Laporan menampilkan Makan sebagai yang paling boros.',
-    terminalOutput: `── LAPORAN PENGELUARAN PER KATEGORI ─────────────────────────
+    terminalOutput: `── LAPORAN PENGELUARAN PER KATEGORI ────────────────────────────
 ┌─ PER KATEGORI ───────────────────────────────────────────────┐
-│ Makan        ███████████████████ 68,0%        Rp85.000       │
-│ Transport    ████████ 32,0%                   Rp40.000       │
+│ Makan         ██████████░░░░░  68,0%     Rp85.000            │
+│ Transport     █████░░░░░░░░░░  32,0%     Rp40.000            │
 └──────────────────────────────────────────────────────────────┘
 
-  Total pengeluaran Rp125.000
+  Total pengeluaran     Rp125.000
   Kategori paling boros Makan`,
   },
   {

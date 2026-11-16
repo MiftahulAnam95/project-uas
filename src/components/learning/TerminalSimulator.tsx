@@ -32,29 +32,74 @@ const MENU = [
   ['0', 'Keluar'],
 ];
 
+/** Semua helper di bawah meniru tampilan.py agar keluarannya sama dengan program asli. */
+const LEBAR = 64;
+const DALAM = LEBAR - 2;
+
 const rupiah = (n: number) => 'Rp' + Math.round(n).toLocaleString('id-ID');
-const bar = (nilai: number, maksimal: number, panjang = 20) => {
+const center = (teks: string, lebar: number) => {
+  const sisa = Math.max(0, lebar - teks.length);
+  return ' '.repeat(Math.floor(sisa / 2)) + teks + ' '.repeat(Math.ceil(sisa / 2));
+};
+const bar = (nilai: number, maksimal: number, panjang = 30) => {
   const rasio = maksimal > 0 ? Math.max(0, Math.min(1, nilai / maksimal)) : 0;
   const terisi = Math.round(rasio * panjang);
   return '█'.repeat(terisi) + '░'.repeat(panjang - terisi);
 };
+const persen = (nilai: number, maksimal: number) =>
+  maksimal > 0 ? Math.round((nilai / maksimal) * 100) : 0;
+const judulBesar = (subjudul: string) => [
+  '╔' + '═'.repeat(DALAM) + '╗',
+  '║' + center('PENCATAT KEUANGAN MAHASISWA', DALAM) + '║',
+  '║' + center(subjudul, DALAM) + '║',
+  '╚' + '═'.repeat(DALAM) + '╝',
+];
+const judulBagian = (teks: string) =>
+  '── ' + teks + ' ' + '─'.repeat(Math.max(0, LEBAR - teks.length - 4));
+const boxTop = (judul: string) =>
+  '┌─ ' + judul + ' ' + '─'.repeat(Math.max(0, DALAM - judul.length - 3)) + '┐';
+const boxBottom = '└' + '─'.repeat(DALAM) + '┘';
+const boxLine = (isi = '') => '│' + (' ' + isi).padEnd(DALAM) + '│';
+const barisNilai = (label: string, nilai: string) => label.padEnd(22) + nilai;
+const pesan = (tag: 'OK' | 'X' | 'i', teks: string) => `  [${tag}] ${teks}`;
+const TUNGGU = '  Tekan Enter untuk kembali ke menu...';
+const SALAH_ANGKA = 'Input salah, masukkan angka bulat lebih dari 0 ya (contoh: 15000).';
+
+/** Sama dengan percabangan status di laporan.cek_peringatan(). */
 const statusHarian = (keluar: number, jatah: number) => {
-  if (jatah <= 0) return 'BELUM DIATUR';
-  if (keluar > jatah) return 'BOROS!';
-  if (keluar >= 0.8 * jatah) return 'HATI-HATI';
-  return 'AMAN';
+  if (keluar > jatah) {
+    return {
+      judul: 'BOROS!',
+      isi: `Kamu sudah lebih ${rupiah(keluar - jatah)} dari jatah hari ini.`,
+    };
+  }
+  if (keluar >= 0.8 * jatah) {
+    return { judul: 'HATI-HATI', isi: 'Pengeluaran hari ini hampir habis jatah.' };
+  }
+  return { judul: 'AMAN', isi: 'Pengeluaran hari ini masih aman.' };
 };
+
+const RIWAYAT_LEBAR = [3, 4, 15, 13, 13];
+const garisTabel = (kiri: string, tengah: string, kanan: string) =>
+  kiri + RIWAYAT_LEBAR.map((l) => '─'.repeat(l + 2)).join(tengah) + kanan;
+const barisTabel = (isi: string[], rata: Array<'kiri' | 'kanan'>) =>
+  '│' +
+  isi
+    .map((sel, i) =>
+      ' ' + (rata[i] === 'kanan' ? sel.padStart(RIWAYAT_LEBAR[i]) : sel.padEnd(RIWAYAT_LEBAR[i])) + ' │'
+    )
+    .join('');
 
 export const TerminalSimulator: React.FC = () => {
   const [history, setHistory] = useState<string[]>([
     'Simulasi menu Python (bukan interpreter Python)',
     '$ python main.py',
-    'Selamat datang di Program Pencatat Keuangan Mahasiswa!',
+    ...judulBesar('Selamat datang!'),
     '',
-    '┌─ ATUR ANGGARAN ──────────────────────────────────────────────┐',
-    '│ Isi anggaran satu bulan (gaji, honor, atau kiriman).         │',
-    '│ Jatah harian akan dihitung otomatis.                         │',
-    '└──────────────────────────────────────────────────────────────┘',
+    boxTop('ATUR ANGGARAN'),
+    boxLine('Isi anggaran satu bulan (gaji, honor, atau kiriman).'),
+    boxLine('Jatah harian akan dihitung otomatis.'),
+    boxBottom,
     '',
     '  ► Anggaran sebulan (Rp)  : ',
   ]);
@@ -76,7 +121,6 @@ export const TerminalSimulator: React.FC = () => {
   const pengeluaranHariIni = transaksi
     .filter((t) => t.hari === hariAktif && t.jenis === 'keluar')
     .reduce((acc, t) => acc + t.jumlah, 0);
-  const status = statusHarian(pengeluaranHariIni, jatah);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -88,17 +132,14 @@ export const TerminalSimulator: React.FC = () => {
   const tampilMenu = () => {
     add(
       '',
-      '╔══════════════════════════════════════════════════════════════╗',
-      '║                 PENCATAT KEUANGAN MAHASISWA                  ║',
-      '║           Catat, pantau, dan hemat uang bulananmu            ║',
-      '╚══════════════════════════════════════════════════════════════╝',
+      ...judulBesar('Catat, pantau, dan hemat uang bulananmu'),
       '',
       `  Hari ke-${hariAktif} dari ${jumlahHari}   │   Saldo ${rupiah(saldo)}   │   Jatah ${rupiah(jatah)}`,
       `  ${bar(hariAktif, jumlahHari, 40)}  perjalanan bulan`,
       '',
-      '┌─ MENU ───────────────────────────────────────────────────────┐',
-      ...MENU.map(([nomor, nama]) => `│ [${nomor}]  ${nama.padEnd(56)}│`),
-      '└──────────────────────────────────────────────────────────────┘',
+      boxTop('MENU'),
+      ...MENU.map(([nomor, nama]) => boxLine(`[${nomor}]  ${nama}`)),
+      boxBottom,
       '',
       '  ► Pilih menu : '
     );
@@ -106,80 +147,121 @@ export const TerminalSimulator: React.FC = () => {
   };
 
   const ringkasan = () => {
-    add(
+    const info = statusHarian(pengeluaranHariIni, jatah);
+    const sisaHari = jumlahHari - hariAktif + 1;
+    const baris = [
       '',
-      `── STATUS HARI KE-${hariAktif} DARI ${jumlahHari} ────────────────────────────────`,
-      '┌─ RINGKASAN ──────────────────────────────────────────────────┐',
-      `│ Saldo sekarang        ${rupiah(saldo).padEnd(28)}│`,
-      `│   ${bar(saldo, anggaran, 34)} ${String(Math.round((saldo / (anggaran || 1)) * 100)).padStart(3)}% dari anggaran`,
-      '│                                                              │',
-      `│ Jatah harian          ${rupiah(jatah).padEnd(28)}│`,
-      `│ Pengeluaran hari ini  ${rupiah(pengeluaranHariIni).padEnd(28)}│`,
-      `│   ${bar(pengeluaranHariIni, jatah, 34)} ${String(Math.round((pengeluaranHariIni / (jatah || 1)) * 100)).padStart(3)}% dari jatah`,
-      '└──────────────────────────────────────────────────────────────┘',
-      `┌─ ${status} ${'─'.repeat(Math.max(0, 60 - status.length))}┐`,
-      `│ Status hari ini: ${status}`,
-      '└──────────────────────────────────────────────────────────────┘',
-      '',
-      '  Tekan Enter untuk kembali ke menu...'
-    );
+      judulBagian(`STATUS HARI KE-${hariAktif} DARI ${jumlahHari}`),
+      boxTop('RINGKASAN'),
+      boxLine(barisNilai('Saldo sekarang', rupiah(saldo))),
+      boxLine(
+        `  ${bar(saldo, anggaran, 34)} ${persen(saldo, anggaran)}% dari anggaran`
+      ),
+      boxLine(),
+      boxLine(barisNilai('Jatah harian', rupiah(jatah))),
+      boxLine(barisNilai('Pengeluaran hari ini', rupiah(pengeluaranHariIni))),
+      boxLine(
+        `  ${bar(pengeluaranHariIni, jatah, 34)} ${persen(pengeluaranHariIni, jatah)}% dari jatah`
+      ),
+      boxBottom,
+      boxTop(info.judul),
+      boxLine(info.isi),
+      boxBottom,
+    ];
+    if (saldo < 0) {
+      baris.push(boxTop('SALDO MINUS'), boxLine('Segera kurangi pengeluaran.'), boxBottom);
+    } else if (saldo <= 0.2 * anggaran) {
+      baris.push(
+        boxTop('SALDO MENIPIS'),
+        boxLine('Saldo tinggal sedikit (kurang dari 20% anggaran).'),
+        boxBottom
+      );
+    }
+    if (sisaHari > 0 && saldo > 0) {
+      baris.push('', pesan('i', `Biar cukup sampai akhir bulan, maksimal pengeluaran ${rupiah(saldo / sisaHari)} per hari.`));
+    }
+    baris.push('', TUNGGU);
+    add(...baris);
     setStep('tunggu');
   };
 
   const riwayat = () => {
-    add('', '── RIWAYAT TRANSAKSI ───────────────────────────────────────────');
+    add('', judulBagian('RIWAYAT TRANSAKSI'));
     if (transaksi.length === 0) {
-      add('  Belum ada transaksi.');
+      add(pesan('i', 'Belum ada transaksi.'));
     } else {
-      add('┌─────┬──────┬─────────────────┬───────────────┬───────────────┐');
-      add('│  No │ Hari │ Keterangan      │         Masuk │        Keluar │');
-      add('├─────┼──────┼─────────────────┼───────────────┼───────────────┤');
-      transaksi.forEach((t, i) => {
+      const rata: Array<'kiri' | 'kanan'> = ['kanan', 'kanan', 'kiri', 'kanan', 'kanan'];
+      add(garisTabel('┌', '┬', '┐'));
+      add(barisTabel(['No', 'Hari', 'Keterangan', 'Masuk', 'Keluar'], rata));
+      add(garisTabel('├', '┼', '┤'));
+      transaksi.forEach((trx, i) => {
         add(
-          `│ ${String(i + 1).padEnd(3)} │ ${String(t.hari).padEnd(4)} │ ${t.kategori
-            .slice(0, 15)
-            .padEnd(15)} │ ${(t.jenis === 'masuk' ? rupiah(t.jumlah) : '-').padStart(13)} │ ${(
-            t.jenis === 'keluar' ? rupiah(t.jumlah) : '-'
-          ).padStart(13)} │`
+          barisTabel(
+            [
+              String(i + 1),
+              String(trx.hari),
+              trx.kategori.slice(0, 15),
+              trx.jenis === 'masuk' ? rupiah(trx.jumlah) : '-',
+              trx.jenis === 'keluar' ? rupiah(trx.jumlah) : '-',
+            ],
+            rata
+          )
         );
       });
-      add('├─────┼──────┼─────────────────┼───────────────┼───────────────┤');
+      add(garisTabel('├', '┼', '┤'));
       add(
-        `│     │      │ TOTAL           │ ${rupiah(
-          transaksi.filter((t) => t.jenis === 'masuk').reduce((a, t) => a + t.jumlah, 0)
-        ).padStart(13)} │ ${rupiah(totalKeluar).padStart(13)} │`
+        barisTabel(
+          [
+            '',
+            '',
+            'TOTAL',
+            rupiah(
+              transaksi.filter((trx) => trx.jenis === 'masuk').reduce((a, trx) => a + trx.jumlah, 0)
+            ),
+            rupiah(totalKeluar),
+          ],
+          rata
+        )
       );
-      add('└─────┴──────┴─────────────────┴───────────────┴───────────────┘');
+      add(garisTabel('└', '┴', '┘'));
     }
-    add('', '  Tekan Enter untuk kembali ke menu...');
+    add('', TUNGGU);
     setStep('tunggu');
   };
 
   const laporanKategori = () => {
-    add('', '── LAPORAN PENGELUARAN PER KATEGORI ─────────────────────────');
+    add('', judulBagian('LAPORAN PENGELUARAN PER KATEGORI'));
     const total: Record<string, number> = {};
-    transaksi.forEach((t) => {
-      if (t.jenis === 'keluar') total[t.kategori] = (total[t.kategori] || 0) + t.jumlah;
+    transaksi.forEach((trx) => {
+      if (trx.jenis === 'keluar') total[trx.kategori] = (total[trx.kategori] || 0) + trx.jumlah;
     });
     const semua = Object.values(total).reduce((a, b) => a + b, 0);
     if (semua === 0) {
-      add('  Belum ada pengeluaran.');
+      add(pesan('i', 'Belum ada pengeluaran.'));
     } else {
-      add('┌─ PER KATEGORI ───────────────────────────────────────────────┐');
-      Object.entries(total)
-        .sort((a, b) => b[1] - a[1])
-        .forEach(([kat, jumlah]) => {
-          const persen = Math.round((jumlah / semua) * 100);
-          add(
-            `│ ${kat.padEnd(14)}${bar(jumlah, semua, 15)} ${String(persen).padStart(3)}% ${rupiah(
-              jumlah
-            ).padStart(12)} │`
-          );
-        });
-      add('└──────────────────────────────────────────────────────────────┘');
-      add('', `  Total pengeluaran ${rupiah(semua)}`);
+      const urutan = Object.entries(total).sort((a, b) => b[1] - a[1]);
+      add(boxTop('PER KATEGORI'));
+      urutan.forEach(([kat, jumlah]) => {
+        const teksPersen = ((jumlah / semua) * 100).toFixed(1).replace('.', ',') + '%';
+        add(
+          boxLine(
+            kat.padEnd(14) +
+              bar(jumlah, semua, 15) +
+              ' ' +
+              teksPersen.padStart(6) +
+              ' ' +
+              rupiah(jumlah).padStart(12)
+          )
+        );
+      });
+      add(boxBottom);
+      add(
+        '',
+        '  ' + barisNilai('Total pengeluaran', rupiah(semua)),
+        '  ' + barisNilai('Kategori paling boros', urutan[0][0])
+      );
     }
-    add('', '  Tekan Enter untuk kembali ke menu...');
+    add('', TUNGGU);
     setStep('tunggu');
   };
 
@@ -196,7 +278,7 @@ export const TerminalSimulator: React.FC = () => {
     if (step === 'anggaran_nominal') {
       const nominal = parseSimulatorInteger(val, true);
       if (nominal === null || nominal <= 0) {
-        add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
+        add(pesan('X', SALAH_ANGKA));
         return;
       }
       setAnggaran(nominal);
@@ -209,16 +291,16 @@ export const TerminalSimulator: React.FC = () => {
     if (step === 'anggaran_hari') {
       const hari = parseSimulatorInteger(val, true);
       if (hari === null || hari <= 0) {
-        add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
+        add(pesan('X', SALAH_ANGKA));
         return;
       }
       const nominal = temp.anggaran ?? 0;
       setJumlahHari(hari);
       setHariAktif(1);
       setTransaksi([{ hari: 1, jenis: 'masuk', kategori: 'Anggaran', jumlah: nominal }]);
-      add('', '  [OK] Anggaran tersimpan.');
-      add(`  [i] Jatah harian kamu: ${rupiah(nominal / hari)}`);
-      add('', '  Tekan Enter untuk kembali ke menu...');
+      add('', pesan('OK', 'Anggaran tersimpan.'));
+      add(pesan('i', `Jatah harian kamu: ${rupiah(nominal / hari)}`));
+      add('', TUNGGU);
       setStep('tunggu');
       return;
     }
@@ -226,16 +308,15 @@ export const TerminalSimulator: React.FC = () => {
     if (step === 'menu') {
       if (val === '') return;
       if (val === '1') {
-        add('', '── CATAT PENGELUARAN ───────────────────────────────────────────');
-        add('┌─ PILIH KATEGORI ─────────────────────────────────────────────┐');
-        KATEGORI.forEach((k, i) => add(`│ [${i + 1}]  ${k.padEnd(56)}│`));
-        add('└──────────────────────────────────────────────────────────────┘');
+        add('', judulBagian('CATAT PENGELUARAN'), boxTop('PILIH KATEGORI'));
+        KATEGORI.forEach((k, i) => add(boxLine(`[${i + 1}]  ${k}`)));
+        add(boxBottom);
         add('  ► Nomor kategori          : ');
         setStep('catat_kat');
         return;
       }
       if (val === '2') {
-        add('', '── CATAT PEMASUKAN ─────────────────────────────────────────────');
+        add('', judulBagian('CATAT PEMASUKAN'));
         add('  ► Sumber pemasukan (contoh: gaji, honor) : ');
         setStep('pemasukan_sumber');
         return;
@@ -254,44 +335,50 @@ export const TerminalSimulator: React.FC = () => {
       }
       if (val === '6') {
         if (hariAktif >= jumlahHari) {
-          add('', '  [i] Ini sudah hari terakhir. Cek laporan akhir di menu 5.');
+          add('', pesan('i', 'Ini sudah hari terakhir. Cek laporan akhir di menu 5.'));
         } else {
           setHariAktif((h) => h + 1);
-          add('', `  [OK] Masuk ke hari ke-${hariAktif + 1}.`);
-          add(`  [i] Jatah hari ini: ${rupiah(jatah)}`);
+          add('', pesan('OK', `Masuk ke hari ke-${hariAktif + 1}.`));
+          add(pesan('i', `Jatah hari ini: ${rupiah(jatah)}`));
         }
-        add('', '  Tekan Enter untuk kembali ke menu...');
+        add('', TUNGGU);
         setStep('tunggu');
         return;
       }
       if (val === '7') {
-        add('', '┌─ ATUR ANGGARAN ──────────────────────────────────────────────┐');
-        add('│ Isi anggaran satu bulan (gaji, honor, atau kiriman).         │');
-        add('│ Perhatian: catatan lama akan dihapus.                        │');
-        add('└──────────────────────────────────────────────────────────────┘');
-        add('  ► Anggaran sebulan (Rp)  : ');
+        add(
+          '',
+          ...judulBesar('Selamat datang!'),
+          '',
+          boxTop('ATUR ANGGARAN'),
+          boxLine('Isi anggaran satu bulan (gaji, honor, atau kiriman).'),
+          boxLine('Jatah harian akan dihitung otomatis.'),
+          boxLine('Perhatian: catatan lama akan dihapus.'),
+          boxBottom,
+          '',
+          '  ► Anggaran sebulan (Rp)  : '
+        );
         setStep('anggaran_nominal');
         return;
       }
       if (val === '0') {
         add(
-          '',
-          '┌─ SAMPAI JUMPA ───────────────────────────────────────────────┐',
-          '│ Terima kasih sudah memakai aplikasi ini.                     │',
-          '│ Semoga keuangannya aman sampai akhir bulan!                  │',
-          '└──────────────────────────────────────────────────────────────┘'
+          boxTop('SAMPAI JUMPA'),
+          boxLine('Terima kasih sudah memakai aplikasi ini.'),
+          boxLine('Semoga keuangannya aman sampai akhir bulan!'),
+          boxBottom
         );
         setRunning(false);
         return;
       }
-      add('  [X] Menu tidak ada, pilih nomor yang tersedia ya.');
+      add(pesan('X', 'Menu tidak ada, pilih nomor yang tersedia ya.'));
       return;
     }
 
     if (step === 'catat_kat') {
       const nomor = parseSimulatorInteger(val);
       if (nomor === null || nomor < 1 || nomor > KATEGORI.length) {
-        add(`  [X] Pilihan tidak valid, masukkan nomor 1 sampai ${KATEGORI.length}.`);
+        add(pesan('X', `Pilihan tidak valid, masukkan nomor 1 sampai ${KATEGORI.length}.`));
         return;
       }
       setTemp((prev) => ({ ...prev, kat: KATEGORI[nomor - 1] }));
@@ -303,19 +390,52 @@ export const TerminalSimulator: React.FC = () => {
     if (step === 'catat_jml') {
       const jumlah = parseSimulatorInteger(val, true);
       if (jumlah === null || jumlah <= 0) {
-        add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
+        add(pesan('X', SALAH_ANGKA));
         return;
       }
       const kat = temp.kat ?? 'Lainnya';
       const baru: Transaksi = { hari: hariAktif, jenis: 'keluar', kategori: kat, jumlah };
       setTransaksi((prev) => [...prev, baru]);
-      add('', `  [OK] Tercatat: ${kat} ${rupiah(jumlah)}`);
+      add('', pesan('OK', `Tercatat: ${kat} ${rupiah(jumlah)}`));
+      // Sama seperti menu_pengeluaran() di main.py: langsung cek_peringatan().
       const pengeluaranBaru = pengeluaranHariIni + jumlah;
-      const statusBaru = statusHarian(pengeluaranBaru, jatah);
-      add(`┌─ ${statusBaru} ${'─'.repeat(Math.max(0, 60 - statusBaru.length))}┐`);
-      add(`│ Status hari ini: ${statusBaru}`);
-      add('└──────────────────────────────────────────────────────────────┘');
-      add('', '  Tekan Enter untuk kembali ke menu...');
+      const infoBaru = statusHarian(pengeluaranBaru, jatah);
+      const sisaHariBaru = jumlahHari - hariAktif + 1;
+      const saldoBaru = saldo - jumlah;
+      add(
+        '',
+        judulBagian(`STATUS HARI KE-${hariAktif} DARI ${jumlahHari}`),
+        boxTop('RINGKASAN'),
+        boxLine(barisNilai('Saldo sekarang', rupiah(saldoBaru))),
+        boxLine(`  ${bar(saldoBaru, anggaran, 34)} ${persen(saldoBaru, anggaran)}% dari anggaran`),
+        boxLine(),
+        boxLine(barisNilai('Jatah harian', rupiah(jatah))),
+        boxLine(barisNilai('Pengeluaran hari ini', rupiah(pengeluaranBaru))),
+        boxLine(`  ${bar(pengeluaranBaru, jatah, 34)} ${persen(pengeluaranBaru, jatah)}% dari jatah`),
+        boxBottom,
+        boxTop(infoBaru.judul),
+        boxLine(infoBaru.isi),
+        boxBottom
+      );
+      if (saldoBaru < 0) {
+        add(boxTop('SALDO MINUS'), boxLine('Segera kurangi pengeluaran.'), boxBottom);
+      } else if (saldoBaru <= 0.2 * anggaran) {
+        add(
+          boxTop('SALDO MENIPIS'),
+          boxLine('Saldo tinggal sedikit (kurang dari 20% anggaran).'),
+          boxBottom
+        );
+      }
+      if (sisaHariBaru > 0 && saldoBaru > 0) {
+        add(
+          '',
+          pesan(
+            'i',
+            `Biar cukup sampai akhir bulan, maksimal pengeluaran ${rupiah(saldoBaru / sisaHariBaru)} per hari.`
+          )
+        );
+      }
+      add('', TUNGGU);
       setStep('tunggu');
       return;
     }
@@ -330,14 +450,14 @@ export const TerminalSimulator: React.FC = () => {
     if (step === 'pemasukan_jml') {
       const jumlah = parseSimulatorInteger(val, true);
       if (jumlah === null || jumlah <= 0) {
-        add('  [X] Input salah, masukkan angka bulat lebih dari 0 ya.');
+        add(pesan('X', SALAH_ANGKA));
         return;
       }
       const sumber = temp.sumber ?? 'Pemasukan lain';
       setTransaksi((prev) => [...prev, { hari: hariAktif, jenis: 'masuk', kategori: sumber, jumlah }]);
-      add('', `  [OK] Tercatat: ${sumber} ${rupiah(jumlah)}`);
-      add(`  [i] Saldo sekarang: ${rupiah(saldo + jumlah)}`);
-      add('', '  Tekan Enter untuk kembali ke menu...');
+      add('', pesan('OK', `Tercatat: ${sumber} ${rupiah(jumlah)}`));
+      add(pesan('i', `Saldo sekarang: ${rupiah(saldo + jumlah)}`));
+      add('', TUNGGU);
       setStep('tunggu');
     }
   };
@@ -346,12 +466,12 @@ export const TerminalSimulator: React.FC = () => {
     setHistory([
       'Simulasi menu Python (bukan interpreter Python)',
       '$ python main.py',
-      'Selamat datang di Program Pencatat Keuangan Mahasiswa!',
+      ...judulBesar('Selamat datang!'),
       '',
-      '┌─ ATUR ANGGARAN ──────────────────────────────────────────────┐',
-      '│ Isi anggaran satu bulan (gaji, honor, atau kiriman).         │',
-      '│ Jatah harian akan dihitung otomatis.                         │',
-      '└──────────────────────────────────────────────────────────────┘',
+      boxTop('ATUR ANGGARAN'),
+      boxLine('Isi anggaran satu bulan (gaji, honor, atau kiriman).'),
+      boxLine('Jatah harian akan dihitung otomatis.'),
+      boxBottom,
       '',
       '  ► Anggaran sebulan (Rp)  : ',
     ]);

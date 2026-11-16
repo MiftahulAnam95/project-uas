@@ -55,7 +55,7 @@ Website ini dirancang khusus untuk mahasiswa semester awal dan pemula yang baru 
 
 4. **Simulasi Terminal Interaktif (Interactive CLI Simulator)**:
    - Mahasiswa dapat mencoba simulasi menu pencatat keuangan di browser tanpa perlu menginstal Python. Simulasi memiliki batas presisi angka JavaScript dan tidak selalu identik dengan program asli.
-   - Menirukan setup awal, menu [1] Catat Pengeluaran, [2] Catat Pemasukan, [3] Ringkasan & Status, [4] Riwayat, [5] Laporan Kategori, [6] Ganti Hari, [7] Atur Ulang Anggaran, dan [0] Keluar. Ini simulasi, bukan eksekusi Python asli.
+   - Menirukan setup awal, menu [1] Catat pengeluaran, [2] Catat pemasukan, [3] Cek saldo dan peringatan, [4] Riwayat transaksi, [5] Laporan per kategori, [6] Lanjut ke hari berikutnya, [7] Atur ulang anggaran, dan [0] Keluar. Ini simulasi, bukan eksekusi Python asli.
 
 5. **Visualisasi Alur & Pelacak Data (State Inspector)**:
    - Skenario realistis anggaran Rp3.000.000 selama 30 hari.

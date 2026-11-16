@@ -26,7 +26,11 @@ File ini tidak menghitung saldo sendiri dan tidak menampilkan tabel sendiri. Ia 
           id: 'kode-import-main',
           title: 'Import di main.py',
           filename: 'main.py',
-          code: `from pencatat import (KATEGORI, akun, format_rupiah, atur_uang_saku,
+          code: `# main.py
+# Menu utama yang menyambungkan semua modul (Orang 3)
+# Jalankan dengan: python main.py
+
+from pencatat import (KATEGORI, akun, format_rupiah, atur_uang_saku,
                       tambah_pemasukan, tambah_pengeluaran, hitung_saldo)
 from laporan import (baca_angka, baca_pilihan, cek_peringatan,
                      tampil_riwayat, laporan_kategori)
@@ -35,9 +39,9 @@ from tampilan import (warna, bersihkan_layar, judul_besar, judul_bagian, kotak, 
           explanation:
             'main.py mengimpor tiga modul. Nama fungsi dipanggil langsung tanpa awalan modul karena memakai from ... import ...',
           lineExplanations: [
-            { line: 1, code: 'from pencatat import ...', explanation: 'Mengambil data dan fungsi dari pencatat.py.' },
-            { line: 3, code: 'from laporan import ...', explanation: 'Mengambil fungsi input dan laporan dari laporan.py.' },
-            { line: 5, code: 'from tampilan import ...', explanation: 'Mengambil alat tampilan dari tampilan.py.' },
+            { line: 5, code: 'from pencatat import (KATEGORI, akun, format_rupiah, atur_uang_saku,', explanation: 'Mengambil data dan fungsi dari pencatat.py.' },
+            { line: 7, code: 'from laporan import (baca_angka, baca_pilihan, cek_peringatan,', explanation: 'Mengambil fungsi input dan laporan dari laporan.py.' },
+            { line: 9, code: 'from tampilan import (warna, bersihkan_layar, judul_besar, judul_bagian, kotak, bar,', explanation: 'Mengambil alat tampilan dari tampilan.py.' },
           ],
         },
       ],
@@ -72,7 +76,8 @@ Menu yang tersedia:
           id: 'kode-tampil-menu',
           title: 'Struktur menu utama',
           filename: 'main.py',
-          code: `MENU = [
+          code: `# Daftar menu: list berisi tuple (nomor, tulisan)
+MENU = [
     ("1", "Catat pengeluaran"),
     ("2", "Catat pemasukan"),
     ("3", "Cek saldo dan peringatan"),
@@ -85,8 +90,8 @@ Menu yang tersedia:
           explanation:
             'MENU adalah list of tuple. Setiap tuple berisi nomor menu dan nama menu. Loop for nomor, nama in MENU mencetak semuanya.',
           lineExplanations: [
-            { line: 1, code: 'MENU = [ ... ]', explanation: 'List berisi pasangan nomor dan nama menu.' },
-            { line: 3, code: '("1", "Catat pengeluaran")', explanation: 'Tuple pertama: nomor "1" dan nama menu.' },
+            { line: 2, code: 'MENU = [', explanation: 'List berisi pasangan nomor dan nama menu.' },
+            { line: 3, code: '("1", "Catat pengeluaran"),', explanation: 'Tuple pertama: nomor "1" dan nama menu.' },
           ],
         },
       ],
@@ -138,14 +143,18 @@ Jika \`ulang=True\`, ditambahkan peringatan bahwa catatan lama akan dihapus.`,
     print()
     uang_saku = baca_angka("  ► Anggaran sebulan (Rp)  : ")
     jumlah_hari = baca_angka("  ► Jumlah hari sebulan    : ")
-    atur_uang_saku(uang_saku, jumlah_hari)`,
+    atur_uang_saku(uang_saku, jumlah_hari)
+    print()
+    pesan_ok("Anggaran tersimpan.")
+    pesan_info("Jatah harian kamu: " + warna(format_rupiah(akun["jatah_harian"]), "kuning", True))
+    tunggu()`,
           explanation:
             'setup_awal() meminta dua angka, lalu memanggil atur_uang_saku() untuk menyimpan data dan menghitung jatah harian.',
           lineExplanations: [
             { line: 2, code: 'bersihkan_layar()', explanation: 'Menghapus layar hanya jika terminal sungguhan.' },
-            { line: 3, code: 'judul_besar(...)', explanation: 'Mencetak kotak judul dari tampilan.py.' },
+            { line: 3, code: 'judul_besar("PENCATAT KEUANGAN MAHASISWA", "Selamat datang!")', explanation: 'Mencetak kotak judul dari tampilan.py.' },
             { line: 7, code: 'if ulang:', explanation: 'Jika menu 7 dipilih, tambahkan peringatan.' },
-            { line: 11, code: 'uang_saku = baca_angka(...)', explanation: 'Input divalidasi di laporan.py.' },
+            { line: 11, code: 'uang_saku = baca_angka("  ► Anggaran sebulan (Rp)  : ")', explanation: 'Input divalidasi di laporan.py.' },
             { line: 13, code: 'atur_uang_saku(uang_saku, jumlah_hari)', explanation: 'Menyimpan data dan menghitung jatah harian.' },
           ],
         },
@@ -196,13 +205,17 @@ Jika \`ulang=True\`, ditambahkan peringatan bahwa catatan lama akan dihapus.`,
     print()
     pilihan = baca_pilihan("  ► Nomor kategori          : ", len(KATEGORI))
     jumlah = baca_angka("  ► Jumlah pengeluaran (Rp) : ")
-    tambah_pengeluaran(jumlah, KATEGORI[pilihan - 1])`,
+    tambah_pengeluaran(jumlah, KATEGORI[pilihan - 1])
+    print()
+    pesan_ok("Tercatat: " + KATEGORI[pilihan - 1] + " " + warna(format_rupiah(jumlah), "merah", True))
+    cek_peringatan()
+    tunggu()`,
           explanation:
             'Nomor kategori mulai dari 1, tetapi index list mulai dari 0. Karena itu dipakai KATEGORI[pilihan - 1].',
           lineExplanations: [
-            { line: 5, code: 'for nama in KATEGORI:', explanation: 'Menampilkan setiap kategori dengan nomor urut.' },
-            { line: 9, code: 'pilihan = baca_pilihan(..., len(KATEGORI))', explanation: 'Memastikan nomor 1 sampai 6.' },
-            { line: 11, code: 'tambah_pengeluaran(jumlah, KATEGORI[pilihan - 1])', explanation: 'Mengubah nomor menjadi kategori, lalu mencatat.' },
+            { line: 6, code: 'for nama in KATEGORI:', explanation: 'Menampilkan setiap kategori dengan nomor urut.' },
+            { line: 11, code: 'pilihan = baca_pilihan("  ► Nomor kategori          : ", len(KATEGORI))', explanation: 'Memastikan nomor 1 sampai 6.' },
+            { line: 13, code: 'tambah_pengeluaran(jumlah, KATEGORI[pilihan - 1])', explanation: 'Mengubah nomor menjadi kategori, lalu mencatat.' },
           ],
         },
       ],
@@ -274,21 +287,24 @@ Di akhir file, \`main()\` dipanggil langsung.`,
             setup_awal(True)
         elif pilihan == "0":
             bersihkan_layar()
-            kotak("SAMPAI JUMPA", ["Terima kasih sudah memakai aplikasi ini."], "hijau")
+            kotak("SAMPAI JUMPA", ["Terima kasih sudah memakai aplikasi ini.",
+                                   "Semoga keuangannya aman sampai akhir bulan!"], "hijau")
             break
         else:
+            print()
             pesan_error("Menu tidak ada, pilih nomor yang tersedia ya.")
             tunggu()
+
 
 main()`,
           explanation:
             'while True mengulang menu. break pada menu 0 menghentikan loop. elif memastikan hanya satu aksi dijalankan.',
           lineExplanations: [
             { line: 3, code: 'while True:', explanation: 'Menu terus muncul sampai pengguna memilih 0.' },
-            { line: 5, code: 'pilihan = input(...)', explanation: 'Membaca pilihan sebagai teks.' },
-            { line: 7, code: 'if pilihan == "1":', explanation: 'Menu 1 memanggil menu_pengeluaran().' },
-            { line: 27, code: 'elif pilihan == "0": ... break', explanation: 'Menu 0 mencetak pesan lalu menghentikan loop.' },
-            { line: 33, code: 'main()', explanation: 'Memanggil fungsi utama saat file dijalankan.' },
+            { line: 5, code: 'pilihan = input("\\n  ► Pilih menu : ").strip()', explanation: 'Membaca pilihan sebagai teks, lalu .strip() membuang spasi di ujung.' },
+            { line: 6, code: 'if pilihan == "1":', explanation: 'Menu 1 memanggil menu_pengeluaran().' },
+            { line: 26, code: 'elif pilihan == "0":', explanation: 'Menu 0 mencetak pesan perpisahan lalu break menghentikan loop.' },
+            { line: 37, code: 'main()', explanation: 'Memanggil fungsi utama saat file dijalankan. Di file asli, baris ini berada paling bawah setelah dua baris kosong.' },
           ],
         },
       ],
