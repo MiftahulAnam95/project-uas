@@ -37,7 +37,11 @@ export const TAMPILAN_CHAPTER: Chapter = {
           id: 'kode-import-tampilan',
           title: 'Hanya dua library bawaan',
           filename: 'tampilan.py',
-          code: `import os
+          code: `# tampilan.py
+# Modul tampilan: warna, kotak, batang kemajuan, dan tabel
+# supaya program terlihat menarik. Hanya memakai library bawaan Python.
+
+import os
 import sys
 
 # Supaya warna tampil di Command Prompt Windows 10 ke atas
@@ -54,10 +58,10 @@ except Exception:
           output: `(Tidak ada output — file ini hanya menyiapkan alat tampilan.)`,
           isSimulated: true,
           lineExplanations: [
-            { line: 1, code: 'import os', explanation: 'Dipakai untuk os.name dan os.system().' },
-            { line: 2, code: 'import sys', explanation: 'Dipakai untuk sys.stdout dan encoding.' },
-            { line: 5, code: 'if os.name == "nt":', explanation: 'Jika Windows, aktifkan pemrosesan warna ANSI.' },
-            { line: 9, code: 'sys.stdout.reconfigure(encoding="utf-8")', explanation: 'Memastikan karakter kotak tidak rusak.' },
+            { line: 5, code: 'import os', explanation: 'Dipakai untuk os.name dan os.system().' },
+            { line: 6, code: 'import sys', explanation: 'Dipakai untuk sys.stdout dan encoding.' },
+            { line: 9, code: 'if os.name == "nt":', explanation: 'Jika Windows, aktifkan pemrosesan warna ANSI.' },
+            { line: 14, code: 'sys.stdout.reconfigure(encoding="utf-8")', explanation: 'Memastikan karakter kotak tidak rusak.' },
           ],
         },
       ],
@@ -126,8 +130,7 @@ Jika \`PAKAI_WARNA\` False (misalnya di IDLE), fungsi mengembalikan teks polos t
           id: 'kode-warna-dictionary',
           title: 'Dictionary WARNA dan fungsi warna()',
           filename: 'tampilan.py',
-          code: `import os, sys
-
+          code: `# Kode warna disimpan di dictionary: nama warna -> kode
 WARNA = {
     "reset": "\\033[0m",
     "tebal": "\\033[1m",
@@ -140,9 +143,13 @@ WARNA = {
     "putih": "\\033[97m",
 }
 
+# Warna hanya dipakai kalau layarnya terminal sungguhan
+# (di IDLE atau saat output disimpan ke file, teks tampil polos)
 PAKAI_WARNA = sys.stdout.isatty() or os.environ.get("FORCE_COLOR") == "1"
 
+
 def warna(teks, nama, tebal=False):
+    """Beri warna pada teks. Contoh: warna("Halo", "hijau", True)"""
     if not PAKAI_WARNA:
         return teks
     kode = WARNA[nama]
@@ -152,12 +159,12 @@ def warna(teks, nama, tebal=False):
           explanation:
             'PAKAI_WARNA bernilai True hanya jika stdout adalah terminal sungguhan. warna() mengambil kode dari WARNA, menambahkan tebal jika diminta, lalu menutup dengan reset.',
           lineExplanations: [
-            { line: 1, code: 'WARNA = { ... }', explanation: 'Menyimpan semua kode warna dalam satu dictionary.' },
-            { line: 12, code: 'PAKAI_WARNA = sys.stdout.isatty() ...', explanation: 'Menentukan apakah warna boleh dipakai.' },
-            { line: 14, code: 'def warna(teks, nama, tebal=False):', explanation: 'Fungsi pembungkus teks berwarna.' },
-            { line: 15, code: 'if not PAKAI_WARNA: return teks', explanation: 'Di IDLE, kembalikan teks polos.' },
-            { line: 17, code: 'kode = WARNA[nama]', explanation: 'Mengambil kode warna dari dictionary.' },
-            { line: 20, code: 'return kode + teks + WARNA["reset"]', explanation: 'Membungkus teks dengan warna dan reset.' },
+            { line: 2, code: 'WARNA = {', explanation: 'Menyimpan semua kode warna dalam satu dictionary.' },
+            { line: 16, code: 'PAKAI_WARNA = sys.stdout.isatty() or os.environ.get("FORCE_COLOR") == "1"', explanation: 'Menentukan apakah warna boleh dipakai.' },
+            { line: 19, code: 'def warna(teks, nama, tebal=False):', explanation: 'Fungsi pembungkus teks berwarna.' },
+            { line: 21, code: 'if not PAKAI_WARNA:', explanation: 'Di IDLE, kembalikan teks polos tanpa kode warna.' },
+            { line: 23, code: 'kode = WARNA[nama]', explanation: 'Mengambil kode warna dari dictionary.' },
+            { line: 26, code: 'return kode + teks + WARNA["reset"]', explanation: 'Membungkus teks dengan warna dan reset.' },
           ],
         },
       ],
@@ -225,7 +232,7 @@ print("Kiri".ljust(20) + "|")
 print("Kanan".rjust(20) + "|")`,
           explanation:
             'Perkalian string membuat garis. center/ljust/rjust mengatur posisi teks dalam lebar tertentu.',
-          output: `────────────────────\n       Judul       \nKiri                |\n               Kanan|`,
+          output: `────────────────────\n       Judul        \nKiri                |\n               Kanan|`,
           isSimulated: true,
           lineExplanations: [
             { line: 1, code: 'print("─" * 20)', explanation: 'Mengulang karakter ─ sebanyak 20 kali.' },
@@ -239,6 +246,7 @@ print("Kanan".rjust(20) + "|")`,
           title: 'judul_besar() memakai karakter bingkai ganda',
           filename: 'tampilan.py',
           code: `def judul_besar(judul, subjudul=""):
+    """Kotak judul berbingkai ganda di bagian atas layar."""
     dalam = LEBAR - 2
     print(warna("╔" + "═" * dalam + "╗", "cyan"))
     print(warna("║", "cyan") + warna(judul.center(dalam), "putih", True) + warna("║", "cyan"))
@@ -248,10 +256,10 @@ print("Kanan".rjust(20) + "|")`,
           explanation:
             'LEBAR = 64, sehingga dalam = 62. judul.center(62) menengahkan judul. Bingkai kiri dan kanan diwarnai cyan.',
           lineExplanations: [
-            { line: 2, code: 'dalam = LEBAR - 2', explanation: 'Lebar bagian dalam kotak, dikurangi bingkai kiri dan kanan.' },
-            { line: 3, code: 'print(warna("╔" + "═" * dalam + "╗", "cyan"))', explanation: 'Garis atas bingkai ganda.' },
-            { line: 4, code: 'judul.center(dalam)', explanation: 'Menengahkan judul di dalam kotak.' },
-            { line: 6, code: 'if subjudul != "":', explanation: 'Subjudul opsional.' },
+            { line: 3, code: 'dalam = LEBAR - 2', explanation: 'Lebar bagian dalam kotak, dikurangi bingkai kiri dan kanan.' },
+            { line: 4, code: 'print(warna("╔" + "═" * dalam + "╗", "cyan"))', explanation: 'Garis atas bingkai ganda.' },
+            { line: 5, code: 'print(warna("║", "cyan") + warna(judul.center(dalam), "putih", True) + warna("║", "cyan"))', explanation: 'Menengahkan judul di dalam kotak.' },
+            { line: 6, code: 'if subjudul != "":', explanation: 'Subjudul opsional, dicetak sebagai baris kedua berwarna abu.' },
           ],
         },
       ],
@@ -296,6 +304,7 @@ Dengan cara ini, kode warna tidak dihitung.`,
           title: 'panjang_tampil()',
           filename: 'tampilan.py',
           code: `def panjang_tampil(teks):
+    """Hitung panjang teks yang terlihat (kode warna tidak ikut dihitung)."""
     jumlah = 0
     dalam_kode = False
     for huruf in teks:
@@ -310,11 +319,11 @@ Dengan cara ini, kode warna tidak dihitung.`,
           explanation:
             'Loop per huruf. Saat menemukan ESC, masuk mode kode. Saat menemukan m, keluar mode kode. Huruf di luar mode kode dihitung.',
           lineExplanations: [
-            { line: 2, code: 'jumlah = 0', explanation: 'Penghitung karakter terlihat.' },
-            { line: 3, code: 'dalam_kode = False', explanation: 'Penanda apakah sedang berada di dalam kode ANSI.' },
-            { line: 5, code: 'if huruf == "\\033":', explanation: 'Menemukan awal kode warna.' },
-            { line: 8, code: 'if huruf == "m":', explanation: 'Menemukan akhir kode warna.' },
-            { line: 11, code: 'jumlah += 1', explanation: 'Menambah hitungan untuk karakter yang terlihat.' },
+            { line: 3, code: 'jumlah = 0', explanation: 'Penghitung karakter terlihat.' },
+            { line: 4, code: 'dalam_kode = False', explanation: 'Penanda apakah sedang berada di dalam kode ANSI.' },
+            { line: 6, code: 'if huruf == "\\033":', explanation: 'Menemukan awal kode warna.' },
+            { line: 9, code: 'if huruf == "m":', explanation: 'Menemukan akhir kode warna.' },
+            { line: 12, code: 'jumlah += 1', explanation: 'Menambah hitungan untuk karakter yang terlihat.' },
           ],
         },
         {
@@ -374,6 +383,8 @@ Langkah kerjanya:
           title: 'bar()',
           filename: 'tampilan.py',
           code: `def bar(nilai, maksimal, panjang=30, nama=None):
+    """Batang kemajuan: █ terisi, ░ kosong.
+    Kalau 'nama' tidak diisi, warna otomatis: hijau, kuning, atau merah."""
     if maksimal <= 0:
         rasio = 0
     else:
@@ -397,13 +408,13 @@ Langkah kerjanya:
           explanation:
             'Rasio dihitung, dibatasi 0..1, lalu round() menentukan jumlah blok. Warna otomatis dipilih dengan if-elif-else.',
           lineExplanations: [
-            { line: 2, code: 'if maksimal <= 0: rasio = 0', explanation: 'Mencegah pembagian dengan nol.' },
-            { line: 5, code: 'rasio = nilai / maksimal', explanation: 'Membandingkan nilai dengan kapasitas.' },
-            { line: 9, code: 'if isi > 1: isi = 1', explanation: 'Membatasi batang agar tidak lebih panjang.' },
-            { line: 11, code: 'terisi = round(isi * panjang)', explanation: 'Membulatkan jumlah blok.' },
-            { line: 14, code: 'if rasio > 1: nama = "merah"', explanation: 'Warna merah jika melebihi maksimal.' },
-            { line: 16, code: 'elif rasio >= 0.8: nama = "kuning"', explanation: 'Warna kuning jika 80% atau lebih.' },
-            { line: 18, code: 'else: nama = "hijau"', explanation: 'Warna hijau untuk sisanya.' },
+            { line: 4, code: 'if maksimal <= 0:', explanation: 'Mencegah pembagian dengan nol; rasio diisi 0.' },
+            { line: 7, code: 'rasio = nilai / maksimal', explanation: 'Membandingkan nilai dengan kapasitas.' },
+            { line: 12, code: 'if isi > 1:', explanation: 'Membatasi batang agar tidak lebih panjang dari panjang yang diminta.' },
+            { line: 14, code: 'terisi = round(isi * panjang)', explanation: 'Membulatkan jumlah blok.' },
+            { line: 17, code: 'if rasio > 1:', explanation: 'Warna merah jika melebihi maksimal.' },
+            { line: 19, code: 'elif rasio >= 0.8:', explanation: 'Warna kuning jika 80% atau lebih.' },
+            { line: 21, code: 'else:', explanation: 'Warna hijau untuk sisanya.' },
           ],
         },
       ],
@@ -440,6 +451,7 @@ Langkah kerjanya:
           title: 'kotak()',
           filename: 'tampilan.py',
           code: `def kotak(judul, baris, nama="cyan"):
+    """Kotak berjudul. 'baris' adalah list teks (boleh sudah berwarna)."""
     dalam = LEBAR - 2
     print(warna("┌─ ", nama) + warna(judul, nama, True) + warna(" " + "─" * (dalam - len(judul) - 3) + "┐", nama))
     for isi in baris:
@@ -450,10 +462,10 @@ Langkah kerjanya:
           explanation:
             'Garis atas memakai len(judul) karena judul diasumsikan polos. Isi kotak memakai panjang_tampil() karena boleh berwarna.',
           lineExplanations: [
-            { line: 2, code: 'dalam = LEBAR - 2', explanation: 'Lebar bagian dalam kotak.' },
-            { line: 3, code: 'print(warna("┌─ ", nama) + ...)', explanation: 'Garis atas dengan judul.' },
+            { line: 3, code: 'dalam = LEBAR - 2', explanation: 'Lebar bagian dalam kotak.' },
+            { line: 4, code: 'print(warna("┌─ ", nama) + warna(judul, nama, True) + warna(" " + "─" * (dalam - len(judul) - 3) + "┐", nama))', explanation: 'Garis atas dengan judul.' },
             { line: 5, code: 'for isi in baris:', explanation: 'Mengulang setiap baris isi.' },
-            { line: 7, code: 'isi + " " * (dalam - panjang_tampil(isi))', explanation: 'Menambahkan spasi sesuai panjang terlihat.' },
+            { line: 7, code: 'isi = isi + " " * (dalam - panjang_tampil(isi))', explanation: 'Menambahkan spasi sesuai panjang terlihat.' },
           ],
         },
         {
@@ -461,12 +473,15 @@ Langkah kerjanya:
           title: 'garis_tabel() dan baris_tabel()',
           filename: 'tampilan.py',
           code: `def garis_tabel(lebar_kolom, kiri, tengah, kanan):
+    """Garis pembatas tabel, contoh: ┌────┬────┐"""
     bagian = []
     for lebar in lebar_kolom:
         bagian.append("─" * (lebar + 2))
     print(warna(kiri + tengah.join(bagian) + kanan, "abu"))
 
+
 def baris_tabel(isi, lebar_kolom, rata):
+    """Satu baris tabel. rata berisi "kiri" atau "kanan" untuk tiap kolom."""
     teks = warna("│", "abu")
     for i in range(len(isi)):
         sel = isi[i]
@@ -482,11 +497,11 @@ def baris_tabel(isi, lebar_kolom, rata):
           explanation:
             'garis_tabel membuat bagian "───" untuk setiap kolom. baris_tabel menghitung sisa spasi dengan panjang_tampil, lalu merata kiri/kanan.',
           lineExplanations: [
-            { line: 3, code: 'bagian.append("─" * (lebar + 2))', explanation: 'Garis untuk satu kolom, ditambah spasi kiri dan kanan.' },
-            { line: 5, code: 'print(warna(kiri + tengah.join(bagian) + kanan, "abu"))', explanation: 'Mencetak garis pembatas berwarna abu.' },
-            { line: 10, code: 'kosong = lebar_kolom[i] - panjang_tampil(sel)', explanation: 'Menghitung sisa lebar kolom.' },
-            { line: 13, code: 'if rata[i] == "kanan":', explanation: 'Jika rata kanan, spasi di kiri.' },
-            { line: 16, code: 'teks += " " + sel + " " + warna("│", "abu")', explanation: 'Menambahkan sel dan pembatas kanan.' },
+            { line: 5, code: 'bagian.append("─" * (lebar + 2))', explanation: 'Garis untuk satu kolom, ditambah spasi kiri dan kanan.' },
+            { line: 6, code: 'print(warna(kiri + tengah.join(bagian) + kanan, "abu"))', explanation: 'Mencetak garis pembatas berwarna abu.' },
+            { line: 14, code: 'kosong = lebar_kolom[i] - panjang_tampil(sel)', explanation: 'Menghitung sisa lebar kolom.' },
+            { line: 17, code: 'if rata[i] == "kanan":', explanation: 'Jika rata kanan, spasi di kiri.' },
+            { line: 21, code: 'teks += " " + sel + " " + warna("│", "abu")', explanation: 'Menambahkan sel dan pembatas kanan.' },
           ],
         },
       ],
@@ -530,13 +545,14 @@ Alasan lain: di IDLE, warna ANSI tidak dirender. \`PAKAI_WARNA\` juga memakai is
           title: 'bersihkan_layar()',
           filename: 'tampilan.py',
           code: `def bersihkan_layar():
+    """Hapus isi layar supaya tampilan menu selalu bersih."""
     if sys.stdout.isatty():
         os.system("cls" if os.name == "nt" else "clear")`,
           explanation:
             'Hanya membersihkan layar jika stdout adalah terminal sungguhan. Di IDLE, fungsi tidak melakukan apa-apa.',
           lineExplanations: [
-            { line: 2, code: 'if sys.stdout.isatty():', explanation: 'Memastikan output terhubung ke terminal sungguhan.' },
-            { line: 3, code: 'os.system("cls" if os.name == "nt" else "clear")', explanation: 'Memilih perintah sesuai sistem operasi.' },
+            { line: 3, code: 'if sys.stdout.isatty():', explanation: 'Memastikan output terhubung ke terminal sungguhan.' },
+            { line: 4, code: 'os.system("cls" if os.name == "nt" else "clear")', explanation: 'Memilih perintah sesuai sistem operasi.' },
           ],
         },
       ],
@@ -591,7 +607,7 @@ Sesudah (dengan kotak dan warna):
 \`\`\`
 ┌─ RINGKASAN ──────────────────────────────────────────────────┐
 │ Saldo sekarang        Rp2.985.000                            │
-│   ██████████████████████████████████ 100% dari anggaran        │
+│   ██████████████████████████████████ 100% dari anggaran      │
 └──────────────────────────────────────────────────────────────┘
 \`\`\`
 
@@ -603,15 +619,11 @@ Pratinjau interaktif di bawah memakai HTML/CSS untuk meniru tampilan terminal, k
           id: 'kode-pakai-tampilan',
           title: 'Memakai tampilan.py dari laporan.py',
           filename: 'laporan.py',
-          code: `from tampilan import warna, kotak, bar, persen, baris_nilai, judul_bagian
-
-kotak("RINGKASAN", [
-    baris_nilai("Saldo sekarang", "Rp2.985.000", "hijau"),
-    "  " + bar(2985000, 3000000, 34, "hijau") + " 100% dari anggaran",
-])`,
-          explanation:
-            'Import membawa fungsi ke laporan.py. kotak() dan bar() dipanggil langsung. Perhatikan bahwa baris di atas memakai nama fungsi yang benar: baris_nilai, bukan baris_nilai.',
-          output: `┌─ RINGKASAN ──────────────────────────────────────────────────┐\n│ Saldo sekarang        Rp2.985.000                            │\n│   ██████████████████████████████████ 100% dari anggaran        │\n└──────────────────────────────────────────────────────────────┘`,
+          code: `from pencatat import akun, transaksi, format_rupiah, hitung_saldo, pengeluaran_hari
+from tampilan import (warna, kotak, bar, persen, baris_nilai, judul_bagian,
+                      pesan_error, pesan_info, garis_tabel, baris_tabel)`,
+          output: `(Tidak ada output — file ini hanya berisi import. Kode lengkapnya bisa dijalankan lewat main.py.)`,
+          explanation: 'Karena diimpor di baris paling atas laporan.py, semua fungsi di bawahnya bisa langsung memanggil warna(), kotak(), bar(), persen(), baris_nilai(), judul_bagian(), pesan_info(), garis_tabel(), dan baris_tabel().',
           isSimulated: true,
         },
       ],

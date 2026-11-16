@@ -21,14 +21,19 @@ File ini tidak menyimpan data sendiri. Ia hanya membaca data dari \`pencatat.py\
           id: 'kode-import-laporan',
           title: 'Import di laporan.py',
           filename: 'laporan.py',
-          code: `from pencatat import akun, transaksi, format_rupiah, hitung_saldo, pengeluaran_hari
+          code: `# laporan.py
+# Peringatan, laporan, dan pengecekan input / eksepsi (Orang 2)
+
+from pencatat import akun, transaksi, format_rupiah, hitung_saldo, pengeluaran_hari
 from tampilan import (warna, kotak, bar, persen, baris_nilai, judul_bagian,
                       pesan_error, pesan_info, garis_tabel, baris_tabel)`,
+          output: `(Tidak ada output — file ini hanya berisi import. Kode lengkapnya bisa dijalankan lewat main.py.)`,
+          isSimulated: true,
           explanation:
             'laporan.py memakai data dari pencatat.py dan alat tampilan dari tampilan.py. Keduanya harus berada di folder yang sama.',
           lineExplanations: [
-            { line: 1, code: 'from pencatat import ...', explanation: 'Mengambil data dan fungsi dari pencatat.py.' },
-            { line: 2, code: 'from tampilan import ...', explanation: 'Mengambil fungsi warna, kotak, bar, dan tabel dari tampilan.py.' },
+            { line: 4, code: 'from pencatat import akun, transaksi, format_rupiah, hitung_saldo, pengeluaran_hari', explanation: 'Mengambil data dan fungsi dari pencatat.py.' },
+            { line: 5, code: 'from tampilan import (warna, kotak, bar, persen, baris_nilai, judul_bagian,', explanation: 'Mengambil fungsi warna, kotak, bar, dan tabel dari tampilan.py.' },
           ],
         },
       ],
@@ -63,6 +68,7 @@ Caranya:
           title: 'baca_angka() dengan try/except',
           filename: 'laporan.py',
           code: `def baca_angka(pesan):
+    """Minta input angka positif. Kalau salah, ulangi terus (pakai try-except)."""
     while True:
         try:
             teks = input(pesan).replace(".", "").replace(",", "").strip()
@@ -75,11 +81,11 @@ Caranya:
           explanation:
             'while True mengulang sampai input benar. try/except menangkap ValueError, lalu program mengulang tanpa crash.',
           lineExplanations: [
-            { line: 2, code: 'while True:', explanation: 'Ulangi terus sampai pengguna memasukkan angka yang benar.' },
-            { line: 4, code: 'teks = input(pesan).replace(...)', explanation: 'Membaca input dan membersihkan titik/koma pemisah ribuan.' },
-            { line: 5, code: 'angka = int(teks)', explanation: 'Mengubah teks menjadi bilangan bulat.' },
-            { line: 6, code: 'if angka <= 0: raise ValueError(...)', explanation: 'Menolak nol dan angka negatif dengan memicu ValueError sendiri.' },
-            { line: 9, code: 'except ValueError:', explanation: 'Menangkap ValueError, lalu mencetak pesan dan mengulang.' },
+            { line: 3, code: 'while True:', explanation: 'Ulangi terus sampai pengguna memasukkan angka yang benar.' },
+            { line: 5, code: 'teks = input(pesan).replace(".", "").replace(",", "").strip()', explanation: 'Membaca input dan membersihkan titik/koma pemisah ribuan.' },
+            { line: 6, code: 'angka = int(teks)', explanation: 'Mengubah teks menjadi bilangan bulat.' },
+            { line: 7, code: 'if angka <= 0:', explanation: 'Menolak nol dan angka negatif dengan raise ValueError("harus lebih dari 0").' },
+            { line: 10, code: 'except ValueError:', explanation: 'Menangkap ValueError, lalu mencetak pesan dan mengulang.' },
           ],
         },
         {
@@ -87,6 +93,7 @@ Caranya:
           title: 'baca_pilihan()',
           filename: 'laporan.py',
           code: `def baca_pilihan(pesan, maksimal):
+    """Minta pilihan nomor dari 1 sampai maksimal."""
     while True:
         try:
             nomor = int(input(pesan))
@@ -98,9 +105,9 @@ Caranya:
           explanation:
             'Memastikan nomor pilihan berada di rentang 1 sampai maksimal. Jika tidak, ValueError ditangkap dan program mengulang.',
           lineExplanations: [
-            { line: 3, code: 'nomor = int(input(pesan))', explanation: 'Membaca pilihan dan mengubahnya menjadi int.' },
-            { line: 4, code: 'if nomor < 1 or nomor > maksimal:', explanation: 'Memeriksa apakah nomor di luar rentang.' },
-            { line: 5, code: 'raise ValueError("di luar rentang")', explanation: 'Memicu error sendiri agar ditangkap except.' },
+            { line: 5, code: 'nomor = int(input(pesan))', explanation: 'Membaca pilihan dan mengubahnya menjadi int.' },
+            { line: 6, code: 'if nomor < 1 or nomor > maksimal:', explanation: 'Memeriksa apakah nomor di luar rentang.' },
+            { line: 7, code: 'raise ValueError("di luar rentang")', explanation: 'Memicu error sendiri agar ditangkap except.' },
           ],
         },
       ],
@@ -137,30 +144,87 @@ Fungsi ini juga menghitung saldo, menampilkan batang kemajuan, dan memberi saran
           id: 'kode-cek-peringatan',
           title: 'Logika status di cek_peringatan()',
           filename: 'laporan.py',
-          code: `keluar_hari_ini = 85000
-jatah = 100000
-def format_rupiah(angka):
-    return "Rp" + str(angka)
+          code: `def cek_peringatan():
+    """Tampilkan status hari ini dan peringatan kalau boros."""
+    saldo = hitung_saldo()
+    hari = akun["hari"]
+    jatah = akun["jatah_harian"]
+    anggaran = akun["uang_saku"]
+    keluar_hari_ini = pengeluaran_hari(hari)
+    sisa_hari = akun["jumlah_hari"] - hari + 1
 
-if keluar_hari_ini > jatah:
-    warna_status = "merah"
-    judul_status = "BOROS!"
-    isi_status = "Kamu sudah lebih " + format_rupiah(keluar_hari_ini - jatah) + " dari jatah hari ini."
-elif keluar_hari_ini >= 0.8 * jatah:
-    warna_status = "kuning"
-    judul_status = "HATI-HATI"
-    isi_status = "Pengeluaran hari ini hampir habis jatah."
-else:
-    warna_status = "hijau"
-    judul_status = "AMAN"
-    isi_status = "Pengeluaran hari ini masih aman."
-print(judul_status)`,
-          explanation:
-            'Python memeriksa dari atas. Jika kondisi pertama benar, elif dan else dilewati. Hanya satu status yang tampil.',
+    judul_bagian("STATUS HARI KE-" + str(hari) + " DARI " + str(akun["jumlah_hari"]))
+
+    # Percabangan: cek boros, hati-hati, atau aman
+    if keluar_hari_ini > jatah:
+        warna_status = "merah"
+        judul_status = "BOROS!"
+        isi_status = "Kamu sudah lebih " + format_rupiah(keluar_hari_ini - jatah) + " dari jatah hari ini."
+    elif keluar_hari_ini >= 0.8 * jatah:
+        warna_status = "kuning"
+        judul_status = "HATI-HATI"
+        isi_status = "Pengeluaran hari ini hampir habis jatah."
+    else:
+        warna_status = "hijau"
+        judul_status = "AMAN"
+        isi_status = "Pengeluaran hari ini masih aman."
+
+    # Warna saldo mengikuti sisa uang dibanding anggaran
+    if saldo <= 0.2 * anggaran:
+        warna_saldo = "merah"
+    elif saldo <= 0.5 * anggaran:
+        warna_saldo = "kuning"
+    else:
+        warna_saldo = "hijau"
+
+    kotak("RINGKASAN", [
+        baris_nilai("Saldo sekarang", format_rupiah(saldo), warna_saldo),
+        "  " + bar(saldo, anggaran, 34, warna_saldo) + " " + str(persen(saldo, anggaran)) + "% dari anggaran",
+        "",
+        baris_nilai("Jatah harian", format_rupiah(jatah)),
+        baris_nilai("Pengeluaran hari ini", format_rupiah(keluar_hari_ini), warna_status),
+        "  " + bar(keluar_hari_ini, jatah, 34) + " " + str(persen(keluar_hari_ini, jatah)) + "% dari jatah",
+    ])
+
+    kotak(judul_status, [isi_status], warna_status)
+
+    if saldo < 0:
+        kotak("SALDO MINUS", ["Segera kurangi pengeluaran."], "merah")
+    elif saldo <= 0.2 * anggaran:
+        kotak("SALDO MENIPIS", ["Saldo tinggal sedikit (kurang dari 20% anggaran)."], "kuning")
+
+    if sisa_hari > 0 and saldo > 0:
+        print()
+        pesan_info("Biar cukup sampai akhir bulan, maksimal pengeluaran "
+                   + warna(format_rupiah(saldo / sisa_hari), "kuning", True) + " per hari.")`,
+          output: `── STATUS HARI KE-1 DARI 30 ────────────────────────────────────
+┌─ RINGKASAN ──────────────────────────────────────────────────┐
+│ Saldo sekarang        Rp2.915.000                            │
+│   █████████████████████████████████░ 97% dari anggaran       │
+│                                                              │
+│ Jatah harian          Rp100.000                              │
+│ Pengeluaran hari ini  Rp85.000                               │
+│   █████████████████████████████░░░░░ 85% dari jatah          │
+└──────────────────────────────────────────────────────────────┘
+┌─ HATI-HATI ──────────────────────────────────────────────────┐
+│ Pengeluaran hari ini hampir habis jatah.                     │
+└──────────────────────────────────────────────────────────────┘
+
+  [i] Biar cukup sampai akhir bulan, maksimal pengeluaran Rp97.167 per hari.`,
+          explanation: 'Python memeriksa percabangan dari atas: hanya satu status yang dipakai. Status (BOROS!/HATI-HATI/AMAN) diambil dari perbandingan pengeluaran hari ini dengan jatah harian, sedangkan warna saldo diambil dari perbandingan saldo dengan anggaran sebulan.',
+          isSimulated: true,
           lineExplanations: [
-            { line: 1, code: 'if keluar_hari_ini > jatah:', explanation: 'Kondisi boros: pengeluaran melebihi jatah.' },
-            { line: 5, code: 'elif keluar_hari_ini >= 0.8 * jatah:', explanation: 'Kondisi hati-hati: 80% jatah atau lebih, tetapi belum melebihi.' },
-            { line: 9, code: 'else:', explanation: 'Jalur aman jika dua kondisi di atas salah.' },
+            { line: 3, code: 'saldo = hitung_saldo()', explanation: 'Saldo dihitung ulang dari seluruh transaksi lewat hitung_saldo() di pencatat.py.' },
+            { line: 7, code: 'keluar_hari_ini = pengeluaran_hari(hari)', explanation: 'Total pengeluaran hari ini diambil dari pengeluaran_hari(hari) di pencatat.py.' },
+            { line: 8, code: 'sisa_hari = akun["jumlah_hari"] - hari + 1', explanation: 'Sisa hari (termasuk hari ini) dipakai untuk menghitung saran pengeluaran per hari.' },
+            { line: 13, code: 'if keluar_hari_ini > jatah:', explanation: 'Kondisi boros: pengeluaran melebihi jatah harian.' },
+            { line: 17, code: 'elif keluar_hari_ini >= 0.8 * jatah:', explanation: 'Kondisi hati-hati: sudah 80% jatah atau lebih, tetapi belum melewati jatah.' },
+            { line: 21, code: 'else:', explanation: 'Jalur aman jika dua kondisi di atas salah.' },
+            { line: 27, code: 'if saldo <= 0.2 * anggaran:', explanation: 'Warna saldo jadi merah kalau saldo tinggal 20% anggaran atau kurang.' },
+            { line: 34, code: 'kotak("RINGKASAN", [', explanation: 'Kotak RINGKASAN berisi saldo, batang saldo, jatah harian, dan pengeluaran hari ini.' },
+            { line: 36, code: '"  " + bar(saldo, anggaran, 34, warna_saldo) + " " + str(persen(saldo, anggaran)) + "% dari anggaran",', explanation: 'Batang kemajuan saldo memakai bar() sepanjang 34 karakter; persen(saldo, anggaran) memberi angka persennya.' },
+            { line: 45, code: 'if saldo < 0:', explanation: 'Kalau saldo minus, muncul kotak tambahan SALDO MINUS.' },
+            { line: 52, code: 'pesan_info("Biar cukup sampai akhir bulan, maksimal pengeluaran "', explanation: 'Saran pengeluaran per hari = saldo dibagi sisa hari.' },
           ],
         },
       ],
@@ -197,22 +261,61 @@ Fungsi ini memakai:
           id: 'kode-tampil-riwayat',
           title: 'Potongan tampil_riwayat()',
           filename: 'laporan.py',
-          code: `from tampilan import garis_tabel, baris_tabel, warna
+          code: `def tampil_riwayat():
+    """Tampilkan semua transaksi dalam bentuk tabel."""
+    judul_bagian("RIWAYAT TRANSAKSI")
+    if len(transaksi) == 0:
+        pesan_info("Belum ada transaksi.")
+        return
 
-lebar = [3, 4, 15, 13, 13]
-rata = ["kanan", "kanan", "kiri", "kanan", "kanan"]
+    lebar = [3, 4, 15, 13, 13]
+    rata = ["kanan", "kanan", "kiri", "kanan", "kanan"]
 
-garis_tabel(lebar, "┌", "┬", "┐")
-baris_tabel([warna("No", "cyan", True), warna("Hari", "cyan", True),
-             warna("Keterangan", "cyan", True), warna("Masuk", "cyan", True),
-             warna("Keluar", "cyan", True)], lebar, rata)
-garis_tabel(lebar, "├", "┼", "┤")`,
-          explanation:
-            'lebar_kolom menentukan lebar setiap kolom. rata menentukan posisi teks: "kiri" atau "kanan".',
+    garis_tabel(lebar, "┌", "┬", "┐")
+    baris_tabel([warna("No", "cyan", True), warna("Hari", "cyan", True),
+                 warna("Keterangan", "cyan", True), warna("Masuk", "cyan", True),
+                 warna("Keluar", "cyan", True)], lebar, rata)
+    garis_tabel(lebar, "├", "┼", "┤")
+
+    nomor = 1
+    total_masuk = 0
+    total_keluar = 0
+    for hari, jenis, kategori, jumlah in transaksi:
+        if jenis == "masuk":
+            masuk = warna(format_rupiah(jumlah), "hijau")
+            keluar = warna("-", "abu")
+            total_masuk += jumlah
+        else:
+            masuk = warna("-", "abu")
+            keluar = warna(format_rupiah(jumlah), "merah")
+            total_keluar += jumlah
+        baris_tabel([str(nomor), str(hari), kategori[:15], masuk, keluar], lebar, rata)
+        nomor += 1
+
+    garis_tabel(lebar, "├", "┼", "┤")
+    baris_tabel(["", "", warna("TOTAL", "putih", True),
+                 warna(format_rupiah(total_masuk), "hijau", True),
+                 warna(format_rupiah(total_keluar), "merah", True)], lebar, rata)
+    garis_tabel(lebar, "└", "┴", "┘")`,
+          output: `── RIWAYAT TRANSAKSI ───────────────────────────────────────────
+          isSimulated: true,
+┌─────┬──────┬─────────────────┬───────────────┬───────────────┐
+│  No │ Hari │ Keterangan      │         Masuk │        Keluar │
+├─────┼──────┼─────────────────┼───────────────┼───────────────┤
+│   1 │    1 │ Anggaran        │   Rp3.000.000 │             - │
+│   2 │    1 │ Makan           │             - │      Rp85.000 │
+│   3 │    1 │ Transport       │             - │      Rp40.000 │
+├─────┼──────┼─────────────────┼───────────────┼───────────────┤
+│     │      │ TOTAL           │   Rp3.000.000 │     Rp125.000 │
+└─────┴──────┴─────────────────┴───────────────┴───────────────┘`,
+          explanation: 'Fungsi lengkap tampil_riwayat(): menyiapkan lebar kolom, mencetak garis tabel, mengulang semua transaksi, lalu menutup dengan baris TOTAL.',
           lineExplanations: [
-            { line: 1, code: 'lebar = [3, 4, 15, 13, 13]', explanation: 'Daftar lebar kolom dalam jumlah karakter.' },
-            { line: 2, code: 'rata = ["kanan", "kanan", "kiri", "kanan", "kanan"]', explanation: 'Posisi teks di setiap kolom.' },
-            { line: 4, code: 'garis_tabel(lebar, "┌", "┬", "┐")', explanation: 'Mencetak garis pembatas atas tabel.' },
+            { line: 4, code: 'if len(transaksi) == 0:', explanation: 'Kalau belum ada transaksi, cukup tampilkan pesan info lalu keluar dari fungsi.' },
+            { line: 8, code: 'lebar = [3, 4, 15, 13, 13]', explanation: 'Daftar lebar kolom dalam jumlah karakter.' },
+            { line: 9, code: 'rata = ["kanan", "kanan", "kiri", "kanan", "kanan"]', explanation: 'Posisi teks di setiap kolom: angka rata kanan, keterangan rata kiri.' },
+            { line: 11, code: 'garis_tabel(lebar, "┌", "┬", "┐")', explanation: 'Mencetak garis pembatas atas tabel.' },
+            { line: 20, code: 'for hari, jenis, kategori, jumlah in transaksi:', explanation: 'Membuka setiap tuple transaksi untuk dijadikan satu baris tabel.' },
+            { line: 33, code: 'baris_tabel(["", "", warna("TOTAL", "putih", True),', explanation: 'Baris TOTAL menjumlahkan semua uang masuk dan keluar.' },
           ],
         },
       ],
@@ -247,29 +350,66 @@ garis_tabel(lebar, "├", "┼", "┤")`,
           id: 'kode-laporan-kategori',
           title: 'Menghitung total per kategori',
           filename: 'laporan.py',
-          code: `transaksi = [(1, "keluar", "Makan", 85000), (1, "keluar", "Transport", 40000)]
-total = {}
-for hari, jenis, kategori, jumlah in transaksi:
-    if jenis == "keluar":
-        if kategori in total:
-            total[kategori] += jumlah
+          code: `def laporan_kategori():
+    """Total pengeluaran per kategori (grafik batang) dan kategori paling boros."""
+    judul_bagian("LAPORAN PENGELUARAN PER KATEGORI")
+
+    total = {}
+    for hari, jenis, kategori, jumlah in transaksi:
+        if jenis == "keluar":
+            if kategori in total:
+                total[kategori] += jumlah
+            else:
+                total[kategori] = jumlah
+
+    if len(total) == 0:
+        pesan_info("Belum ada pengeluaran.")
+        return
+
+    semua = sum(total.values())
+
+    # Urutkan dari yang terbesar: list berisi tuple (jumlah, kategori)
+    urutan = []
+    for kategori in total:
+        urutan.append((total[kategori], kategori))
+    urutan.sort(reverse=True)
+
+    baris = []
+    nomor = 0
+    for jumlah, kategori in urutan:
+        persen_ini = jumlah / semua * 100
+        teks_persen = str(round(persen_ini, 1)).replace(".", ",") + "%"
+        if nomor == 0:
+            nama_warna = "merah"      # yang terbesar diberi warna merah
         else:
-            total[kategori] = jumlah
+            nama_warna = "cyan"
+        baris.append(kategori.ljust(14) + bar(jumlah, semua, 15, nama_warna) + " "
+                     + teks_persen.rjust(6) + " " + format_rupiah(jumlah).rjust(12))
+        nomor += 1
 
-semua = sum(total.values())
+    kotak("PER KATEGORI", baris)
+    print()
+    print("  " + baris_nilai("Total pengeluaran", format_rupiah(semua)))
+    print("  " + baris_nilai("Kategori paling boros", urutan[0][1], "merah"))`,
+          output: `── LAPORAN PENGELUARAN PER KATEGORI ────────────────────────────
+          isSimulated: true,
+┌─ PER KATEGORI ───────────────────────────────────────────────┐
+│ Makan         ██████████░░░░░  68,0%     Rp85.000            │
+│ Transport     █████░░░░░░░░░░  32,0%     Rp40.000            │
+└──────────────────────────────────────────────────────────────┘
 
-urutan = []
-for kategori in total:
-    urutan.append((total[kategori], kategori))
-urutan.sort(reverse=True)`,
-          explanation:
-            'Dictionary total menyimpan jumlah per kategori. sort(reverse=True) mengurutkan dari jumlah terbesar.',
+  Total pengeluaran     Rp125.000
+  Kategori paling boros Makan`,
+          explanation: 'Fungsi lengkap laporan_kategori(): menghitung total per kategori, mengurutkannya dari yang terbesar, menggambar batang, lalu menulis kategori paling boros.',
           lineExplanations: [
-            { line: 1, code: 'total = {}', explanation: 'Dictionary kosong untuk menampung total per kategori.' },
-            { line: 3, code: 'if jenis == "keluar":', explanation: 'Hanya pengeluaran yang dihitung.' },
-            { line: 4, code: 'if kategori in total:', explanation: 'Jika kategori sudah ada, tambahkan jumlahnya.' },
-            { line: 9, code: 'semua = sum(total.values())', explanation: 'Menjumlahkan semua nilai di dictionary.' },
-            { line: 13, code: 'urutan.sort(reverse=True)', explanation: 'Mengurutkan dari terbesar ke terkecil.' },
+            { line: 5, code: 'total = {}', explanation: 'Dictionary kosong untuk menampung total per kategori.' },
+            { line: 7, code: 'if jenis == "keluar":', explanation: 'Hanya pengeluaran yang dihitung.' },
+            { line: 8, code: 'if kategori in total:', explanation: 'Kalau kategori sudah ada, tambahkan jumlahnya; kalau belum, buat entri baru.' },
+            { line: 17, code: 'semua = sum(total.values())', explanation: 'Menjumlahkan semua nilai di dictionary untuk pembagi batang.' },
+            { line: 20, code: 'urutan = []', explanation: 'Total diubah menjadi list berisi tuple (jumlah, kategori) supaya bisa diurutkan.' },
+            { line: 23, code: 'urutan.sort(reverse=True)', explanation: 'Mengurutkan dari yang terbesar ke terkecil.' },
+            { line: 34, code: 'baris.append(kategori.ljust(14) + bar(jumlah, semua, 15, nama_warna) + " "', explanation: 'Tiap baris: nama kategori, batang, persen, dan nominal.' },
+            { line: 38, code: 'kotak("PER KATEGORI", baris)', explanation: 'Semua baris dimasukkan ke dalam satu kotak.' },
           ],
         },
       ],

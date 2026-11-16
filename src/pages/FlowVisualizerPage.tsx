@@ -559,7 +559,7 @@ export const FlowVisualizerPage: React.FC = () => {
               <span className="text-gradient">Keuangan di Sini</span>
             </h2>
             <p className="mx-auto mt-1.5 max-w-xl text-xs leading-relaxed text-slate-600 sm:text-sm">
-              Ketik angka menu 1 sampai 5 (atau 0 untuk keluar) seperti sedang berada di
+              Ketik angka menu 1 sampai 7 (atau 0 untuk keluar) seperti sedang berada di
               terminal laptopmu sungguhan.
             </p>
           </div>

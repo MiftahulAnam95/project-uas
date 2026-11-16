@@ -47,21 +47,54 @@ Cara kerja program ini sangat sederhana namun ampuh:
           {
             id: 'contoh-output-program',
             title: 'Tampilan yang Dihasilkan Program Kita Nanti',
-            code: `=============================================
-           RINGKASAN KEUANGAN MAHASISWA
-=============================================
- Hari Aktif           : Hari ke-1
- Anggaran Awal        : Rp 3.000.000
- Jatah Harian         : Rp 100.000
----------------------------------------------
- Pengeluaran Hari Ini : Rp 85.000
- Status Hari Ini      : HATI-HATI (Mendekati batas jatah harian!)
----------------------------------------------
- Total Pengeluaran    : Rp 85.000
- Sisa Saldo           : Rp 2.915.000
-=============================================`,
+            code: `╔══════════════════════════════════════════════════════════════╗
+║                 PENCATAT KEUANGAN MAHASISWA                  ║
+║           Catat, pantau, dan hemat uang bulananmu            ║
+╚══════════════════════════════════════════════════════════════╝
+
+  Hari ke-1 dari 30   │   Saldo Rp3.000.000   │   Jatah Rp100.000
+  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  perjalanan bulan
+
+┌─ MENU ───────────────────────────────────────────────────────┐
+│ [1]  Catat pengeluaran                                       │
+│ [2]  Catat pemasukan                                         │
+│ [3]  Cek saldo dan peringatan                                │
+│ [4]  Riwayat transaksi                                       │
+│ [5]  Laporan per kategori                                    │
+│ [6]  Lanjut ke hari berikutnya                               │
+│ [7]  Atur ulang anggaran                                     │
+│ [0]  Keluar                                                  │
+└──────────────────────────────────────────────────────────────┘
+
+  ► Pilih menu : 1
+── CATAT PENGELUARAN ───────────────────────────────────────────
+┌─ PILIH KATEGORI ─────────────────────────────────────────────┐
+│ [1]  Makan                                                   │
+│ [2]  Transport                                               │
+│ [3]  Kuota                                                   │
+│ [4]  Kuliah/Tugas                                            │
+│ [5]  Hiburan                                                 │
+│ [6]  Lainnya                                                 │
+└──────────────────────────────────────────────────────────────┘
+
+  ► Nomor kategori          : 1
+  ► Jumlah pengeluaran (Rp) : 85000
+  [OK] Tercatat: Makan Rp85.000
+
+── STATUS HARI KE-1 DARI 30 ────────────────────────────────────
+┌─ RINGKASAN ──────────────────────────────────────────────────┐
+│ Saldo sekarang        Rp2.915.000                            │
+│   █████████████████████████████████░ 97% dari anggaran       │
+│                                                              │
+│ Jatah harian          Rp100.000                              │
+│ Pengeluaran hari ini  Rp85.000                               │
+│   █████████████████████████████░░░░░ 85% dari jatah          │
+└──────────────────────────────────────────────────────────────┘
+┌─ HATI-HATI ──────────────────────────────────────────────────┐
+│ Pengeluaran hari ini hampir habis jatah.                     │
+└──────────────────────────────────────────────────────────────┘`,
             explanation:
-              'Inilah hasil akhir yang akan dicetak ke layar terminal. Program menyajikan informasi angka yang jelas dan status peringatan otomatis.',
+              'Inilah tampilan asli program kita: judul berbingkai ganda, saldo dan jatah harian, daftar menu 1–7 dan 0, lalu ringkasan status AMAN / HATI-HATI / BOROS setelah transaksi dicatat.',
             isSimulated: true,
           },
         ],
@@ -1638,19 +1671,19 @@ print(tambah(3, 4))`,
         stepLabel: 'import',
         stepTagline: 'Menyambung empat file',
         content: `Sampai sini, semua kode kita ada dalam satu file. Program keuangan yang sebenarnya dipecah menjadi empat file supaya rapi:
-- \`pencatat.py\` → logika data dan hitungan
-- \`laporan.py\` → format Rupiah dan status
+- \`pencatat.py\` → data, hitungan, dan format Rupiah
+- \`laporan.py\` → validasi input, status AMAN/HATI-HATI/BOROS, riwayat, dan laporan kategori
 - \`main.py\` → menu dan penghubung
 - \`tampilan.py\` → warna, kotak, tabel, dan batang kemajuan
 
 **Cara menyambungnya: \`import\`.**
 
-Misalnya \`pencatat.py\` berisi fungsi \`atur_uang_saku\` dan \`hitung_saldo\`. Di file lain, \`main.py\` cukup menulis \`from pencatat import atur_uang_saku, hitung_saldo\`, lalu memanggil fungsinya langsung tanpa awalan.
+Misalnya \`pencatat.py\` berisi fungsi \`atur_uang_saku\` dan \`hitung_saldo\`. Di file lain, \`main.py\` menulis \`from pencatat import ...\` (di proyek ini daftarnya: \`KATEGORI, akun, format_rupiah, atur_uang_saku, tambah_pemasukan, tambah_pengeluaran, hitung_saldo\`), lalu memanggil fungsinya langsung tanpa awalan.
 
 **Aturan penting:**
 - Tulis nama file **tanpa \`.py\`**: \`import pencatat\`, bukan \`import pencatat.py\`.
 - Kedua file harus berada di **folder yang sama**.
-- Awalan \`pencatat.\` wajib. Tanpa itu, Python tidak tahu fungsi itu milik file mana.
+- Awalan \`pencatat.\` wajib kalau kamu memakai \`import pencatat\`. Tanpa awalan itu, Python tidak tahu fungsi yang dipanggil milik file mana.
 
 **Kenapa repot-repot dipisah?** Karena setiap file punya satu tanggung jawab. Saat ada error di format Rupiah, kamu cukup membuka \`laporan.py\`, tidak perlu menyisir 300 baris kode. Ini yang disebut **modularitas**.
 
@@ -1663,43 +1696,50 @@ Misalnya \`pencatat.py\` berisi fungsi \`atur_uang_saku\` dan \`hitung_saldo\`. 
             filename: 'pencatat.py',
             title: 'File yang menyediakan fungsi',
             code: `# pencatat.py
-akun = {"uang_saku": 0, "jumlah_hari": 30, "jatah_harian": 0.0, "hari": 1}
+# Bagian inti: data dan fungsi untuk mencatat anggaran bulanan (Orang 1)
+
+# Tuple kategori pengeluaran (isinya tetap, jadi pakai tuple)
+KATEGORI = ("Makan", "Transport", "Kuota", "Kuliah/Tugas", "Hiburan", "Lainnya")
+
+# Data akun disimpan di dictionary
+akun = {
+    "uang_saku": 0,
+    "jumlah_hari": 30,
+    "jatah_harian": 0.0,
+    "hari": 1,
+}
+
+# Semua transaksi disimpan di list
+# Isi tiap transaksi berupa tuple: (hari, jenis, kategori, jumlah)
+# jenis = "masuk" atau "keluar"
 transaksi = []
 
+
+def format_rupiah(angka):
+    """Ubah angka jadi tulisan rupiah, contoh 1500000 -> Rp1.500.000"""
+    teks = "Rp{:,.0f}".format(abs(angka)).replace(",", ".")
+    if angka < 0:
+        teks = "-" + teks
+    return teks
+
+
 def atur_uang_saku(uang_saku, jumlah_hari):
+    """Set anggaran bulanan (gaji/uang saku), lalu hitung jatah harian otomatis."""
+    transaksi.clear()  # mulai dari awal lagi
     akun["uang_saku"] = uang_saku
     akun["jumlah_hari"] = jumlah_hari
     akun["jatah_harian"] = uang_saku / jumlah_hari
-    transaksi.append((1, "masuk", "Anggaran", uang_saku))
-
-def hitung_saldo():
-    saldo = 0
-    for hari, jenis, kategori, jumlah in transaksi:
-        if jenis == "masuk":
-            saldo += jumlah
-        else:
-            saldo -= jumlah
-    return saldo`,
+    akun["hari"] = 1
+    transaksi.append((1, "masuk", "Anggaran", uang_saku))`,
             explanation:
               'File ini hanya menyiapkan data dan fungsi. Saat dijalankan sendiri, tidak ada yang dicetak karena belum ada perintah print.',
-            output: '(Tidak ada output — file ini hanya menyiapkan fungsi.)',
             isSimulated: true,
             lineExplanations: [
-              {
-                line: 4,
-                code: 'def atur_uang_saku(uang_saku, jumlah_hari):',
-                explanation: 'Fungsi ini disimpan di dalam file pencatat.py.',
-              },
-              {
-                line: 7,
-                code: 'akun["jatah_harian"] = uang_saku / jumlah_hari',
-                explanation: 'Jatah harian dihitung dengan pembagian biasa.',
-              },
-              {
-                line: 11,
-                code: 'def hitung_saldo():',
-                explanation: 'Fungsi ini menjumlahkan pemasukan dan mengurangi pengeluaran.',
-              },
+              { line: 5, code: 'KATEGORI = ("Makan", "Transport", "Kuota", "Kuliah/Tugas", "Hiburan", "Lainnya")', explanation: 'Tuple berisi semua kategori pengeluaran. Isinya tetap, jadi cocok disimpan di tuple.' },
+              { line: 8, code: 'akun = {', explanation: 'Dictionary untuk data akun: uang_saku, jumlah_hari, jatah_harian, dan hari.' },
+              { line: 18, code: 'transaksi = []', explanation: 'List kosong untuk menampung semua transaksi. Tiap isinya tuple: (hari, jenis, kategori, jumlah).' },
+              { line: 21, code: 'def format_rupiah(angka):', explanation: 'Fungsi bantu mengubah angka menjadi teks rupiah, misalnya 1500000 menjadi Rp1.500.000.' },
+              { line: 29, code: 'def atur_uang_saku(uang_saku, jumlah_hari):', explanation: 'Fungsi inilah yang dipanggil main.py saat anggaran diisi.' },
             ],
           },
           {
@@ -1707,30 +1747,22 @@ def hitung_saldo():
             filename: 'main.py',
             title: 'File yang memakai fungsi dari file lain',
             code: `# main.py
-from pencatat import atur_uang_saku, hitung_saldo
+# Menu utama yang menyambungkan semua modul (Orang 3)
+# Jalankan dengan: python main.py
 
-atur_uang_saku(3000000, 30)
-print(f"Saldo awal: Rp {hitung_saldo()}")`,
-            explanation:
-              'from pencatat import ... membaca file pencatat.py. Fungsi bisa dipanggil langsung tanpa awalan modul.',
-            output: `Saldo awal: Rp 3000000`,
+from pencatat import (KATEGORI, akun, format_rupiah, atur_uang_saku,
+                      tambah_pemasukan, tambah_pengeluaran, hitung_saldo)
+from laporan import (baca_angka, baca_pilihan, cek_peringatan,
+                     tampil_riwayat, laporan_kategori)
+from tampilan import (warna, bersihkan_layar, judul_besar, judul_bagian, kotak, bar,
+                      pesan_ok, pesan_error, pesan_info, tunggu)`,
+            output: `(Tidak ada output — file ini hanya berisi import. Kode lengkapnya bisa dijalankan lewat main.py.)`,
+            explanation: 'main.py tidak menyimpan data sendiri. File ini mengimpor data dan fungsi dari pencatat.py, laporan.py, dan tampilan.py, lalu memakainya di dalam fungsinya. Detail tiap import dibahas di Bab 4.',
             isSimulated: true,
             lineExplanations: [
-              {
-                line: 2,
-                code: 'from pencatat import atur_uang_saku, hitung_saldo',
-                explanation: 'Mengimpor dua fungsi dari pencatat.py yang ada di folder yang sama.',
-              },
-              {
-                line: 4,
-                code: 'atur_uang_saku(3000000, 30)',
-                explanation: 'Mengatur anggaran dan mencatat pemasukan awal.',
-              },
-              {
-                line: 5,
-                code: 'print(f"Saldo awal: Rp {hitung_saldo()}")',
-                explanation: 'hitung_saldo() mengembalikan 3000000, lalu dicetak.',
-              },
+              { line: 5, code: 'from pencatat import (KATEGORI, akun, format_rupiah, atur_uang_saku,', explanation: 'Mengimpor data (KATEGORI, akun) dan fungsi dari pencatat.py.' },
+              { line: 7, code: 'from laporan import (baca_angka, baca_pilihan, cek_peringatan,', explanation: 'Mengimpor fungsi input, peringatan, dan laporan dari laporan.py.' },
+              { line: 9, code: 'from tampilan import (warna, bersihkan_layar, judul_besar, judul_bagian, kotak, bar,', explanation: 'Mengimpor alat tampilan: warna, kotak, bar, pesan, dan tunggu.' },
             ],
           },
         ],
@@ -1973,7 +2005,7 @@ print(sisa)`,
     id: 'bab-4',
     number: 4,
     title: 'Bedah pencatat.py',
-    subtitle: 'Mengelola Data Keuangan, Variabel Global, dan Logika Perhitungan Matematika',
+    subtitle: 'Mengelola Data Keuangan di Dictionary akun, List transaksi, dan Logika Perhitungan Matematika',
     description:
       'Di bab ini, kita membedah file pertama dari empat file proyek: pencatat.py. File ini adalah otak akuntansi yang menyimpan data anggaran, transaksi, dan seluruh rumus perhitungan keuangan mahasiswa.',
     learningGoals: [
@@ -2189,14 +2221,12 @@ Lalu kita ganti tanda koma tersebut menjadi titik gaya Indonesia menggunakan \`.
             id: 'kode-format-rupiah',
             title: 'Fungsi format_rupiah()',
             code: `def format_rupiah(angka):
-    teks = f"{angka:,}".replace(",", ".")
-    return f"Rp {teks}"
-
-# Contoh pemanggilan:
-print(format_rupiah(3000000))  # Output: Rp 3.000.000
-print(format_rupiah(85000))    # Output: Rp 85.000`,
+    """Ubah angka jadi tulisan rupiah, contoh 1500000 -> Rp1.500.000"""
+    teks = "Rp{:,.0f}".format(abs(angka)).replace(",", ".")
+    if angka < 0:
+        teks = "-" + teks
+    return teks`,
             explanation: 'Mengubah bilangan bulat apa pun menjadi string berformat rupiah yang sangat mudah dibaca.',
-            output: `Rp 3.000.000\nRp 85.000`,
           },
         ],
       },
@@ -2746,7 +2776,7 @@ Jika mahasiswa sudah berjalan sampai Hari ke-3 dan total keluar Rp300.000, rata-
       {
         id: 'prediksi-bab9-rata-rata',
         title: 'Prediksi Hasil Rata-Rata',
-        prompt: 'Jika hari_aktif bernilai 4 dan total pengeluaran adalah Rp240.000, berapa hasil dari 240000 // 4?',
+        prompt: 'Jika total pengeluaran Rp240.000 dibagi ke 4 hari, berapa hasil dari 240000 // 4?',
         code: `total = 240000
 hari = 4
 rata_rata = total // hari

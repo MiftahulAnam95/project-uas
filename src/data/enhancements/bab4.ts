@@ -44,8 +44,10 @@ Artinya: hari ke-1, uang keluar, kategori Makan, sebesar Rp15.000.`,
           id: 'kode-data-pencatat',
           title: 'Data awal pencatat.py',
           filename: 'pencatat.py',
-          code: `KATEGORI = ("Makan", "Transport", "Kuota", "Kuliah/Tugas", "Hiburan", "Lainnya")
+          code: `# Tuple kategori pengeluaran (isinya tetap, jadi pakai tuple)
+KATEGORI = ("Makan", "Transport", "Kuota", "Kuliah/Tugas", "Hiburan", "Lainnya")
 
+# Data akun disimpan di dictionary
 akun = {
     "uang_saku": 0,
     "jumlah_hari": 30,
@@ -53,15 +55,18 @@ akun = {
     "hari": 1,
 }
 
+# Semua transaksi disimpan di list
+# Isi tiap transaksi berupa tuple: (hari, jenis, kategori, jumlah)
+# jenis = "masuk" atau "keluar"
 transaksi = []`,
           explanation:
             'KATEGORI tuple, akun dictionary, transaksi list. Semua data program ada di sini.',
           output: `(Tidak ada output — file ini hanya menyiapkan data.)`,
           isSimulated: true,
           lineExplanations: [
-            { line: 1, code: 'KATEGORI = (...)', explanation: 'Tuple berisi pilihan kategori. Isinya tetap.' },
-            { line: 3, code: 'akun = { ... }', explanation: 'Dictionary menyimpan data dengan label.' },
-            { line: 9, code: 'transaksi = []', explanation: 'List kosong untuk menampung banyak transaksi.' },
+            { line: 2, code: 'KATEGORI = ("Makan", "Transport", "Kuota", "Kuliah/Tugas", "Hiburan", "Lainnya")', explanation: 'Tuple berisi pilihan kategori. Isinya tetap.' },
+            { line: 5, code: 'akun = {', explanation: 'Dictionary menyimpan data dengan label (uang_saku, jumlah_hari, jatah_harian, hari).' },
+            { line: 15, code: 'transaksi = []', explanation: 'List kosong untuk menampung banyak transaksi.' },
           ],
         },
       ],
@@ -99,21 +104,18 @@ transaksi = []`,
           title: 'format_rupiah()',
           filename: 'pencatat.py',
           code: `def format_rupiah(angka):
+    """Ubah angka jadi tulisan rupiah, contoh 1500000 -> Rp1.500.000"""
     teks = "Rp{:,.0f}".format(abs(angka)).replace(",", ".")
     if angka < 0:
         teks = "-" + teks
-    return teks
-
-print(format_rupiah(1500000))
-print(format_rupiah(85000))`,
+    return teks`,
           explanation:
             'Format "{:,.0f}" memberi pemisah ribuan gaya Amerika. Lalu .replace(",", ".") mengubahnya menjadi gaya Indonesia.',
-          output: `Rp1.500.000\nRp85.000`,
           isSimulated: true,
           lineExplanations: [
-            { line: 2, code: 'teks = "Rp{:,.0f}".format(abs(angka))...', explanation: 'Format angka dengan pemisah ribuan, lalu ganti koma menjadi titik.' },
-            { line: 3, code: 'if angka < 0:', explanation: 'Jika angka negatif, tambahkan tanda minus di depan.' },
-            { line: 5, code: 'return teks', explanation: 'Kembalikan teks Rupiah ke pemanggil.' },
+            { line: 3, code: 'teks = "Rp{:,.0f}".format(abs(angka)).replace(",", ".")', explanation: 'Format angka dengan pemisah ribuan, lalu ganti koma menjadi titik.' },
+            { line: 4, code: 'if angka < 0:', explanation: 'Jika angka negatif, tambahkan tanda minus di depan.' },
+            { line: 6, code: 'return teks', explanation: 'Kembalikan teks Rupiah ke pemanggil.' },
           ],
         },
         {
@@ -121,7 +123,8 @@ print(format_rupiah(85000))`,
           title: 'atur_uang_saku()',
           filename: 'pencatat.py',
           code: `def atur_uang_saku(uang_saku, jumlah_hari):
-    transaksi.clear()
+    """Set anggaran bulanan (gaji/uang saku), lalu hitung jatah harian otomatis."""
+    transaksi.clear()  # mulai dari awal lagi
     akun["uang_saku"] = uang_saku
     akun["jumlah_hari"] = jumlah_hari
     akun["jatah_harian"] = uang_saku / jumlah_hari
@@ -130,9 +133,9 @@ print(format_rupiah(85000))`,
           explanation:
             'Data lama dibersihkan, lalu data baru disimpan. Jatah harian dihitung dengan / sehingga hasilnya float.',
           lineExplanations: [
-            { line: 2, code: 'transaksi.clear()', explanation: 'Mengosongkan semua transaksi lama.' },
-            { line: 5, code: 'akun["jatah_harian"] = uang_saku / jumlah_hari', explanation: 'Pembagian biasa menghasilkan float, misalnya 100000.0.' },
-            { line: 7, code: 'transaksi.append((1, "masuk", "Anggaran", uang_saku))', explanation: 'Saldo awal dicatat sebagai pemasukan hari ke-1.' },
+            { line: 3, code: 'transaksi.clear()  # mulai dari awal lagi', explanation: 'Mengosongkan semua transaksi lama.' },
+            { line: 6, code: 'akun["jatah_harian"] = uang_saku / jumlah_hari', explanation: 'Pembagian biasa menghasilkan float, misalnya 100000.0.' },
+            { line: 8, code: 'transaksi.append((1, "masuk", "Anggaran", uang_saku))', explanation: 'Saldo awal dicatat sebagai pemasukan hari ke-1.' },
           ],
         },
       ],
@@ -168,15 +171,18 @@ Keduanya memakai \`akun["hari"]\` sebagai hari aktif, jadi tidak perlu mengirim 
           title: 'Mencatat pemasukan dan pengeluaran',
           filename: 'pencatat.py',
           code: `def tambah_pemasukan(jumlah, sumber):
+    """Catat uang masuk, misalnya kiriman tambahan atau hasil kerja."""
     transaksi.append((akun["hari"], "masuk", sumber, jumlah))
 
+
 def tambah_pengeluaran(jumlah, kategori):
+    """Catat uang keluar sesuai kategori."""
     transaksi.append((akun["hari"], "keluar", kategori, jumlah))`,
           explanation:
             'Setiap fungsi membuat tuple baru berisi hari aktif, jenis, kategori/sumber, dan jumlah, lalu menambahkannya ke list.',
           lineExplanations: [
-            { line: 2, code: 'transaksi.append((akun["hari"], "masuk", sumber, jumlah))', explanation: 'Tuple baru ditambahkan ke akhir list.' },
-            { line: 5, code: 'transaksi.append((akun["hari"], "keluar", kategori, jumlah))', explanation: 'Sama, tetapi jenisnya "keluar".' },
+            { line: 3, code: 'transaksi.append((akun["hari"], "masuk", sumber, jumlah))', explanation: 'Tuple baru ditambahkan ke akhir list.' },
+            { line: 8, code: 'transaksi.append((akun["hari"], "keluar", kategori, jumlah))', explanation: 'Sama, tetapi jenisnya "keluar".' },
           ],
         },
       ],
@@ -211,6 +217,7 @@ def tambah_pengeluaran(jumlah, kategori):
           title: 'hitung_saldo() dan pengeluaran_hari()',
           filename: 'pencatat.py',
           code: `def hitung_saldo():
+    """Saldo = total pemasukan - total pengeluaran."""
     saldo = 0
     for hari, jenis, kategori, jumlah in transaksi:
         if jenis == "masuk":
@@ -219,7 +226,9 @@ def tambah_pengeluaran(jumlah, kategori):
             saldo -= jumlah
     return saldo
 
+
 def pengeluaran_hari(hari_ke):
+    """Total uang keluar pada hari tertentu."""
     total = 0
     for hari, jenis, kategori, jumlah in transaksi:
         if hari == hari_ke and jenis == "keluar":
@@ -228,10 +237,10 @@ def pengeluaran_hari(hari_ke):
           explanation:
             'Loop melewati setiap transaksi. Untuk saldo, semua jenis diperhitungkan. Untuk pengeluaran harian, hanya hari dan jenis keluar yang cocok.',
           lineExplanations: [
-            { line: 3, code: 'for hari, jenis, kategori, jumlah in transaksi:', explanation: 'Membuka tuple transaksi satu per satu.' },
+            { line: 4, code: 'for hari, jenis, kategori, jumlah in transaksi:', explanation: 'Membuka tuple transaksi satu per satu.' },
             { line: 5, code: 'if jenis == "masuk":', explanation: 'Jika pemasukan, tambahkan ke saldo.' },
-            { line: 8, code: 'return saldo', explanation: 'Kembalikan saldo akhir.' },
-            { line: 14, code: 'if hari == hari_ke and jenis == "keluar":', explanation: 'Hanya hitung pengeluaran pada hari yang diminta.' },
+            { line: 9, code: 'return saldo', explanation: 'Kembalikan saldo akhir.' },
+            { line: 16, code: 'if hari == hari_ke and jenis == "keluar":', explanation: 'Hanya hitung pengeluaran pada hari yang diminta.' },
           ],
         },
       ],

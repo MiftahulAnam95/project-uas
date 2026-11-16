@@ -7,11 +7,11 @@ export const PYTHON_ERRORS: PythonErrorGuide[] = [
     title: 'IndentationError: unexpected indent / expected an indented block',
     simpleMeaning:
       'Python bingung karena spasi di awal baris tidak rapi atau tidak sejajar. Di Python, spasi menentukan blok kode (anak kalimat).',
-    sampleBrokenCode: `def atur_anggaran(anggaran):
-jatah = anggaran // 30   # Salah! Tidak ada spasi masuk ke dalam fungsi
-return jatah`,
+    sampleBrokenCode: `def atur_uang_saku(uang_saku, jumlah_hari):
+jatah_harian = uang_saku / jumlah_hari   # Salah! Tidak ada spasi masuk ke dalam fungsi
+akun["jatah_harian"] = jatah_harian`,
     terminalOutput: `  File "pencatat.py", line 2
-    jatah = anggaran // 30
+    jatah_harian = uang_saku / jumlah_hari
     ^
 IndentationError: expected an indented block after function definition on line 1`,
     commonCauses: [
@@ -21,9 +21,9 @@ IndentationError: expected an indented block after function definition on line 1
     ],
     howToFix:
       'Pastikan setiap kode di dalam fungsi, if, atau perulangan menjorok ke dalam sebanyak 4 spasi (atau 1 tab konsisten). Gunakan tombol Shift + Tab jika ingin memajukan baris yang terlalu masuk.',
-    sampleFixedCode: `def atur_anggaran(anggaran):
-    jatah = anggaran // 30   # Benar! Menjorok 4 spasi ke dalam
-    return jatah`,
+    sampleFixedCode: `def atur_uang_saku(uang_saku, jumlah_hari):
+    jatah_harian = uang_saku / jumlah_hari   # Benar! Menjorok 4 spasi ke dalam
+    akun["jatah_harian"] = jatah_harian`,
     practiceSnippet: {
       question: 'Manakah cara perbaikan yang benar untuk kode di bawah ini?',
       buggyCode: `if jatah_harian > 0:
@@ -46,11 +46,12 @@ status = "Aman"`,
     title: 'SyntaxError: invalid syntax / unexpected EOF',
     simpleMeaning:
       'Penulisan tata bahasa Python salah atau ada tanda baca yang kurang/salah ketik, seperti kurang titik dua (:), kurung buka tanpa kurung tutup, atau tanda petik tertukar.',
-    sampleBrokenCode: `def hitung_saldo(anggaran, keluar)
-    return anggaran - keluar`,
-    terminalOutput: `  File "pencatat.py", line 1
-    def hitung_saldo(anggaran, keluar)
-                                     ^
+    sampleBrokenCode: `def tampil_menu()
+    bersihkan_layar()
+    judul_besar("PENCATAT KEUANGAN MAHASISWA")`,
+    terminalOutput: `  File "main.py", line 1
+    def tampil_menu()
+                    ^
 SyntaxError: expected ':'`,
     commonCauses: [
       'Lupa menuliskan tanda titik dua (:) di akhir pernyataan def, if, elif, else, while, atau for',
@@ -60,8 +61,9 @@ SyntaxError: expected ':'`,
     ],
     howToFix:
       'Periksa tanda panah merah (^) pada pesan error. Biasanya error terjadi tepat di tanda panah tersebut atau satu baris sebelumnya. Tambahkan tanda baca yang tertinggal.',
-    sampleFixedCode: `def hitung_saldo(anggaran, keluar):   # Ditambah titik dua (:)
-    return anggaran - keluar`,
+    sampleFixedCode: `def tampil_menu():   # Ditambah titik dua (:)
+    bersihkan_layar()
+    judul_besar("PENCATAT KEUANGAN MAHASISWA")`,
     practiceSnippet: {
       question: 'Apa kesalahan sintaks pada potongan kode berikut?',
       buggyCode: `print("Pengeluaran hari ini: " + str(total_keluar)`,
@@ -83,12 +85,12 @@ SyntaxError: expected ':'`,
     title: "NameError: name '...' is not defined",
     simpleMeaning:
       'Python dipanggil untuk menggunakan suatu variabel atau fungsi, tetapi nama tersebut belum pernah dibuat sebelumnya atau salah ketik huruf kapital.',
-    sampleBrokenCode: `anggaran_bulanan = 3000000
-print(Anggaran_bulanan)  # Salah ketik huruf kapital 'A'`,
+    sampleBrokenCode: `uang_saku = 3000000
+print(Uang_saku)  # Salah ketik huruf kapital 'U'`,
     terminalOutput: `  File "main.py", line 2, in <module>
-    print(Anggaran_bulanan)
-          ^^^^^^^^^^^^^^^^
-NameError: name 'Anggaran_bulanan' is not defined. Did you mean: 'anggaran_bulanan'?`,
+    print(Uang_saku)
+          ^^^^^^^^^
+NameError: name 'Uang_saku' is not defined. Did you mean: 'uang_saku'?`,
     commonCauses: [
       'Typo atau salah ketik huruf besar/kecil (Python sangat sensitif: Saldo beda dengan saldo)',
       'Memanggil variabel sebelum baris di mana variabel itu dibuat',
@@ -96,15 +98,15 @@ NameError: name 'Anggaran_bulanan' is not defined. Did you mean: 'anggaran_bulan
     ],
     howToFix:
       'Cek ejaan nama variabel. Pastikan huruf kapital dan kecil persis sama. Jika memanggil fungsi dari file lain, pastikan sudah ada perintah import di baris atas.',
-    sampleFixedCode: `anggaran_bulanan = 3000000
-print(anggaran_bulanan)  # Huruf kecil semua, cocok dengan deklarasi`,
+    sampleFixedCode: `uang_saku = 3000000
+print(uang_saku)  # Huruf kecil semua, cocok dengan deklarasi`,
     practiceSnippet: {
-      question: 'Mengapa kode `tambah_transaksi("Makan", 25000)` menghasilkan NameError di file main.py?',
+      question: 'Mengapa kode `tambah_pengeluaran(25000, "Makan")` menghasilkan NameError di file main.py?',
       buggyCode: `import pencatat
-tambah_transaksi("Makan", 25000)`,
+tambah_pengeluaran(25000, "Makan")`,
       options: [
         'Nilai 25000 harus berupa string',
-        'Fungsi harus dipanggil dengan awalan nama modulnya: pencatat.tambah_transaksi(...)',
+        'Fungsi harus dipanggil dengan awalan nama modulnya: pencatat.tambah_pengeluaran(...)',
         'Parameter kategori harus berupa huruf kapital semua',
         'Nama file harus diganti',
       ],
