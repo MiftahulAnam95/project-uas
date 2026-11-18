@@ -14,6 +14,9 @@ import { ProjectPage } from './pages/ProjectPage';
 import { useProgress } from './hooks/useProgress';
 import { ChapterId } from './types';
 import { CHAPTERS } from './data/lessons';
+import { cn } from './utils/cn';
+
+const SIDEBAR_COLLAPSED_KEY = 'uas_daftar_bab_collapsed_v1';
 
 export function App() {
   const {
@@ -34,6 +37,22 @@ export function App() {
     progress.lastVisitedChapter || 'bab-1'
   );
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Mode minimize/maximize untuk panel "Daftar Bab" di desktop (tersimpan di perangkat ini)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, sidebarCollapsed ? '1' : '0');
+    } catch {
+      // Abaikan bila localStorage tidak tersedia
+    }
+  }, [sidebarCollapsed]);
 
   // Sync with browser hash on initial load
   useEffect(() => {
@@ -134,13 +153,20 @@ export function App() {
             key={viewKey}
             className="mx-auto flex w-full max-w-7xl flex-1 gap-8 px-4 py-6 sm:px-6 lg:px-8 anim-fade"
           >
-            {/* Sidebar desktop */}
-            <div className="hidden w-72 shrink-0 lg:block">
+            {/* Sidebar desktop — bisa di-minimize agar area materi lebih lebar */}
+            <div
+              className={cn(
+                'hidden shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out lg:block',
+                sidebarCollapsed ? 'w-[4.75rem]' : 'w-72'
+              )}
+            >
               <div className="sticky top-[5.5rem] h-[calc(100vh-7.5rem)] overflow-hidden rounded-3xl border border-slate-200/80 bg-white/70 shadow-soft backdrop-blur-xl">
                 <Sidebar
                   currentChapterId={currentChapterId}
                   onSelectChapter={handleSelectChapter}
                   completedChapters={progress.completedChapters}
+                  collapsed={sidebarCollapsed}
+                  onToggleCollapsed={() => setSidebarCollapsed((v) => !v)}
                 />
               </div>
             </div>
