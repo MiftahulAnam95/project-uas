@@ -155,7 +155,7 @@ export const ChapterPage: React.FC<ChapterPageProps> = ({
       : 0;
 
   return (
-    <div className="mx-auto max-w-6xl pt-0 pb-4 sm:pb-8">
+    <div className="w-full pt-0 pb-4 sm:pb-8">
       {/* ======================= KEPALA BAB ======================= */}
       <PageHeader
         eyebrow={`Bab ${chapter.number} dari ${CHAPTERS.length} · Modul Resmi`}
