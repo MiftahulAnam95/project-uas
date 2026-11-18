@@ -153,14 +153,17 @@ export function App() {
             key={viewKey}
             className="mx-auto flex w-full max-w-7xl flex-1 gap-8 px-4 py-6 sm:px-6 lg:px-8 anim-fade"
           >
-            {/* Sidebar desktop — bisa di-minimize agar area materi lebih lebar */}
+            {/* Sidebar desktop — bisa di-minimize agar area materi lebih lebar.
+                Wrapper ini sendiri yang sticky (bukan elemen dalam), karena
+                overflow-hidden pada wrapper akan menjadikan wrapper sebagai
+                scroll container dan mendorong sticky di dalamnya ke bawah. */}
             <div
               className={cn(
-                'hidden shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out lg:block',
+                'sticky top-[5.5rem] hidden h-[calc(100vh-7.5rem)] shrink-0 self-start overflow-hidden transition-[width] duration-300 ease-in-out lg:block',
                 sidebarCollapsed ? 'w-[4.75rem]' : 'w-72'
               )}
             >
-              <div className="sticky top-[5.5rem] h-[calc(100vh-7.5rem)] overflow-hidden rounded-3xl border border-slate-200/80 bg-white/70 shadow-soft backdrop-blur-xl">
+              <div className="h-full overflow-hidden rounded-3xl border border-slate-200/80 bg-white/70 shadow-soft backdrop-blur-xl">
                 <Sidebar
                   currentChapterId={currentChapterId}
                   onSelectChapter={handleSelectChapter}
