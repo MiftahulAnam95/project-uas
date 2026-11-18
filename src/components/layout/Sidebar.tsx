@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, BookOpen, Sparkles } from 'lucide-react';
+import { Check, BookOpen, Sparkles, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { CHAPTERS } from '../../data/lessons';
 import { ChapterId } from '../../types';
 import { accentForChapter } from '../../theme/accents';
@@ -11,6 +11,10 @@ interface SidebarProps {
   onSelectChapter: (chapterId: ChapterId) => void;
   completedChapters: ChapterId[];
   className?: string;
+  /** Tampilkan mode ramping (ikon bab saja) — dipakai desktop */
+  collapsed?: boolean;
+  /** Dipanggil saat tombol minimize/maximize ditekan. Bila tidak diisi, tombol tidak tampil */
+  onToggleCollapsed?: () => void;
 }
 
 /** Daftar bab di sisi kiri: tiap bab punya warna identitas sendiri. */
@@ -19,10 +23,101 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectChapter,
   completedChapters,
   className = '',
+  collapsed = false,
+  onToggleCollapsed,
 }) => {
   const total = CHAPTERS.length;
   const done = completedChapters.length;
   const pct = Math.round((done / total) * 100);
+
+  // ---------- Mode ramping (minimized): hanya ikon bab ----------
+  if (collapsed) {
+    return (
+      <aside
+        className={cn(
+          'flex h-full flex-col items-center overflow-hidden bg-white/95 py-3 backdrop-blur-sm',
+          className
+        )}
+        aria-label="Daftar Bab (mode ramping)"
+      >
+        {/* Tombol maximize */}
+        <button
+          type="button"
+          onClick={onToggleCollapsed}
+          aria-label="Perbesar Daftar Bab"
+          aria-expanded={false}
+          title="Perbesar Daftar Bab"
+          className="group flex h-10 w-10 cursor-pointer items-center justify-center rounded-2xl border border-slate-200/80 bg-white text-slate-500 shadow-soft transition-all duration-200 hover:-translate-y-px hover:border-brand-200 hover:text-brand-600 hover:shadow-[0_10px_24px_-12px_rgba(106,90,232,0.55)]"
+        >
+          <PanelLeftOpen className="h-4.5 w-4.5 transition-transform duration-200 group-hover:scale-110" strokeWidth={2.2} />
+        </button>
+
+        {/* Cincin progres ringkas */}
+        <div className="mt-3" title={`Progres belajar: ${done} dari ${total} bab selesai (${pct}%)`}>
+          <ProgressRing
+            value={pct}
+            size={36}
+            stroke={4}
+            label={
+              <span className="text-[9px] font-extrabold tabular text-slate-700">
+                {pct}%
+              </span>
+            }
+          />
+        </div>
+
+        <div
+          aria-hidden="true"
+          className="my-3 h-px w-8 bg-gradient-to-r from-transparent via-slate-200 to-transparent"
+        />
+
+        {/* Daftar ikon bab */}
+        <nav className="thin-scrollbar flex flex-1 flex-col items-center gap-1.5 overflow-y-auto px-1.5 pb-1">
+          {CHAPTERS.map((chap) => {
+            const isCurrent = chap.id === currentChapterId;
+            const isDone = completedChapters.includes(chap.id);
+            const accent = accentForChapter(chap.number);
+
+            return (
+              <button
+                key={chap.id}
+                type="button"
+                onClick={() => onSelectChapter(chap.id)}
+                aria-current={isCurrent ? 'true' : undefined}
+                aria-label={`Bab ${chap.number} — ${chap.title}`}
+                title={`Bab ${chap.number} — ${chap.title}`}
+                className={cn(
+                  'flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-xl text-[11px] font-extrabold tabular transition-all duration-200',
+                  isDone
+                    ? 'bg-gradient-to-br from-emerald-500 to-teal-400 text-white shadow-[0_6px_14px_-6px_rgba(5,150,105,0.9)] hover:scale-110'
+                    : isCurrent
+                    ? cn(
+                        'scale-110 bg-gradient-to-br text-white shadow-md ring-2 ring-slate-900/10',
+                        accent.iconTile
+                      )
+                    : 'bg-slate-100 text-slate-500 hover:scale-110 hover:bg-slate-200 hover:text-slate-700'
+                )}
+              >
+                {isDone ? (
+                  <Check className="h-4 w-4" strokeWidth={3} />
+                ) : (
+                  chap.number
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Kaki: ringkasan jumlah */}
+        <div
+          className="mt-2 rounded-lg bg-slate-50 px-2 py-1 text-[9px] font-extrabold uppercase tracking-wider text-slate-400 tabular"
+          title={`${done} dari ${total} bab selesai`}
+        >
+          {done}/{total}
+        </div>
+      </aside>
+    );
+  }
 
   return (
     <aside
@@ -51,16 +146,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </p>
             </div>
           </div>
-          <ProgressRing
-            value={pct}
-            size={38}
-            stroke={4.5}
-            label={
-              <span className="text-[10px] font-extrabold tabular text-slate-700">
-                {done}/{total}
-              </span>
-            }
-          />
+          <div className="flex shrink-0 items-center gap-1.5">
+            <ProgressRing
+              value={pct}
+              size={38}
+              stroke={4.5}
+              label={
+                <span className="text-[10px] font-extrabold tabular text-slate-700">
+                  {done}/{total}
+                </span>
+              }
+            />
+            {onToggleCollapsed && (
+              <button
+                type="button"
+                onClick={onToggleCollapsed}
+                aria-label="Perkecil Daftar Bab"
+                aria-expanded={true}
+                title="Perkecil Daftar Bab — perlebar area materi"
+                className="group flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl border border-slate-200/80 bg-white/80 text-slate-400 transition-all duration-200 hover:-translate-y-px hover:border-brand-200 hover:text-brand-600 hover:shadow-[0_8px_18px_-10px_rgba(106,90,232,0.55)]"
+              >
+                <PanelLeftClose className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" strokeWidth={2.2} />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Bar progres tipis */}
