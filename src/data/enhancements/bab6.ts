@@ -1,4 +1,10 @@
 import { Chapter } from '../../types';
+import mainCode from '../project/main.py?raw';
+
+/** Potongan main.py dari daftar MENU sampai akhir tampil_menu(), persis file asli. */
+const MENU_DAN_TAMPIL_MENU = mainCode
+  .slice(mainCode.indexOf('# Daftar menu'), mainCode.indexOf('def setup_awal'))
+  .trimEnd();
 
 export const bab6: Partial<Chapter> = {
   openingAnalogy:
@@ -74,24 +80,20 @@ Menu yang tersedia:
       codeSnippets: [
         {
           id: 'kode-tampil-menu',
-          title: 'Struktur menu utama',
+          title: 'MENU dan fungsi tampil_menu()',
           filename: 'main.py',
-          code: `# Daftar menu: list berisi tuple (nomor, tulisan)
-MENU = [
-    ("1", "Catat pengeluaran"),
-    ("2", "Catat pemasukan"),
-    ("3", "Cek saldo dan peringatan"),
-    ("4", "Riwayat transaksi"),
-    ("5", "Laporan per kategori"),
-    ("6", "Lanjut ke hari berikutnya"),
-    ("7", "Atur ulang anggaran"),
-    ("0", "Keluar"),
-]`,
+          code: MENU_DAN_TAMPIL_MENU,
           explanation:
-            'MENU adalah list of tuple. Setiap tuple berisi nomor menu dan nama menu. Loop for nomor, nama in MENU mencetak semuanya.',
+            'Ini potongan main.py yang sama persis dengan file aslinya: MENU adalah list of tuple berisi nomor dan nama menu, lalu tampil_menu() mencetak judul, saldo, jatah harian, dan kotak menu memakai loop for nomor, nama in MENU.',
           lineExplanations: [
             { line: 2, code: 'MENU = [', explanation: 'List berisi pasangan nomor dan nama menu.' },
             { line: 3, code: '("1", "Catat pengeluaran"),', explanation: 'Tuple pertama: nomor "1" dan nama menu.' },
+            { line: 14, code: 'def tampil_menu():', explanation: 'Fungsi yang dipanggil setiap kali menu utama ditampilkan.' },
+            { line: 15, code: 'bersihkan_layar()', explanation: 'Membersihkan terminal sebelum menggambar menu baru.' },
+            { line: 18, code: 'saldo = hitung_saldo()', explanation: 'Saldo dihitung ulang dari seluruh transaksi.' },
+            { line: 24, code: 'print("  " + warna("Hari ke-" + str(akun["hari"]) + " dari " + str(akun["jumlah_hari"]), "kuning", True)', explanation: 'Mencetak hari aktif, saldo, dan jatah harian dalam satu baris berwarna.' },
+            { line: 31, code: 'for nomor, nama in MENU:', explanation: 'Setiap tuple di MENU diubah menjadi satu baris menu berwarna.' },
+            { line: 33, code: 'kotak("MENU", baris)', explanation: 'Semua baris menu dicetak di dalam kotak.' },
           ],
         },
       ],
