@@ -100,3 +100,20 @@ test('semua potongan kode proyek sama dengan file asli', () => {
 
   assert.deepEqual(masalah, [], `Kode materi berbeda dari file asli:\n\n${masalah.join('\n\n')}`);
 });
+
+test('source code utama ditampilkan lengkap, bukan terpotong', () => {
+  const bab3 = chapters.find((chapter) => chapter.id === 'bab-3');
+  const langkah9 = bab3.sections.find((section) => section.id === 'langkah-9-import');
+  const pencatat = langkah9.codeSnippets.find((snippet) => snippet.id === 'contoh-modul-pencatat');
+  assert.equal(
+    pencatat.code.trim(),
+    readFileSync(path.join(root, 'src/data/project/pencatat.py'), 'utf8').trim(),
+    'Kode pencatat.py di Bab 3 harus sama dengan isi file aslinya'
+  );
+
+  const bab6 = chapters.find((chapter) => chapter.id === 'bab-6');
+  const menu = bab6.sections.find((section) => section.id === 'menu-utama');
+  const snippetMenu = menu.codeSnippets.find((snippet) => snippet.id === 'kode-tampil-menu');
+  assert.match(snippetMenu.code, /def tampil_menu\(\):/);
+  assert.match(snippetMenu.code, /kotak\("MENU", baris\)/);
+});
