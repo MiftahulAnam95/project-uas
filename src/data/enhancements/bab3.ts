@@ -1,5 +1,10 @@
 import { Chapter, ChapterSection, TraceTableData } from '../../types';
 import { CHAPTERS as BASE } from '../lessonsBase';
+import pencatatCode from '../project/pencatat.py?raw';
+import mainCode from '../project/main.py?raw';
+
+/** Potongan awal main.py (komentar + import) diambil langsung dari file asli. */
+const MAIN_HEADER = mainCode.slice(0, mainCode.indexOf('# Daftar menu')).trim();
 
 const baseBab3 = BASE.find((c) => c.id === 'bab-3')!;
 
@@ -7,12 +12,28 @@ const PROJECT_BY_STEP: Record<string, ChapterSection['projectConnection']> = {
   'langkah-1-print': {
     file: 'main.py',
     note: 'print() dipakai di mana-mana: judul menu, saldo, jatah harian, dan pesan [OK]/[X]. Di laporan.py, print() dipakai untuk mencetak tabel dan kotak.',
-    code: `print("  Hari ke-" + str(akun["hari"]) + " dari " + str(akun["jumlah_hari"]))`,
+    code: `print("  " + warna("Hari ke-" + str(akun["hari"]) + " dari " + str(akun["jumlah_hari"]), "kuning", True)
+      + warna("   │   ", "abu") + "Saldo " + warna(format_rupiah(saldo), warna_saldo, True)
+      + warna("   │   ", "abu") + "Jatah " + warna(format_rupiah(akun["jatah_harian"]), "putih", True))`,
   },
   'langkah-2-variabel': {
     file: 'pencatat.py',
-    note: 'Data program disimpan dalam dictionary akun dan list transaksi. Dictionary menyimpan label, list menyimpan banyak catatan.',
-    code: `akun = {"uang_saku": 0, "jumlah_hari": 30, "jatah_harian": 0.0, "hari": 1}\ntransaksi = []`,
+    note: 'Data program disimpan di KATEGORI (tuple), akun (dictionary), dan transaksi (list). Dictionary menyimpan label, list menyimpan banyak catatan.',
+    code: `# Tuple kategori pengeluaran (isinya tetap, jadi pakai tuple)
+KATEGORI = ("Makan", "Transport", "Kuota", "Kuliah/Tugas", "Hiburan", "Lainnya")
+
+# Data akun disimpan di dictionary
+akun = {
+    "uang_saku": 0,
+    "jumlah_hari": 30,
+    "jatah_harian": 0.0,
+    "hari": 1,
+}
+
+# Semua transaksi disimpan di list
+# Isi tiap transaksi berupa tuple: (hari, jenis, kategori, jumlah)
+# jenis = "masuk" atau "keluar"
+transaksi = []`,
   },
   'langkah-3-input': {
     file: 'laporan.py',
@@ -21,33 +42,68 @@ const PROJECT_BY_STEP: Record<string, ChapterSection['projectConnection']> = {
   },
   'langkah-4-operator': {
     file: 'pencatat.py',
-    note: 'Jatah harian dihitung dengan pembagian biasa, lalu format_rupiah() merapikan angka. Saldo dihitung dengan penjumlahan dan pengurangan.',
-    code: `akun["jatah_harian"] = uang_saku / jumlah_hari\nsaldo = 0\nfor hari, jenis, kategori, jumlah in transaksi:\n    if jenis == "masuk":\n        saldo += jumlah\n    else:\n        saldo -= jumlah`,
+    note: 'Jatah harian dihitung dengan pembagian biasa, lalu format_rupiah() merapikan angka. Penjumlahan dan pengurangan saldo ada di hitung_saldo().',
+    code: `akun["uang_saku"] = uang_saku
+akun["jumlah_hari"] = jumlah_hari
+akun["jatah_harian"] = uang_saku / jumlah_hari
+akun["hari"] = 1`,
   },
   'langkah-5-percabangan': {
     file: 'laporan.py',
     note: 'Status harian AMAN / HATI-HATI / BOROS ditentukan oleh if-elif-else di cek_peringatan().',
-    code: `if keluar_hari_ini > jatah:\n    judul_status = "BOROS!"\nelif keluar_hari_ini >= 0.8 * jatah:\n    judul_status = "HATI-HATI"\nelse:\n    judul_status = "AMAN"`,
+    code: `if keluar_hari_ini > jatah:
+    warna_status = "merah"
+    judul_status = "BOROS!"
+    isi_status = "Kamu sudah lebih " + format_rupiah(keluar_hari_ini - jatah) + " dari jatah hari ini."
+elif keluar_hari_ini >= 0.8 * jatah:
+    warna_status = "kuning"
+    judul_status = "HATI-HATI"
+    isi_status = "Pengeluaran hari ini hampir habis jatah."
+else:
+    warna_status = "hijau"
+    judul_status = "AMAN"
+    isi_status = "Pengeluaran hari ini masih aman."`,
   },
   'langkah-6-wadah-data': {
     file: 'pencatat.py',
     note: 'Satu transaksi disimpan sebagai tuple (hari, jenis, kategori, jumlah). Semua transaksi disimpan dalam list. Di laporan.py, list ini ditampilkan sebagai tabel.',
-    code: `transaksi.append((akun["hari"], "keluar", kategori, jumlah))\nfor hari, jenis, kategori, jumlah in transaksi:\n    print(hari, jenis, kategori, jumlah)`,
+    code: `def tambah_pengeluaran(jumlah, kategori):
+    """Catat uang keluar sesuai kategori."""
+    transaksi.append((akun["hari"], "keluar", kategori, jumlah))`,
   },
   'langkah-7-perulangan': {
     file: 'laporan.py',
     note: 'Loop dipakai untuk menjumlahkan transaksi, menampilkan riwayat, dan menghitung total per kategori.',
-    code: `for hari, jenis, kategori, jumlah in transaksi:\n    if jenis == "keluar":\n        total[kategori] += jumlah`,
+    code: `total = {}
+for hari, jenis, kategori, jumlah in transaksi:
+    if jenis == "keluar":
+        if kategori in total:
+            total[kategori] += jumlah
+        else:
+            total[kategori] = jumlah`,
   },
   'langkah-8-fungsi': {
     file: 'pencatat.py',
     note: 'hitung_saldo() dan pengeluaran_hari() adalah fungsi yang mengembalikan angka. Fungsi lain di laporan.py dan main.py memanggilnya.',
-    code: `def hitung_saldo():\n    saldo = 0\n    for hari, jenis, kategori, jumlah in transaksi:\n        if jenis == "masuk":\n            saldo += jumlah\n        else:\n            saldo -= jumlah\n    return saldo`,
+    code: `def hitung_saldo():
+    """Saldo = total pemasukan - total pengeluaran."""
+    saldo = 0
+    for hari, jenis, kategori, jumlah in transaksi:
+        if jenis == "masuk":
+            saldo += jumlah
+        else:
+            saldo -= jumlah
+    return saldo`,
   },
   'langkah-9-import': {
     file: 'main.py',
     note: 'main.py mengimpor tiga modul: pencatat, laporan, dan tampilan. laporan.py juga mengimpor pencatat dan tampilan.',
-    code: `from pencatat import KATEGORI, akun, format_rupiah, atur_uang_saku\nfrom laporan import baca_angka, baca_pilihan, cek_peringatan\nfrom tampilan import warna, bersihkan_layar, judul_besar, kotak, bar`,
+    code: `from pencatat import (KATEGORI, akun, format_rupiah, atur_uang_saku,
+                      tambah_pemasukan, tambah_pengeluaran, hitung_saldo)
+from laporan import (baca_angka, baca_pilihan, cek_peringatan,
+                     tampil_riwayat, laporan_kategori)
+from tampilan import (warna, bersihkan_layar, judul_besar, judul_bagian, kotak, bar,
+                      pesan_ok, pesan_error, pesan_info, tunggu)`,
   },
 };
 
@@ -160,12 +216,43 @@ const TRACE_LOOP: TraceTableData = {
 export const bab3: Partial<Chapter> = {
   openingAnalogy:
     'Bayangkan kamu baru pertama kali masuk dapur kantin. Ada sembilan alat: pengeras suara (print), stoples berlabel (variabel), slip pesanan (input), kalkulator (operator), papan keputusan (if/else), rak map (list & dict), daftar tugas berulang (loop), resep (fungsi), dan colokan listrik (import). Hari ini kita cuma memakai satu alat per langkah, tidak semuanya sekaligus.',
-  sections: baseBab3.sections.map((section) => ({
-    ...section,
-    projectConnection: PROJECT_BY_STEP[section.id],
-    ...(section.id === 'langkah-5-percabangan' ? { traceTable: TRACE_IF } : {}),
-    ...(section.id === 'langkah-7-perulangan' ? { traceTable: TRACE_LOOP } : {}),
-  })),
+  sections: baseBab3.sections.map((section) => {
+    const next: ChapterSection = {
+      ...section,
+      projectConnection: PROJECT_BY_STEP[section.id],
+      ...(section.id === 'langkah-5-percabangan' ? { traceTable: TRACE_IF } : {}),
+      ...(section.id === 'langkah-7-perulangan' ? { traceTable: TRACE_LOOP } : {}),
+    };
+
+    // Langkah 9 menampilkan kode sumber proyek. Ambil langsung dari file asli
+    // supaya isi yang tampil tidak pernah berbeda dengan proyek akhir.
+    if (section.id === 'langkah-9-import' && section.codeSnippets) {
+      next.codeSnippets = section.codeSnippets.map((snippet) => {
+        if (snippet.id === 'contoh-modul-pencatat') {
+          return {
+            ...snippet,
+            title: 'Isi lengkap pencatat.py',
+            code: pencatatCode.trim(),
+            explanation:
+              'Ini isi lengkap pencatat.py yang dipakai proyek: KATEGORI, akun, dan transaksi di bagian atas, lalu semua fungsi data dan perhitungan di bawahnya. Saat dijalankan sendiri, file ini tidak mencetak apa pun karena belum ada perintah print.',
+          };
+        }
+        if (snippet.id === 'contoh-modul-main') {
+          return {
+            ...snippet,
+            title: 'Bagian awal main.py: komentar dan import',
+            code: MAIN_HEADER,
+            output: `(Tidak ada output — potongan ini hanya berisi komentar dan import. Fungsi menu dan main() dibahas di Bab 6.)`,
+            explanation:
+              'Potongan awal main.py di atas sama persis dengan file aslinya. File ini tidak menyimpan data sendiri: data dan fungsi diimpor dari pencatat.py, laporan.py, dan tampilan.py, lalu dipakai oleh fungsi menu di bawahnya.',
+          };
+        }
+        return snippet;
+      });
+    }
+
+    return next;
+  }),
   cheatSheet: {
     title: 'Cheat Sheet Bab 3 — Sembilan Langkah Dasar',
     items: [

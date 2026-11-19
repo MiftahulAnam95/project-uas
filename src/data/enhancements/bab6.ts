@@ -107,7 +107,10 @@ MENU = [
       projectConnection: {
         file: 'main.py',
         note: 'MENU dipakai di tampil_menu() dan di loop utama main().',
-        code: `for nomor, nama in MENU:\n    print("[" + nomor + "] " + nama)`,
+        code: `baris = []
+for nomor, nama in MENU:
+    baris.append(warna("[" + nomor + "]", "cyan", True) + "  " + nama)
+kotak("MENU", baris)`,
       },
     },
     {
@@ -169,8 +172,8 @@ Jika \`ulang=True\`, ditambahkan peringatan bahwa catatan lama akan dihapus.`,
         'Lupa import atur_uang_saku dari pencatat.py.',
       ],
       projectConnection: {
-        file: 'pencatat.py',
-        note: 'setup_awal() memanggil atur_uang_saku() yang menulis ke akun dan transaksi.',
+        file: 'main.py',
+        note: 'setup_awal() memanggil atur_uang_saku() yang menulis ke akun dan transaksi di pencatat.py.',
         code: `atur_uang_saku(uang_saku, jumlah_hari)`,
       },
     },
@@ -229,8 +232,8 @@ Jika \`ulang=True\`, ditambahkan peringatan bahwa catatan lama akan dihapus.`,
         'Lupa memanggil cek_peringatan() setelah mencatat pengeluaran.',
       ],
       projectConnection: {
-        file: 'pencatat.py',
-        note: 'tambah_pengeluaran() dan tambah_pemasukan() menambah tuple ke list transaksi.',
+        file: 'main.py',
+        note: 'tambah_pengeluaran() dan tambah_pemasukan() menambah tuple ke list transaksi di pencatat.py.',
         code: `tambah_pengeluaran(jumlah, KATEGORI[pilihan - 1])`,
       },
     },
@@ -322,7 +325,11 @@ main()`,
       projectConnection: {
         file: 'main.py',
         note: 'main() adalah loop utama yang menghubungkan semua modul.',
-        code: `if pilihan == "0":\n    break`,
+        code: `elif pilihan == "0":
+    bersihkan_layar()
+    kotak("SAMPAI JUMPA", ["Terima kasih sudah memakai aplikasi ini.",
+                           "Semoga keuangannya aman sampai akhir bulan!"], "hijau")
+    break`,
       },
     },
   ],
