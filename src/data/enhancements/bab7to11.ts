@@ -72,9 +72,11 @@ MENU = [
           'Transaksi lama tidak hilang saat hari berganti.',
         ],
         projectConnection: {
-          file: 'pencatat.py',
-          note: 'Transaksi dan anggaran diubah oleh fungsi di pencatat.py; hari aktif dinaikkan di main.py.',
-          code: `akun["hari"] += 1\ntransaksi.append((akun["hari"], "keluar", kategori, jumlah))`,
+          file: 'main.py',
+          note: 'Hari aktif dinaikkan di main.py lewat hari_berikutnya(); transaksi baru ditambahkan lewat fungsi di pencatat.py.',
+          code: `akun["hari"] += 1
+pesan_ok("Masuk ke hari ke-" + str(akun["hari"]) + ".")
+pesan_info("Jatah hari ini: " + warna(format_rupiah(akun["jatah_harian"]), "kuning", True))`,
         },
       },
       {
@@ -124,7 +126,11 @@ print(pengeluaran_hari(1))`,
         projectConnection: {
           file: 'laporan.py',
           note: 'laporan.py membaca state untuk menampilkan ringkasan dan status.',
-          code: `saldo = hitung_saldo()\nkeluar_hari_ini = pengeluaran_hari(akun["hari"])`,
+          code: `saldo = hitung_saldo()
+hari = akun["hari"]
+jatah = akun["jatah_harian"]
+anggaran = akun["uang_saku"]
+keluar_hari_ini = pengeluaran_hari(hari)`,
         },
       },
     ],
@@ -407,7 +413,8 @@ def baca_angka(pesan):
         projectConnection: {
           file: 'laporan.py',
           note: 'baca_angka() dan baca_pilihan() memakai try/except ValueError.',
-          code: `except ValueError:\n    pesan_error("Input salah, masukkan angka bulat lebih dari 0 ya.")`,
+          code: `except ValueError:
+    pesan_error("Input salah, masukkan angka bulat lebih dari 0 ya (contoh: 15000).")`,
         },
       },
     ],
@@ -563,9 +570,14 @@ def baca_angka(pesan):
           'Setelah menambah kategori, uji menu 1 di main.py.',
         ],
         projectConnection: {
-          file: 'pencatat.py',
+          file: 'main.py',
           note: 'KATEGORI dipakai oleh main.py untuk menampilkan pilihan kategori.',
-          code: `for nama in KATEGORI:\n    print(nama)`,
+          code: `baris = []
+nomor = 1
+for nama in KATEGORI:
+    baris.append(warna("[" + str(nomor) + "]", "cyan", True) + "  " + nama)
+    nomor += 1
+kotak("PILIH KATEGORI", baris)`,
         },
       },
       {
@@ -663,8 +675,7 @@ Fungsi ini bisa dipanggil dari \`laporan.py\` atau \`main.py\`.`,
         ],
         projectConnection: {
           file: 'pencatat.py',
-          note: 'total_masuk() melengkapi hitung_saldo() dan pengeluaran_hari().',
-          code: `from pencatat import total_masuk\nprint(total_masuk())`,
+          note: 'total_masuk() nanti ditambahkan ke pencatat.py. Fungsinya melengkapi hitung_saldo() dan pengeluaran_hari() yang sudah ada.',
         },
       },
     ],

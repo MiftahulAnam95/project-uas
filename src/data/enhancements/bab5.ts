@@ -123,9 +123,10 @@ Caranya:
         'Menulis except tanpa ValueError; semua error ikut tertangkap dan menyembunyikan bug lain.',
       ],
       projectConnection: {
-        file: 'laporan.py',
+        file: 'main.py',
         note: 'baca_angka() dipanggil di setup_awal(), menu_pengeluaran(), dan menu_pemasukan() pada main.py.',
-        code: `uang_saku = baca_angka("  ► Anggaran sebulan (Rp)  : ")\njumlah_hari = baca_angka("  ► Jumlah hari sebulan    : ")`,
+        code: `uang_saku = baca_angka("  ► Anggaran sebulan (Rp)  : ")
+jumlah_hari = baca_angka("  ► Jumlah hari sebulan    : ")`,
       },
     },
     {

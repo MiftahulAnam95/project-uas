@@ -82,7 +82,11 @@ transaksi = []`,
       projectConnection: {
         file: 'pencatat.py',
         note: 'Data ini dipakai oleh laporan.py untuk membuat tabel dan oleh main.py untuk menampilkan menu.',
-        code: `akun["uang_saku"]\nakun["jatah_harian"]\ntransaksi`,
+        code: `akun["uang_saku"] = uang_saku
+akun["jumlah_hari"] = jumlah_hari
+akun["jatah_harian"] = uang_saku / jumlah_hari
+akun["hari"] = 1
+transaksi.append((1, "masuk", "Anggaran", uang_saku))`,
       },
     },
     {
@@ -149,9 +153,11 @@ transaksi = []`,
         'Lupa transaksi.clear() sehingga data lama tercampur data baru.',
       ],
       projectConnection: {
-        file: 'pencatat.py',
-        note: 'format_rupiah() dipakai di laporan.py dan main.py. atur_uang_saku() dipanggil dari setup_awal() di main.py.',
-        code: `from pencatat import atur_uang_saku, format_rupiah\natur_uang_saku(3000000, 30)\nprint(format_rupiah(akun["jatah_harian"]))`,
+        file: 'main.py',
+        note: 'atur_uang_saku() dipanggil dari setup_awal() di main.py setelah anggaran dan jumlah hari dibaca. Hasil jatah harian lalu dicetak dengan format_rupiah().',
+        code: `uang_saku = baca_angka("  ► Anggaran sebulan (Rp)  : ")
+jumlah_hari = baca_angka("  ► Jumlah hari sebulan    : ")
+atur_uang_saku(uang_saku, jumlah_hari)`,
       },
     },
     {
@@ -196,9 +202,11 @@ def tambah_pengeluaran(jumlah, kategori):
         'Lupa menyertakan akun["hari"] sehingga transaksi tidak punya hari.',
       ],
       projectConnection: {
-        file: 'pencatat.py',
-        note: 'Dipanggil dari menu_pengeluaran() dan menu_pemasukan() di main.py.',
-        code: `tambah_pengeluaran(15000, "Makan")\ntambah_pemasukan(500000, "Honor")`,
+        file: 'main.py',
+        note: 'tambah_pengeluaran() dipanggil dari menu_pengeluaran() dan tambah_pemasukan() dari menu_pemasukan() di main.py.',
+        code: `pilihan = baca_pilihan("  ► Nomor kategori          : ", len(KATEGORI))
+jumlah = baca_angka("  ► Jumlah pengeluaran (Rp) : ")
+tambah_pengeluaran(jumlah, KATEGORI[pilihan - 1])`,
       },
     },
     {
@@ -256,7 +264,11 @@ def pengeluaran_hari(hari_ke):
       projectConnection: {
         file: 'laporan.py',
         note: 'cek_peringatan() memanggil hitung_saldo() dan pengeluaran_hari() untuk menentukan status.',
-        code: `saldo = hitung_saldo()\nkeluar_hari_ini = pengeluaran_hari(akun["hari"])`,
+        code: `saldo = hitung_saldo()
+hari = akun["hari"]
+jatah = akun["jatah_harian"]
+anggaran = akun["uang_saku"]
+keluar_hari_ini = pengeluaran_hari(hari)`,
       },
     },
   ],

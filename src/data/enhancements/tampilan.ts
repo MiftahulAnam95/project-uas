@@ -71,9 +71,10 @@ except Exception:
         'Warna hanya muncul di terminal sungguhan, bukan di IDLE atau file teks.',
       ],
       projectConnection: {
-        file: 'tampilan.py',
+        file: 'laporan.py',
         note: 'Dipakai oleh laporan.py dan main.py. File ini tidak dijalankan sendiri saat program utama berjalan.',
-        code: `from tampilan import warna, kotak, bar, judul_besar`,
+        code: `from tampilan import (warna, kotak, bar, persen, baris_nilai, judul_bagian,
+                      pesan_error, pesan_info, garis_tabel, baris_tabel)`,
       },
     },
     {
@@ -182,7 +183,10 @@ def warna(teks, nama, tebal=False):
       projectConnection: {
         file: 'laporan.py',
         note: 'warna() dipakai untuk mewarnai status, saldo, dan tabel.',
-        code: `warna(format_rupiah(saldo), "hijau", True)`,
+        code: `if jenis == "masuk":
+    masuk = warna(format_rupiah(jumlah), "hijau")
+    keluar = warna("-", "abu")
+    total_masuk += jumlah`,
       },
     },
     {
@@ -273,7 +277,7 @@ print("Kanan".rjust(20) + "|")`,
         'Menggunakan karakter kotak di terminal lama yang tidak mendukung UTF-8; muncul karakter aneh.',
       ],
       projectConnection: {
-        file: 'tampilan.py',
+        file: 'main.py',
         note: 'judul_besar() dan kotak() memakai karakter bingkai. main.py memanggil judul_besar() di menu.',
         code: `judul_besar("PENCATAT KEUANGAN MAHASISWA", "Catat, pantau, dan hemat uang bulananmu")`,
       },
@@ -431,7 +435,7 @@ Langkah kerjanya:
       projectConnection: {
         file: 'laporan.py',
         note: 'bar() dipakai untuk saldo, pengeluaran hari ini, perjalanan bulan, dan laporan kategori.',
-        code: `bar(saldo, anggaran, 34, warna_saldo)\nbar(keluar_hari_ini, jatah, 34)`,
+        code: `"  " + bar(saldo, anggaran, 34, warna_saldo) + " " + str(persen(saldo, anggaran)) + "% dari anggaran",`,
       },
     },
     {
@@ -519,7 +523,14 @@ def baris_tabel(isi, lebar_kolom, rata):
       projectConnection: {
         file: 'laporan.py',
         note: 'kotak() dipakai untuk ringkasan dan status; garis_tabel() dan baris_tabel() dipakai di tampil_riwayat().',
-        code: `kotak("RINGKASAN", [baris_nilai("Saldo sekarang", format_rupiah(saldo))])\ngaris_tabel(lebar, "┌", "┬", "┐")\nbaris_tabel([str(nomor), str(hari), kategori[:15], masuk, keluar], lebar, rata)`,
+        code: `lebar = [3, 4, 15, 13, 13]
+rata = ["kanan", "kanan", "kiri", "kanan", "kanan"]
+
+garis_tabel(lebar, "┌", "┬", "┐")
+baris_tabel([warna("No", "cyan", True), warna("Hari", "cyan", True),
+             warna("Keterangan", "cyan", True), warna("Masuk", "cyan", True),
+             warna("Keluar", "cyan", True)], lebar, rata)
+garis_tabel(lebar, "├", "┼", "┤")`,
       },
     },
     {
@@ -719,7 +730,14 @@ print("os.name:", __import__("os").name)`,
       projectConnection: {
         file: 'tampilan.py',
         note: 'Bagian atas tampilan.py sudah menyiapkan UTF-8 dan ANSI untuk Windows.',
-        code: `if os.name == "nt":\n    os.system("")\ntry:\n    sys.stdout.reconfigure(encoding="utf-8")\nexcept Exception:\n    pass`,
+        code: `if os.name == "nt":
+    os.system("")
+
+# Pakai UTF-8 supaya karakter kotak dan batang tampil dengan benar
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except Exception:
+    pass`,
       },
     },
   ],
